@@ -7,7 +7,7 @@ export class AppController {
     }
 
     @Get()
-    rootPath() {
+    getHealthcheck() {
         return `Healthcheck Ok`;
     }
 
