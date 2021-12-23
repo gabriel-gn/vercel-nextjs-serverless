@@ -5,7 +5,6 @@
 /.pnp
 .pnp.js
 /.idea
-dist/
 
 # testing
 /coverage
