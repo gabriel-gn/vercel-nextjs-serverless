@@ -42,6 +42,7 @@ export class AppService {
         const decodedDeck: Deck = getDeckFromCode(deckCode);
         const finalDeck: { card: any, count: number }[] = decodedDeck.map(card => {
           return {
+            card: cards.find(lorCard => lorCard.cardCode === card.cardCode),
             count: card.count
           };
         });
