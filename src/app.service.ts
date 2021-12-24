@@ -6,7 +6,8 @@ import {
   Deck
 } from "lor-deckcodes-ts";
 import { from, map, Observable } from "rxjs";
-import { Card, DeckCard } from "./models";
+import { Card, DeckCard, LoRDeck } from "./models";
+import { DeckFormat } from "./deck-format-utils";
 
 @Injectable()
 export class AppService {
@@ -51,6 +52,14 @@ export class AppService {
         return finalDeck;
       })
     )
+    ;
+  }
+
+  public getLoRDeck(deckCode: string): Observable<LoRDeck> {
+    return this.getDeckByCode(deckCode)
+    .pipe(map(deck => {
+      return DeckFormat.cardArrayToLorDeck(deck);
+    }))
     ;
   }
 }

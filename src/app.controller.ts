@@ -13,6 +13,6 @@ export class AppController {
 
     @Get('deck/:deckCode')
     async getDeckByCode(@Param('deckCode') deckCode: string) {
-        return this.appService.getDeckByCode(deckCode);
+        return this.appService.getLoRDeck(deckCode);
     }
 }
