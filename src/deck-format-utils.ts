@@ -151,7 +151,7 @@ export class DeckFormat {
       deck.mainFactions.push(_.difference(deck.factions, deck.mainFactions)[0]);
     }
     Object.keys(deck.cards).forEach(key => {
-      deck.cards[key] = _.sortBy(deck.cards[key], "cost");
+      deck.cards[key] = _.sortBy(deck.cards[key], "card.cost");
       deck.cards[key].forEach(card => {
         deck.factionCardsQt[DeckFormat.getCardMainRegionRef(card.card, deck.mainFactions)] += card.count;
       });
