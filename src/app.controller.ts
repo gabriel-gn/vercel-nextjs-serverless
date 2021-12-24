@@ -12,7 +12,7 @@ export class AppController {
     }
 
     @Get('deck/:deckCode')
-    getDeckByCode(@Param('deckCode') deckCode: string): { card: any, count: number }[] {
+    async getDeckByCode(@Param('deckCode') deckCode: string) {
         return this.appService.getDeckByCode(deckCode);
     }
 }

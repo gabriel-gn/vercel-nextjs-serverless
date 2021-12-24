@@ -1,30 +1,51 @@
-import {Injectable} from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
-    getCodeFromDeck,
-    getDeckFromCode,
-    CardCodeAndCount,
-    Deck
-} from 'lor-deckcodes-ts';
+  getCodeFromDeck,
+  getDeckFromCode,
+  CardCodeAndCount,
+  Deck
+} from "lor-deckcodes-ts";
+import { from, map, Observable } from "rxjs";
 
 @Injectable()
 export class AppService {
-    private cards;
-    constructor() {
-        const set1 = require('./assets/en_us/set1-en_us.json');
-        const set2 = require('./assets/en_us/set2-en_us.json');
-        const set3 = require('./assets/en_us/set3-en_us.json');
-        const set4 = require('./assets/en_us/set4-en_us.json');
-        this.cards = [...set1, ...set2, ...set3, ...set4];
-    }
+  constructor() {
+  }
 
-    getDeckByCode(deckCode: string): { card: any, count: number }[] {
+  getCards(): Observable<any[]> {
+    return from(
+      Promise.allSettled([
+        require("./assets/en_us/set1-en_us.json"),
+        require("./assets/en_us/set2-en_us.json"),
+        require("./assets/en_us/set3-en_us.json"),
+        require("./assets/en_us/set4-en_us.json")
+      ])
+    )
+    .pipe(
+      map((response) => {
+        let cards = [];
+        response.forEach(resolved => {
+          cards = [...cards, ...resolved['value']];
+        });
+        return cards;
+      })
+    );
+  }
+
+  getDeckByCode(deckCode: string): Observable<{ card: any, count: number }[]> {
+    return this.getCards()
+    .pipe(
+      map(cards => {
         const decodedDeck: Deck = getDeckFromCode(deckCode);
         const finalDeck: { card: any, count: number }[] = decodedDeck.map(card => {
-            return {
-                card: this.cards.find(lorCard => lorCard.cardCode === card.cardCode),
-                count: card.count
-            }
-        })
+          return {
+            card: cards.find(lorCard => lorCard.cardCode === card.cardCode),
+            count: card.count
+          };
+        });
         return finalDeck;
-    }
+      })
+    )
+    ;
+  }
 }
