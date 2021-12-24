@@ -15,4 +15,9 @@ export class AppController {
     async getDeckByCode(@Param('deckCode') deckCode: string) {
         return this.appService.getLoRDeck(deckCode);
     }
+
+    @Get('meta')
+    async getMetaDecks() {
+        return this.appService.getMetaDecks();
+    }
 }

@@ -5,13 +5,16 @@ import {
   CardCodeAndCount,
   Deck
 } from "lor-deckcodes-ts";
-import { from, map, Observable } from "rxjs";
-import { Card, DeckCard, LoRDeck } from "./models";
+import { from, map, Observable, pluck, forkJoin, catchError, throwError, concatMap } from "rxjs";
+import { Card, DeckCard, LoRDeck, MobalyticsMetaDeck } from "./models";
 import { DeckFormat } from "./deck-format-utils";
+import { HttpService } from "@nestjs/axios";
 
 @Injectable()
 export class AppService {
-  constructor() {
+  constructor(
+    private http: HttpService
+  ) {
   }
 
   private getCards(): Observable<Card[]> {
@@ -38,7 +41,7 @@ export class AppService {
     ;
   }
 
-  public getDeckByCode(deckCode: string): Observable<DeckCard[]> {
+  public getDeckCardsByCode(deckCode: string): Observable<DeckCard[]> {
     return this.getCards()
     .pipe(
       map(cards => {
@@ -56,10 +59,36 @@ export class AppService {
   }
 
   public getLoRDeck(deckCode: string): Observable<LoRDeck> {
-    return this.getDeckByCode(deckCode)
-    .pipe(map(deck => {
-      return DeckFormat.cardArrayToLorDeck(deck);
-    }))
+    return this.getDeckCardsByCode(deckCode)
+    .pipe(
+      map(deck => {
+        return DeckFormat.cardArrayToLorDeck(deck);
+      })
+    )
+    ;
+  }
+
+  public getMetaDecks(): Observable<MobalyticsMetaDeck[]> {
+    return this.http.get('https://lor.mobalytics.gg/api/v2/meta/tier-list')
+    .pipe(
+      map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
+      pluck('archetypes'),
+      concatMap(mobalyticsDecks => { // esse concat map adiciona a propriedade "lorDeck" no objeto que retorna do mobalytics
+        const observablesArray: Observable<LoRDeck[]>[] = mobalyticsDecks.map(deck => {return this.getLoRDeck(deck.mostPopularDeck.exportUID)});
+        return forkJoin(observablesArray)
+        .pipe(
+          map(lorDecks => {
+            const finalMobalyticDecks: MobalyticsMetaDeck[] = [];
+            for (let i = 0; i < mobalyticsDecks.length; i++) {
+              finalMobalyticDecks.push({...mobalyticsDecks[i], ...{lorDeck: lorDecks[i]}});
+            }
+            return finalMobalyticDecks;
+          })
+        )
+        ;
+      }),
+      catchError(error => throwError(error))
+    )
     ;
   }
 }

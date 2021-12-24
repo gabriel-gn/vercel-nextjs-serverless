@@ -93,3 +93,34 @@ export interface LoRDeck {
   essenceCost: number;
   factionCardsQt: {[faction: string]: number};
 }
+
+export interface MobalyticsMostPopularDeck {
+  uid: string;
+  mode: string;
+  exportUID: string;
+  playStyle: string;
+  title: string;
+  owner: {
+    uid: string;
+    name: string;
+    image: string;
+  };
+  isPrivate: boolean;
+  isDraft: boolean;
+  isRiot: boolean;
+}
+
+export interface MobalyticsMetaDeck {
+  uid: string;
+  title: string;
+  coreCards: string[];
+  tier: string;
+  mostPopularDeck: MobalyticsMostPopularDeck;
+  whyToBuild: string;
+  howToPlay: string;
+  videoGuides: {
+    url: string;
+    placeholder: string;
+  }[];
+  lorDeck?: LoRDeck; // NÃO VEM DO MOBALYTICS, DEVE SER ADICIONADO APÓS A CHAMADA!!
+}
