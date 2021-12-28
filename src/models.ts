@@ -64,6 +64,8 @@ export enum FactionIdentifiersReverse {
   BC = 'BANDLECITY',
 }
 
+export type Factions =  'DE' | 'FR' | 'IO' | 'NX' | 'PZ' | 'SI' | 'BW' | 'MT' | 'SH' | 'BC';
+
 export enum FactionIdentifiersColors {
   DE = '191,176,131',
   FR = '90,184,218',

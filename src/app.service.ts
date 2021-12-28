@@ -9,6 +9,7 @@ import { from, map, Observable, pluck, forkJoin, catchError, throwError, concatM
 import { Card, DeckCard, LoRDeck, MobalyticsMetaDeck } from "./models";
 import { DeckFormat } from "./deck-format-utils";
 import { HttpService } from "@nestjs/axios";
+import { SearchDeckLibraryDto } from "./deck-library.dto";
 
 @Injectable()
 export class AppService {
@@ -89,6 +90,50 @@ export class AppService {
       }),
       catchError(error => throwError(error))
     )
+    ;
+  }
+
+  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<LoRDeck[]> {
+    const defaultParams = {
+      sortBy: 'recently_updated',
+      from: 0,
+      count: 20,
+      withUserCards: false,
+    }
+    const addedParams = {}
+    for (let key of Object.keys(searchObj)) {
+      switch(key) {
+        case 'factions':
+          addedParams['region'] = searchObj.factions;
+          break;
+        case 'category':
+          addedParams['category'] = searchObj.category;
+          break;
+        case 'playStyle':
+          addedParams['playStyle'] = searchObj.playStyle;
+          break;
+        case 'count':
+          addedParams['count'] = searchObj.count;
+          break;
+        case 'cardIds':
+          addedParams['cardID'] = searchObj.cardIds;
+          break;
+        case 'keywords':
+          addedParams['keyword'] = searchObj.cardIds;
+          break;
+      }
+    }
+    return this.http.get('https://lor.mobalytics.gg/api/v2/decks/library', {params: { ...defaultParams, ...addedParams }})
+      .pipe(
+        map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
+        pluck('decks'),
+        concatMap((decks) => {
+          const decksObs: Observable<LoRDeck>[] = []
+          // @ts-ignore
+          decks.forEach(deck => decksObs.push(this.getLoRDeck(deck.exportUID)));
+          return forkJoin(decksObs)
+        })
+      )
     ;
   }
 }

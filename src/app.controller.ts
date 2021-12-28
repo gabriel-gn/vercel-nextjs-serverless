@@ -1,5 +1,6 @@
-import {Controller, Get, Param} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import {AppService} from './app.service';
+import { SearchDeckLibraryDto } from "./deck-library.dto";
 
 @Controller()
 export class AppController {
@@ -19,5 +20,10 @@ export class AppController {
     @Get('meta')
     async getMetaDecks() {
         return this.appService.getMetaDecks();
+    }
+
+    @Post('library')
+    async getLibraryDecks(@Body() searchObj: SearchDeckLibraryDto) {
+        return this.appService.getDecksFromLibrary(searchObj);
     }
 }
