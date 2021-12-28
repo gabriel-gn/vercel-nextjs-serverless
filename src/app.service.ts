@@ -10,6 +10,7 @@ import { Card, DeckCard, LoRDeck, MobalyticsMetaDeck } from "./models";
 import { DeckFormat } from "./deck-format-utils";
 import { HttpService } from "@nestjs/axios";
 import { SearchDeckLibraryDto } from "./deck-library.dto";
+import qs from "qs";
 
 @Injectable()
 export class AppService {
@@ -126,7 +127,10 @@ export class AppService {
           break;
       }
     }
-    return this.http.get('https://lor.mobalytics.gg/api/v2/decks/library', {params: { ...defaultParams, ...addedParams }})
+    return this.http.get('https://lor.mobalytics.gg/api/v2/decks/library',{
+      params: { ...defaultParams, ...addedParams },
+      paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
+    })
       .pipe(
         map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
         pluck('decks'),
