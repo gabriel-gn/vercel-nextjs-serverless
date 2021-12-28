@@ -103,11 +103,14 @@ export class AppService {
     const addedParams = {}
     for (let key of Object.keys(searchObj)) {
       switch(key) {
-        case 'factions':
-          addedParams['region'] = searchObj.factions;
-          break;
         case 'category':
           addedParams['category'] = searchObj.category;
+          break;
+        case 'searchTerm':
+          addedParams['searchTerm'] = searchObj.searchTerm;
+          break;
+        case 'factions':
+          addedParams['region'] = searchObj.factions;
           break;
         case 'playStyle':
           addedParams['playStyle'] = searchObj.playStyle;

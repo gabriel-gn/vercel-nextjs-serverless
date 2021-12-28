@@ -1,8 +1,9 @@
 import { Factions } from "./models";
 
 export class SearchDeckLibraryDto {
-  factions?: Factions[];
   category: 'BUDGET' | 'FEATURED' | 'COMMUNITY';
+  searchTerm?: string;
+  factions?: Factions[];
   playStyle?: 'AGGRO' | 'COMBO' | 'CONTROL' | 'MIDRANGE';
   count?: number;
   cardIds?: string[];
