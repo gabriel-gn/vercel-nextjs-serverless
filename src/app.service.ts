@@ -49,8 +49,12 @@ export class AppService {
       map(cards => {
         const decodedDeck: Deck = getDeckFromCode(deckCode);
         const finalDeck: DeckCard[] = decodedDeck.map(card => {
+          const foundCard = cards.find(lorCard => lorCard.cardCode === card.cardCode);
+          if (foundCard.associatedCardRefs.length > 0) {
+            foundCard.associatedCardRefs = foundCard.associatedCardRefs.sort();
+          }
           return {
-            card: cards.find(lorCard => lorCard.cardCode === card.cardCode),
+            card: foundCard,
             count: card.count
           };
         });
