@@ -5,7 +5,7 @@ import {
   CardCodeAndCount,
   Deck
 } from "lor-deckcodes-ts";
-import { from, map, Observable, pluck, forkJoin, catchError, throwError, concatMap } from "rxjs";
+import { from, map, Observable, pluck, forkJoin, catchError, throwError, concatMap, of } from "rxjs";
 import { Card, DeckCard, LoRDeck, MobalyticsMetaDeck } from "./models";
 import { DeckFormat } from "./deck-format-utils";
 import { HttpService } from "@nestjs/axios";
@@ -43,9 +43,17 @@ export class AppService {
     ;
   }
 
-  public getDeckCardsByCode(deckCode: string): Observable<DeckCard[]> {
-    return this.getCards()
+  public getDeckCardsByDeckCode(deckCode: string, cards: Card[] = undefined): Observable<DeckCard[]> {
+    return of(cards)
     .pipe(
+      // caso seja passado as cartas, não requer de novo o json
+      concatMap(cardArray => {
+        if (cardArray) {
+          return of(cardArray)
+        } else {
+          return this.getCards();
+        }
+      }),
       map(cards => {
         const decodedDeck: Deck = getDeckFromCode(deckCode);
         const finalDeck: DeckCard[] = decodedDeck.map(card => {
@@ -65,13 +73,28 @@ export class AppService {
   }
 
   public getLoRDeck(deckCode: string): Observable<LoRDeck> {
-    return this.getDeckCardsByCode(deckCode)
+    return this.getLoRDecks([deckCode])
     .pipe(
-      map(deck => {
-        return DeckFormat.cardArrayToLorDeck(deck);
+      map(decks => {
+        return decks[0];
       })
     )
     ;
+  }
+
+  public getLoRDecks(deckCodes: string[]): Observable<LoRDeck[]> {
+    return this.getCards().pipe(
+      concatMap(cards => {
+        return forkJoin(
+          deckCodes.map(deckCode => {
+            return this.getDeckCardsByDeckCode(deckCode, cards)
+              .pipe(
+                map(deck => {return DeckFormat.cardArrayToLorDeck(deck);})
+              )
+          })
+        )
+      })
+    );
   }
 
   public getMetaDecks(): Observable<MobalyticsMetaDeck[]> {
@@ -80,8 +103,8 @@ export class AppService {
       map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
       pluck('archetypes'),
       concatMap(mobalyticsDecks => { // esse concat map adiciona a propriedade "lorDeck" no objeto que retorna do mobalytics
-        const observablesArray: Observable<LoRDeck[]>[] = mobalyticsDecks.map(deck => {return this.getLoRDeck(deck.mostPopularDeck.exportUID)});
-        return forkJoin(observablesArray)
+        const observablesArray: Observable<LoRDeck[]> = this.getLoRDecks(mobalyticsDecks.map(deck => deck.mostPopularDeck.exportUID));
+        return observablesArray
         .pipe(
           map(lorDecks => {
             const finalMobalyticDecks: MobalyticsMetaDeck[] = [];
@@ -139,10 +162,7 @@ export class AppService {
         map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
         pluck('decks'),
         concatMap((decks) => {
-          const decksObs: Observable<LoRDeck>[] = []
-          // @ts-ignore
-          decks.forEach(deck => decksObs.push(this.getLoRDeck(deck.exportUID)));
-          return forkJoin(decksObs)
+          return this.getLoRDecks(decks.map(deck => deck.exportUID));
         })
       )
     ;
