@@ -83,6 +83,7 @@ export interface LoRDeck {
   code: string;
   title?: string;
   description?: string;
+  badges?: {tier?: string}
   cards: {
     champions: DeckCard[];
     followers: DeckCard[];

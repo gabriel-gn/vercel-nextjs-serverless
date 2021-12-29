@@ -109,7 +109,7 @@ export class AppService {
           map(lorDecks => {
             const finalMobalyticDecks: MobalyticsMetaDeck[] = [];
             for (let i = 0; i < mobalyticsDecks.length; i++) {
-              const lorDeckObj = { ...lorDecks[i], ...{ title: mobalyticsDecks[i].title } };
+              const lorDeckObj = { ...lorDecks[i], ...{ title: mobalyticsDecks[i].title, badges: {tier: mobalyticsDecks[i].tier} } };
               finalMobalyticDecks.push({...mobalyticsDecks[i], ...{lorDeck: lorDeckObj}});
             }
             return finalMobalyticDecks;
