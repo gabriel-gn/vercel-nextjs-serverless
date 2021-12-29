@@ -161,8 +161,13 @@ export class AppService {
       .pipe(
         map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
         pluck('decks'),
-        concatMap((decks) => {
-          return this.getLoRDecks(decks.map(deck => deck.exportUID));
+        concatMap((mobalyticsDecks) => {
+          return this.getLoRDecks(mobalyticsDecks.map(deck => deck.exportUID))
+            .pipe(
+              map(lorDecks => lorDecks.map((lorDeck, i) => {
+                return { ...lorDeck, ...{title: mobalyticsDecks[i]?.title, description: mobalyticsDecks[i]?.description} };
+              }))
+          );
         })
       )
     ;

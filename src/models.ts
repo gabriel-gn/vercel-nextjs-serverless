@@ -81,6 +81,8 @@ export enum FactionIdentifiersColors {
 
 export interface LoRDeck {
   code: string;
+  title?: string;
+  description?: string;
   cards: {
     champions: DeckCard[];
     followers: DeckCard[];
