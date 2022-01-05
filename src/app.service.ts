@@ -6,7 +6,7 @@ import {
   Deck
 } from "lor-deckcodes-ts";
 import { from, map, Observable, pluck, forkJoin, catchError, throwError, concatMap, of } from "rxjs";
-import { Card, DeckCard, LoRDeck, MobalyticsDeck, MobalyticsMetaDeck, UserDeck } from "./models";
+import { Card, DeckCard, LoRDeck, MobalyticsDeck, MobalyticsMetaDeck, UserDeck, UserDeckQueryResponse } from "./models";
 import { DeckFormat } from "./deck-format-utils";
 import { HttpService } from "@nestjs/axios";
 import { SearchDeckLibraryDto } from "./deck-library.dto";
@@ -137,7 +137,7 @@ export class AppService {
       );
   }
 
-  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeck[]> {
+  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeckQueryResponse> {
     const defaultParams = {
       sortBy: 'recently_updated',
       from: 0,
@@ -179,10 +179,20 @@ export class AppService {
     })
       .pipe(
         map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
-        pluck('decks'),
-        concatMap((mobalyticsDecks: MobalyticsDeck[]) => {
-          return this.mobalyticsDecksToUserDecks(mobalyticsDecks);
-        })
+        concatMap(response => {
+          return of(response).pipe(
+            pluck('decks'),
+            concatMap((mobalyticsDecks: MobalyticsDeck[]) => {
+              return this.mobalyticsDecksToUserDecks(mobalyticsDecks);
+            }),
+            map(userDecks => {
+              return {
+                decks: userDecks,
+                hasNext: response.hasNext
+              }
+            })
+          );
+        }),
       )
     ;
   }
