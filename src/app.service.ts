@@ -19,28 +19,49 @@ export class AppService {
   ) {
   }
 
-  private getCards(): Observable<Card[]> {
+  private getCardsFromRuneterraAr(): Observable<Card[]> {
     return from(
       Promise.allSettled([
-        require("./sets/en_us/set1-en_us.json"),
-        require("./sets/en_us/set2-en_us.json"),
-        require("./sets/en_us/set3-en_us.json"),
-        require("./sets/en_us/set4-en_us.json"),
-        require("./sets/en_us/set5-en_us.json"),
+        require("./sets/runeterraAR/en_us.json"),
       ])
     )
-    .pipe(
-      //@ts-ignore
-      map((response: Array<{value: Card, status: "fulfilled" | "rejected"}>) => {
-        let cards: Card[] = [];
-        response.forEach(resolved => {
-          // @ts-ignore
-          cards = [...cards, ...resolved.value];
-        });
-        return cards;
-      })
-    )
-    ;
+      .pipe(
+        //@ts-ignore
+        map((response: Array<{value: Card[], status: "fulfilled" | "rejected"}>) => {
+          let cards: Card[] = [];
+          response.forEach(resolved => {
+            // @ts-ignore
+            cards = [...cards, ...resolved.value.cards];
+          });
+          return cards;
+        })
+      )
+      ;
+  }
+
+  private getCards(): Observable<Card[]> {
+    return this.getCardsFromRuneterraAr();
+    // return from(
+    //   Promise.allSettled([
+    //     require("./sets/en_us/set1-en_us.json"),
+    //     require("./sets/en_us/set2-en_us.json"),
+    //     require("./sets/en_us/set3-en_us.json"),
+    //     require("./sets/en_us/set4-en_us.json"),
+    //     require("./sets/en_us/set5-en_us.json"),
+    //   ])
+    // )
+    // .pipe(
+    //   //@ts-ignore
+    //   map((response: Array<{value: Card[], status: "fulfilled" | "rejected"}>) => {
+    //     let cards: Card[] = [];
+    //     response.forEach(resolved => {
+    //       // @ts-ignore
+    //       cards = [...cards, ...resolved.value];
+    //     });
+    //     return cards;
+    //   })
+    // )
+    // ;
   }
 
   public getDeckCardsByDeckCode(deckCode: string, cards: Card[] = undefined): Observable<DeckCard[]> {
