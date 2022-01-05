@@ -8,4 +8,5 @@ export class SearchDeckLibraryDto {
   count?: number;
   cardIds?: string[];
   keywords?: string[];
+  from?: number;
 }

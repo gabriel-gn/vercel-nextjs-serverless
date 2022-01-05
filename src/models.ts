@@ -81,9 +81,6 @@ export enum FactionIdentifiersColors {
 
 export interface LoRDeck {
   code: string;
-  title?: string;
-  description?: string;
-  badges?: {tier?: string}
   cards: {
     champions: DeckCard[];
     followers: DeckCard[];
@@ -99,12 +96,25 @@ export interface LoRDeck {
   factionCardsQt: {[faction: string]: number};
 }
 
-export interface MobalyticsMostPopularDeck {
+export interface UserDeck {
+  title?: string;
+  description?: string;
+  badges?: {tier?: string};
+  changedAt: number;
+  createdAt: number;
+  username: string;
+  deck: LoRDeck;
+}
+
+export interface MobalyticsDeck {
+  title: string;
+  changedAt?: number;
+  createdAt?: number;
+  description?: string;
   uid: string;
   mode: string;
   exportUID: string;
   playStyle: string;
-  title: string;
   owner: {
     uid: string;
     name: string;
@@ -113,6 +123,7 @@ export interface MobalyticsMostPopularDeck {
   isPrivate: boolean;
   isDraft: boolean;
   isRiot: boolean;
+  rating?: number;
 }
 
 export interface MobalyticsMetaDeck {
@@ -120,7 +131,7 @@ export interface MobalyticsMetaDeck {
   title: string;
   coreCards: string[];
   tier: string;
-  mostPopularDeck: MobalyticsMostPopularDeck;
+  mostPopularDeck: MobalyticsDeck;
   whyToBuild: string;
   howToPlay: string;
   videoGuides: {
@@ -128,4 +139,9 @@ export interface MobalyticsMetaDeck {
     placeholder: string;
   }[];
   lorDeck?: LoRDeck; // NÃO VEM DO MOBALYTICS, DEVE SER ADICIONADO APÓS A CHAMADA!!
+}
+
+export interface UserDeckQueryResponse {
+  decks: UserDeck[];
+  hasNext: boolean;
 }

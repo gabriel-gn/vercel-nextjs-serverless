@@ -6,7 +6,7 @@ import {
   Deck
 } from "lor-deckcodes-ts";
 import { from, map, Observable, pluck, forkJoin, catchError, throwError, concatMap, of } from "rxjs";
-import { Card, DeckCard, LoRDeck, MobalyticsMetaDeck } from "./models";
+import { Card, DeckCard, LoRDeck, MobalyticsDeck, MobalyticsMetaDeck, UserDeck } from "./models";
 import { DeckFormat } from "./deck-format-utils";
 import { HttpService } from "@nestjs/axios";
 import { SearchDeckLibraryDto } from "./deck-library.dto";
@@ -97,32 +97,47 @@ export class AppService {
     );
   }
 
-  public getMetaDecks(): Observable<MobalyticsMetaDeck[]> {
+  public getMetaDecks(): Observable<UserDeck[]> {
     return this.http.get('https://lor.mobalytics.gg/api/v2/meta/tier-list')
     .pipe(
       map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
       pluck('archetypes'),
-      concatMap(mobalyticsDecks => { // esse concat map adiciona a propriedade "lorDeck" no objeto que retorna do mobalytics
-        const observablesArray: Observable<LoRDeck[]> = this.getLoRDecks(mobalyticsDecks.map(deck => deck.mostPopularDeck.exportUID));
-        return observablesArray
-        .pipe(
-          map(lorDecks => {
-            const finalMobalyticDecks: MobalyticsMetaDeck[] = [];
-            for (let i = 0; i < mobalyticsDecks.length; i++) {
-              const lorDeckObj = { ...lorDecks[i], ...{ title: mobalyticsDecks[i].title, badges: {tier: mobalyticsDecks[i].tier} } };
-              finalMobalyticDecks.push({...mobalyticsDecks[i], ...{lorDeck: lorDeckObj}});
-            }
-            return finalMobalyticDecks;
+      concatMap((metaDecks: MobalyticsMetaDeck[]) => {
+        const mobalyticsDecks = metaDecks.map(metaDeck => {
+          return { ...metaDeck.mostPopularDeck, ...{title: metaDeck.title, description: metaDeck.whyToBuild} }
+        });
+        return this.mobalyticsDecksToUserDecks(mobalyticsDecks).pipe(
+          map(rawUserDecks => {
+            return rawUserDecks.map((rawUserDeck, index) => {
+              return {...rawUserDeck, ...{badges: {tier: metaDecks[index].tier}}};
+            })
           })
-        )
-        ;
+        );
       }),
       catchError(error => throwError(error))
     )
     ;
   }
 
-  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<LoRDeck[]> {
+  public mobalyticsDecksToUserDecks(mobalyticsDecks: MobalyticsDeck[]): Observable<UserDeck[]> {
+    return this.getLoRDecks(mobalyticsDecks.map(deck => deck.exportUID))
+      .pipe(
+        map(lorDecks => lorDecks.map((lorDeck, i) => {
+          return {
+            ...{ deck: lorDeck },
+            ...{
+              title: mobalyticsDecks[i]?.title,
+              description: mobalyticsDecks[i]?.description,
+              changedAt: mobalyticsDecks[i]?.changedAt,
+              createdAt: mobalyticsDecks[i]?.createdAt,
+              username: mobalyticsDecks[i]?.owner?.name,
+            }
+          };
+        }))
+      );
+  }
+
+  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeck[]> {
     const defaultParams = {
       sortBy: 'recently_updated',
       from: 0,
@@ -153,6 +168,9 @@ export class AppService {
         case 'keywords':
           addedParams['keyword'] = searchObj.cardIds;
           break;
+        case 'from':
+          addedParams['from'] = searchObj.from;
+          break;
       }
     }
     return this.http.get('https://lor.mobalytics.gg/api/v2/decks/library',{
@@ -162,13 +180,8 @@ export class AppService {
       .pipe(
         map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
         pluck('decks'),
-        concatMap((mobalyticsDecks) => {
-          return this.getLoRDecks(mobalyticsDecks.map(deck => deck.exportUID))
-            .pipe(
-              map(lorDecks => lorDecks.map((lorDeck, i) => {
-                return { ...lorDeck, ...{title: mobalyticsDecks[i]?.title, description: mobalyticsDecks[i]?.description} };
-              }))
-          );
+        concatMap((mobalyticsDecks: MobalyticsDeck[]) => {
+          return this.mobalyticsDecksToUserDecks(mobalyticsDecks);
         })
       )
     ;
