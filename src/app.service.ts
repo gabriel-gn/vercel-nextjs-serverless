@@ -31,7 +31,7 @@ export class AppService {
           let cards: Card[] = [];
           response.forEach(resolved => {
             // @ts-ignore
-            cards = [...cards, ...resolved.value.cards];
+            cards = [...cards, ...resolved.value];
           });
           return cards;
         })
