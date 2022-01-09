@@ -5,12 +5,10 @@ import {
   FactionIdentifiersColors,
   FactionIdentifiersReverse,
   LoRDeck
-} from "./models";
+} from "../models";
 import {
   getCodeFromDeck,
-  getDeckFromCode,
   CardCodeAndCount,
-  Deck
 } from "lor-deckcodes-ts";
 import _ from "lodash";
 

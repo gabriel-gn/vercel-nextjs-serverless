@@ -138,7 +138,6 @@ export interface MobalyticsMetaDeck {
     url: string;
     placeholder: string;
   }[];
-  lorDeck?: LoRDeck; // NÃO VEM DO MOBALYTICS, DEVE SER ADICIONADO APÓS A CHAMADA!!
 }
 
 export interface UserDeckQueryResponse {
