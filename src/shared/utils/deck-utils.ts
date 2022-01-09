@@ -1,0 +1,85 @@
+import { Deck, getDeckFromCode } from "lor-deckcodes-ts";
+import { DeckFormat } from "./deck-format-utils";
+import { map, Observable, forkJoin, concatMap, of } from "rxjs";
+import {
+  Card,
+  DeckCard,
+  LoRDeck, MobalyticsDeck, UserDeck
+} from "../../shared/models";
+import {
+  getCards
+} from "./card-utils"
+
+export function getDeckCardsByDeckCode(deckCode: string, cards: Card[] = undefined): Observable<DeckCard[]> {
+  return of(cards)
+    .pipe(
+      // caso seja passado as cartas, não requer de novo o json
+      concatMap(cardArray => {
+        if (cardArray) {
+          return of(cardArray);
+        } else {
+          return getCards();
+        }
+      }),
+      map(cards => {
+        const decodedDeck: Deck = getDeckFromCode(deckCode);
+        const finalDeck: DeckCard[] = decodedDeck.map(card => {
+          const foundCard = cards.find(lorCard => lorCard.cardCode === card.cardCode);
+          if (foundCard.associatedCardRefs.length > 0) {
+            foundCard.associatedCardRefs = foundCard.associatedCardRefs.sort();
+          }
+          return {
+            card: foundCard,
+            count: card.count
+          };
+        });
+        return finalDeck;
+      })
+    )
+    ;
+}
+
+export function getLoRDeck(deckCode: string): Observable<LoRDeck> {
+  return getLoRDecks([deckCode])
+    .pipe(
+      map(decks => {
+        return decks[0];
+      })
+    )
+    ;
+}
+
+export function getLoRDecks(deckCodes: string[]): Observable<LoRDeck[]> {
+  return getCards().pipe(
+    concatMap(cards => {
+      return forkJoin(
+        deckCodes.map(deckCode => {
+          return getDeckCardsByDeckCode(deckCode, cards)
+            .pipe(
+              map((deck: DeckCard[]) => {
+                return DeckFormat.cardArrayToLorDeck(deck);
+              })
+            );
+        })
+      );
+    })
+  );
+}
+
+export function mobalyticsDecksToUserDecks(mobalyticsDecks: MobalyticsDeck[]): Observable<UserDeck[]> {
+  return getLoRDecks(mobalyticsDecks.map(deck => deck.exportUID))
+    .pipe(
+      map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
+        return {
+          ...{ deck: lorDeck },
+          ...{
+            title: mobalyticsDecks[i]?.title,
+            description: mobalyticsDecks[i]?.description,
+            changedAt: mobalyticsDecks[i]?.changedAt,
+            createdAt: mobalyticsDecks[i]?.createdAt,
+            username: mobalyticsDecks[i]?.owner?.name,
+          }
+        };
+      }))
+    );
+}

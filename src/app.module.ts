@@ -1,10 +1,12 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { HttpModule } from "@nestjs/axios";
+import { AppRoutingModule } from "./app.routing.module";
 
 @Module({
-  imports: [HttpModule],
+  imports: [
+    AppRoutingModule
+  ],
   controllers: [AppController],
   providers: [AppService]
 })

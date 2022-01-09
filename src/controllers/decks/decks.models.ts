@@ -1,4 +1,4 @@
-import { Factions } from "./models";
+import { Factions } from "../../shared/models";
 
 export class SearchDeckLibraryDto {
   category: 'BUDGET' | 'FEATURED' | 'COMMUNITY';
