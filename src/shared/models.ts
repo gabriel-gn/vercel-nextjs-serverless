@@ -100,8 +100,8 @@ export interface UserDeck {
   title?: string;
   description?: string;
   badges?: {tier?: string};
-  changedAt: number;
-  createdAt: number;
+  changedAt?: number;
+  createdAt?: number;
   username: string;
   deck: LoRDeck;
 }

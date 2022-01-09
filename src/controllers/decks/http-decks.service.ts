@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import { catchError, concatMap, map, Observable, of, pluck, throwError } from "rxjs";
-import { MobalyticsDeck, MobalyticsMetaDeck, UserDeck, UserDeckQueryResponse } from "../../shared/models";
+import { catchError, concatMap, forkJoin, map, Observable, of, pluck, throwError } from "rxjs";
+import { LoRDeck, MobalyticsDeck, MobalyticsMetaDeck, UserDeck, UserDeckQueryResponse } from "../../shared/models";
 import qs from "qs";
-import { mobalyticsDecksToUserDecks } from "../../shared/utils/deck-utils";
+import { getLoRDecks, mobalyticsDecksToUserDecks } from "../../shared/utils/deck-utils";
 import { SearchDeckLibraryDto } from "./decks.models";
 
 @Injectable()
@@ -92,7 +92,52 @@ export class HttpDecksService {
             })
           );
         }),
+        catchError(error => throwError(error))
       )
       ;
+  }
+
+  public getTrendingDecks(): Observable<UserDeck[]> {
+    const url = 'https://runeterra.ar/Meta/get/filter/everyone/en_us';
+    const defaultPayload = {
+      region: [],
+      champ: []
+    };
+    const defaultParams = {
+      take: 5,
+      type: 'two',
+      filter: true,
+    }
+    const getDeckName = (deck: LoRDeck) => {
+      let name = '';
+      if (deck.cards.champions.length > 0) {
+        name = deck.cards.champions.slice(0, 2).map(champion => champion.card.name).join(' / ');
+      } else {
+        name = '';
+      }
+      return name;
+    }
+    const request1 = this.http.post(url, defaultPayload, { params: defaultParams }).pipe(
+      map(response => response.data),
+    );
+    const request2 = this.http.post(url, defaultPayload, { params: { ...defaultParams, ...{page: 2} } }).pipe(
+      map(response => response.data),
+    );
+    return forkJoin([request1, request2]).pipe(
+      map(response => {
+          return [
+            ...response[0].meta.map(metaDeck => metaDeck.deck_code),
+            ...response[1].meta.map(metaDeck => metaDeck.deck_code)
+          ];
+        },
+      ),
+      concatMap((deckCodes: string[]) => getLoRDecks(deckCodes)),
+      map((lorDecks: LoRDeck[]) => {
+        return lorDecks.map(deck => {
+          return { deck: deck, title: getDeckName(deck), description: "", username: "" }
+        });
+      }),
+      catchError(error => throwError(error))
+    )
   }
 }

@@ -17,6 +17,11 @@ export class DecksController {
     return this.decksService.getMetaDecks();
   }
 
+  @Get("trending")
+  async getTrendingDecks() {
+    return this.decksService.getTrendingDecks();
+  }
+
   @Post("library")
   async getLibraryDecks(@Body() searchObj: SearchDeckLibraryDto) {
     return this.decksService.getDecksFromLibrary(searchObj);
