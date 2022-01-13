@@ -117,17 +117,20 @@ export class HttpDecksService {
       }
       return name;
     }
-    const request1 = this.http.post(url, defaultPayload, { params: defaultParams }).pipe(
-      map(response => response.data),
-    );
+    const request1 = this.http.post(url, defaultPayload, { params: defaultParams }).pipe(map(response => response.data));
+
     const request2 = this.http.post(url, defaultPayload, { params: { ...defaultParams, ...{page: 2} } }).pipe(
       map(response => response.data),
     );
-    return forkJoin([request1, request2]).pipe(
+    const request3 = this.http.post(url, defaultPayload, { params: { ...defaultParams, ...{page: 3} } }).pipe(
+      map(response => response.data),
+    );
+    return forkJoin([request1, request2, request3]).pipe(
       map(response => {
           return [
             ...response[0].meta.map(metaDeck => metaDeck.deck_code),
-            ...response[1].meta.map(metaDeck => metaDeck.deck_code)
+            ...response[1].meta.map(metaDeck => metaDeck.deck_code),
+            ...response[2].meta.map(metaDeck => metaDeck.deck_code)
           ];
         },
       ),
