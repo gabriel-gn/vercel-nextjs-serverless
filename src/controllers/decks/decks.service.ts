@@ -3,7 +3,7 @@ import { HttpDecksService } from "./http-decks.service";
 import { Observable } from "rxjs";
 import { LoRDeck, UserDeck, UserDeckQueryResponse } from "../../shared/models";
 import { getLoRDeck } from "../../shared/utils/deck-utils";
-import { SearchDeckLibraryDto } from "./decks.models";
+import { SearchDeckLibraryDto } from "./decks.dto";
 
 @Injectable()
 export class DecksService {

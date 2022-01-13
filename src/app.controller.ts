@@ -1,4 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller()
 export class AppController {
@@ -11,3 +12,10 @@ export class AppController {
     }
 
 }
+
+// @ApiTags('Models')
+// @Controller()
+// export class ModelsController {
+//     constructor() {
+//     }
+// }

@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { DecksService } from "./decks.service";
-import { SearchDeckLibraryDto } from "./decks.models";
+import { SearchDeckLibraryDto } from "./decks.dto";
+import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Decks')
 @Controller()
 export class DecksController {
 
@@ -23,6 +25,14 @@ export class DecksController {
   }
 
   @Post("library")
+  @ApiBody({ type: SearchDeckLibraryDto })
+  @ApiResponse({
+    status: 201,
+    description: 'List of decks from mobalytics library',
+    schema: {
+      type: "UserDeckQueryResponse"
+    }
+  })
   async getLibraryDecks(@Body() searchObj: SearchDeckLibraryDto) {
     return this.decksService.getDecksFromLibrary(searchObj);
   }

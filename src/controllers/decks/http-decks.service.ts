@@ -4,7 +4,7 @@ import { catchError, concatMap, forkJoin, map, Observable, of, pluck, throwError
 import { LoRDeck, MobalyticsDeck, MobalyticsMetaDeck, UserDeck, UserDeckQueryResponse } from "../../shared/models";
 import qs from "qs";
 import { getLoRDecks, mobalyticsDecksToUserDecks } from "../../shared/utils/deck-utils";
-import { SearchDeckLibraryDto } from "./decks.models";
+import { SearchDeckLibraryDto } from "./decks.dto";
 
 @Injectable()
 export class HttpDecksService {
