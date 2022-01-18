@@ -13,9 +13,9 @@ export class AppController {
 
 }
 
-// @ApiTags('Models')
-// @Controller()
-// export class ModelsController {
-//     constructor() {
-//     }
-// }
+@ApiTags('Models')
+@Controller()
+export class ModelsController {
+    constructor() {
+    }
+}

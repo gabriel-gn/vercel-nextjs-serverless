@@ -6,7 +6,7 @@ import { RedocModule, RedocOptions } from "nestjs-redoc";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
-  if (false) {
+  if (process.env.VERCEL_ENV !== 'production') {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Legends of Runeterra Decks')
       .setDescription('Get Decks from mobalytics, Runeterra AR and card information for Legends of Runeterra card game.')

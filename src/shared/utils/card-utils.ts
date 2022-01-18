@@ -1,5 +1,25 @@
 import { from, map, Observable } from "rxjs";
 import { Card } from "../models";
+import _ from 'lodash';
+
+function filterCards(cards: Card[]): Card[] { // deixar o objeto menor!!
+  const attrsToKeep = [
+    'associatedCardRefs',
+    'regions',
+    'regionRefs',
+    'cost',
+    'name',
+    'cardCode',
+    'rarity',
+    'rarityRef',
+    'subtypes',
+    'supertype',
+    'type',
+  ];
+  return cards.map(cardFull => {
+    return _.pickBy(cardFull, (value, key) => attrsToKeep.includes(key));
+  }) as Card[];
+}
 
 export function getCardsFromRuneterraAr(): Observable<Card[]> {
   return from(
@@ -13,7 +33,7 @@ export function getCardsFromRuneterraAr(): Observable<Card[]> {
         let cards: Card[] = [];
         response.forEach(resolved => {
           // @ts-ignore
-          cards = [...cards, ...resolved.value];
+          cards = [...cards, ...filterCards(resolved.value)];
         });
         return cards;
       })
