@@ -28,28 +28,22 @@ function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto m
   }
 }
 
-function getCardsFromRuneterraAr(): Observable<Card[]> {
+export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
   return from(
     Promise.allSettled([
-      require("../../assets/sets/runeterraAR/en_us.json"),
+      require("../../assets/sets/en_us/en_us.json"),
     ])
   )
-    .pipe(
-      //@ts-ignore
-      map((response: Array<{value: Card[], status: "fulfilled" | "rejected"}>) => {
-        let cards: Card[] = [];
-        response.forEach(resolved => {
-          // @ts-ignore
-          cards = [...cards, ...resolved.value];
-        });
-        return cards;
-      })
-    )
-    ;
-}
-
-export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
-  return getCardsFromRuneterraAr().pipe(
+  .pipe(
+    //@ts-ignore
+    map((response: Array<{value: Card[], status: "fulfilled" | "rejected"}>) => {
+      let cards: Card[] = [];
+      response.forEach(resolved => {
+        // @ts-ignore
+        cards = [...cards, ...resolved.value];
+      });
+      return cards;
+    }),
     map((cards: Card[]) => {
       if (minifyCardData) {
         return minifyCards(cards) as Card[];
@@ -57,26 +51,6 @@ export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
         return cards as unknown as Card[];
       }
     })
-  );
-  // return from(
-  //   Promise.allSettled([
-  //     require("./assets/sets/en_us/set1-en_us.json"),
-  //     require("./assets/sets/en_us/set2-en_us.json"),
-  //     require("./assets/sets/en_us/set3-en_us.json"),
-  //     require("./assets/sets/en_us/set4-en_us.json"),
-  //     require("./assets/sets/en_us/set5-en_us.json"),
-  //   ])
-  // )
-  // .pipe(
-  //   //@ts-ignore
-  //   map((response: Array<{value: Card[], status: "fulfilled" | "rejected"}>) => {
-  //     let cards: Card[] = [];
-  //     response.forEach(resolved => {
-  //       // @ts-ignore
-  //       cards = [...cards, ...resolved.value];
-  //     });
-  //     return cards;
-  //   })
-  // )
-  // ;
+  )
+  ;
 }
