@@ -2,12 +2,33 @@
 const Downloader = require('nodejs-file-downloader');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const extract = require('extract-zip');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { _ } = require('lodash');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Rx = require('rxjs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const RxOp = require('rxjs/operators');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs');
+
+/***********************************
+ * VARIÁVEIS DO SCRIPT
+ ************************************/
+
+const setNames = ['set1', 'set2', 'set3', 'set4', 'set5'];
+const langs = ['en_us'];
+const isLite = true;
+const tempDir = `${process.cwd()}/tmp`;
+const setsDir = `${tempDir}/sets`;
+const downloadUrl = `https://dd.b.pvp.net/latest`;
 
 /***********************************
  * MÉTODOS DO SCRIPT
  ************************************/
 
 async function downloadSet(url, destDir) {
+  const fileExtension = '.zip';
+  url = `${url}${fileExtension}`;
   let currPercentage = 0;
   const downloader = new Downloader({
     url: url,
@@ -16,55 +37,64 @@ async function downloadSet(url, destDir) {
       //Gets called with each percentage.
       if (Math.round(percentage) !== currPercentage) {
         currPercentage = Math.round(percentage);
-        console.log(`Downloading ${filename} (${currPercentage}%)`);
+        console.log(`Downloading ${url} (${currPercentage}%)`);
       }
     },
   });
 
   try {
-    await downloader.download();
+    return downloader.download();
   } catch (error) {
     console.log(error);
+    return Promise.reject(false);
   }
 }
 
 async function extractSet(filename, destinationDir) {
+  const fileExtension = '.zip';
   try {
     console.log(`Extracting ${filename}`);
-    await extract(`${tempDir}/${filename}`, {
+    return extract(`${tempDir}/${filename}${fileExtension}`, {
       dir: destinationDir,
     });
-    console.log(`Extraction of ${filename} completed on: ${destinationDir}`);
   } catch (err) {
-    console.log(`Extraction failed (${filename}): `, err);
+    return Promise.reject(false);
   }
 }
 
-/***********************************
- * VARIÁVEIS DO SCRIPT
- ************************************/
+function createSetFile(lang) {
+  if (!fs.existsSync(setsDir)) {
+    fs.mkdirSync(setsDir);
+  }
+  fs.writeFileSync(`${setsDir}/${lang}.json`, JSON.stringify([])); // CRIA O ARQUIVO VAZIO!
+}
 
-const setNumbers = [1, 2, 3, 4, 5];
-const isLite = true;
-const langs = ['en_us'];
-const tempDir = `${process.cwd()}/tmp`;
-const filenames = langs // todos os sets que serão baixados!!
-  .map((lang) => {
-    return setNumbers.map(
-      (setNumber) => `set${setNumber}${isLite ? '-lite' : ''}-${lang}.zip`,
-    );
-  })
-  .flat();
+function updateMetadataFile(filename, lang) {
+  console.log(`Updating sets metadata for ${lang}`);
+  const metadataFilename = `${setsDir}/${lang}.json`;
+  const currentMetadataFilename = `${tempDir}/${filename}/${lang}/data/${filename.replace('lite-', '')}.json`;
+  const currentMetadataFile = fs.readFileSync(currentMetadataFilename);
+  const currentMetadataObject = JSON.parse(currentMetadataFile.toString());
+  const metadataFile = fs.readFileSync(metadataFilename);
+  const metadataObject = JSON.parse(metadataFile.toString());
+  fs.writeFileSync(metadataFilename, JSON.stringify([...metadataObject, ...currentMetadataObject]));
+  console.log(`Sets metadata for ${lang} completed`);
+}
 
 /***********************************
  * EXECUÇÃO DO SCRIPT
  ************************************/
 
-const filename = filenames[0];
-
 async function executeScript() {
-  await downloadSet(`https://dd.b.pvp.net/latest/${filename}`, tempDir);
-  await extractSet(filename, `${tempDir}/${filename.split('.')[0]}`);
+  for (let lang of langs) {
+    createSetFile(lang); // cria o arquivo json vazio
+    for (let setName of setNames) {
+      const filename = `${setName}${isLite ? '-lite-' : '-'}${lang}`; // SEM EXTENSÃO!!
+      await downloadSet(`${downloadUrl}/${filename}`, tempDir);
+      await extractSet(filename, `${tempDir}/${filename}`);
+      updateMetadataFile(filename, lang);
+    }
+  }
 }
 
 executeScript();
