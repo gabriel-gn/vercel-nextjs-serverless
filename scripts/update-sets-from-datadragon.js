@@ -3,13 +3,13 @@ const Downloader = require('nodejs-file-downloader');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const extract = require('extract-zip');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { _ } = require('lodash');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const Rx = require('rxjs');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const RxOp = require('rxjs/operators');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fsx = require('fs-extra');
 
 /***********************************
  * VARIÁVEIS DO SCRIPT
@@ -63,22 +63,28 @@ async function extractSet(filename, destinationDir) {
 }
 
 function createSetFile(lang) {
-  if (!fs.existsSync(setsDir)) {
-    fs.mkdirSync(setsDir);
+  const dir = `${setsDir}/${lang}`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(`${setsDir}/${lang}.json`, JSON.stringify([])); // CRIA O ARQUIVO VAZIO!
+  fs.writeFileSync(`${dir}/${lang}.json`, JSON.stringify([])); // CRIA O ARQUIVO VAZIO!
 }
 
 function updateMetadataFile(filename, lang) {
   console.log(`Updating sets metadata for ${lang}`);
-  const metadataFilename = `${setsDir}/${lang}.json`;
+  const metadataFilename = `${setsDir}/${lang}/${lang}.json`;
   const currentMetadataFilename = `${tempDir}/${filename}/${lang}/data/${filename.replace('lite-', '')}.json`;
   const currentMetadataFile = fs.readFileSync(currentMetadataFilename);
   const currentMetadataObject = JSON.parse(currentMetadataFile.toString());
   const metadataFile = fs.readFileSync(metadataFilename);
   const metadataObject = JSON.parse(metadataFile.toString());
   fs.writeFileSync(metadataFilename, JSON.stringify([...metadataObject, ...currentMetadataObject]));
+  fs.copyFileSync(currentMetadataFilename, `${setsDir}/${lang}/${filename.replace('lite-', '')}.json`);
   console.log(`Sets metadata for ${lang} completed`);
+}
+
+function updateBackendAssets(lang) {
+  fsx.copy(`${setsDir}/${lang}`, `./src/assets/sets/${lang}`);
 }
 
 /***********************************
@@ -90,10 +96,11 @@ async function executeScript() {
     createSetFile(lang); // cria o arquivo json vazio
     for (let setName of setNames) {
       const filename = `${setName}${isLite ? '-lite-' : '-'}${lang}`; // SEM EXTENSÃO!!
-      await downloadSet(`${downloadUrl}/${filename}`, tempDir);
-      await extractSet(filename, `${tempDir}/${filename}`);
+      // await downloadSet(`${downloadUrl}/${filename}`, tempDir);
+      // await extractSet(filename, `${tempDir}/${filename}`);
       updateMetadataFile(filename, lang);
     }
+    updateBackendAssets(lang);
   }
 }
 
