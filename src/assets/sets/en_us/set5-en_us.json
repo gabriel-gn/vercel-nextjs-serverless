@@ -14211,5 +14211,320 @@
     "type": "Unit",
     "collectible": true,
     "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [
+      "05BC166",
+      "05BC161T2",
+      "05BC161T1"
+    ],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC161.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC161-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City",
+      "Freljord"
+    ],
+    "regionRefs": [
+      "BandleCity",
+      "Freljord"
+    ],
+    "attack": 4,
+    "cost": 4,
+    "health": 3,
+    "description": "<link=vocab.Strike><style=Vocab>Strike</style></link>: Create a <link=card.create><style=AssociatedCard>Pokey Stick</style></link> in hand or, if you have one, reduce its cost by 1.",
+    "descriptionRaw": "Strike: Create a Pokey Stick in hand or, if you have one, reduce its cost by 1.",
+    "levelupDescription": "<link=vocab.RoundEnd><style=Vocab>Round End</style></link>: You've damaged the enemy Nexus this round.",
+    "levelupDescriptionRaw": "Round End: You've damaged the enemy Nexus this round.",
+    "flavorText": "Long ago, Gnar and his kin thrived in the Nakotak Valley. It was an innocent place, untouched by modern trappings. How unfortunate that the passing of time took this place from Gnar. But how fortunate that time doesn't exactly function as expected in Bandle City.",
+    "artistName": "SIXMOREVODKA",
+    "name": "Gnar",
+    "cardCode": "05BC161",
+    "keywords": [
+      "Quick Attack"
+    ],
+    "keywordRefs": [
+      "QuickStrike"
+    ],
+    "spellSpeed": "",
+    "spellSpeedRef": "",
+    "rarity": "Champion",
+    "rarityRef": "Champion",
+    "subtypes": [
+      "YORDLE"
+    ],
+    "supertype": "Champion",
+    "type": "Unit",
+    "collectible": true,
+    "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [
+      "05BC161T2",
+      "05BC161"
+    ],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC161T1.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC161T1-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City",
+      "Freljord"
+    ],
+    "regionRefs": [
+      "BandleCity",
+      "Freljord"
+    ],
+    "attack": 6,
+    "cost": 4,
+    "health": 5,
+    "description": "When I level up, grant the <link=vocab.Strongest><style=Vocab>strongest</style></link> enemy <link=keyword.Vulnerable><sprite name=Vulnerable><style=Keyword>Vulnerable</style></link>.\r\n<link=vocab.RoundEnd><style=Vocab>Round End</style></link>: If I've seen you start the round with the attack token, transform me back into <link=card.level1><style=AssociatedCard>Gnar</style></link>.",
+    "descriptionRaw": "When I level up, grant the strongest enemy Vulnerable.\r\nRound End: If I've seen you start the round with the attack token, transform me back into Gnar.",
+    "levelupDescription": "",
+    "levelupDescriptionRaw": "",
+    "flavorText": "The yordles sat on their tree branch and cheered for Gnar as he duked it out with another passing monster. These were rare events, but always awesome to spectate!",
+    "artistName": "SIXMOREVODKA",
+    "name": "Mega Gnar",
+    "cardCode": "05BC161T1",
+    "keywords": [
+      "Overwhelm",
+      "Quick Attack"
+    ],
+    "keywordRefs": [
+      "Overwhelm",
+      "QuickStrike"
+    ],
+    "spellSpeed": "",
+    "spellSpeedRef": "",
+    "rarity": "None",
+    "rarityRef": "None",
+    "subtypes": [
+      "YORDLE"
+    ],
+    "supertype": "Champion",
+    "type": "Unit",
+    "collectible": false,
+    "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC213.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC213-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City"
+    ],
+    "regionRefs": [
+      "BandleCity"
+    ],
+    "attack": 0,
+    "cost": 3,
+    "health": 0,
+    "description": "Deal 1 to an enemy and <link=keyword.Stun><sprite name=Stunned><style=Keyword>Stun</style></link> it. ",
+    "descriptionRaw": "Deal 1 to an enemy and Stun it. ",
+    "levelupDescription": "",
+    "levelupDescriptionRaw": "",
+    "flavorText": "\"Ahanga!\" - Gnar",
+    "artistName": "Kudos Productions",
+    "name": "Wallop",
+    "cardCode": "05BC213",
+    "keywords": [
+      "Fast"
+    ],
+    "keywordRefs": [
+      "Fast"
+    ],
+    "spellSpeed": "Fast",
+    "spellSpeedRef": "Fast",
+    "rarity": "COMMON",
+    "rarityRef": "Common",
+    "subtypes": [],
+    "supertype": "",
+    "type": "Spell",
+    "collectible": true,
+    "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [
+      "05BC023T1"
+    ],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC023.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC023-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City"
+    ],
+    "regionRefs": [
+      "BandleCity"
+    ],
+    "attack": 6,
+    "cost": 7,
+    "health": 6,
+    "description": "<link=vocab.RoundEnd><style=Vocab>Round End</style></link>: If you've damaged the enemy Nexus this round, transform me into <link=card.transform><style=AssociatedCard>Megatee</style></link>.",
+    "descriptionRaw": "Round End: If you've damaged the enemy Nexus this round, transform me into Megatee.",
+    "levelupDescription": "",
+    "levelupDescriptionRaw": "",
+    "flavorText": "Things minitees like: napping on the warm summerstones beside the Nakotak tribal lands. Things minitees do not like: being shoved off said summerstones by cheeky yordles...",
+    "artistName": "Polar Engine",
+    "name": "Minitee",
+    "cardCode": "05BC023",
+    "keywords": [],
+    "keywordRefs": [],
+    "spellSpeed": "",
+    "spellSpeedRef": "",
+    "rarity": "EPIC",
+    "rarityRef": "Epic",
+    "subtypes": [],
+    "supertype": "",
+    "type": "Unit",
+    "collectible": true,
+    "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [
+      "05BC001T1",
+      "05BC023"
+    ],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC023T1.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC023T1-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City"
+    ],
+    "regionRefs": [
+      "BandleCity"
+    ],
+    "attack": 8,
+    "cost": 7,
+    "health": 8,
+    "description": "<link=vocab.RoundStart><style=Vocab>Round Start</style></link>: Transform the <link=vocab.Strongest><style=Vocab>strongest</style></link> enemy into a 3|3 <link=card.summon><style=AssociatedCard>Mini-Minitee</style></link> and <link=vocab.Silence><style=Vocab>Silence</style></link> it. It can't block.",
+    "descriptionRaw": "Round Start: Transform the strongest enemy into a 3|3 Mini-Minitee and Silence it. It can't block.",
+    "levelupDescription": "",
+    "levelupDescriptionRaw": "",
+    "flavorText": "...but, as they say, yordles gonna yordle!",
+    "artistName": "Polar Engine",
+    "name": "Megatee",
+    "cardCode": "05BC023T1",
+    "keywords": [
+      "Impact"
+    ],
+    "keywordRefs": [
+      "Impact"
+    ],
+    "spellSpeed": "",
+    "spellSpeedRef": "",
+    "rarity": "EPIC",
+    "rarityRef": "Epic",
+    "subtypes": [],
+    "supertype": "",
+    "type": "Unit",
+    "collectible": false,
+    "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC104.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC104-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City"
+    ],
+    "regionRefs": [
+      "BandleCity"
+    ],
+    "attack": 0,
+    "cost": 4,
+    "health": 0,
+    "description": "Grant an ally +2|+2 and <link=keyword.Impact><sprite name=Impact><style=Keyword>Impact</style></link>.",
+    "descriptionRaw": "Grant an ally +2|+2 and Impact.",
+    "levelupDescription": "",
+    "levelupDescriptionRaw": "",
+    "flavorText": "Yes, he's very cute. Yes, he has a temper. No, you don't want to see it.",
+    "artistName": "Kudos Productions",
+    "name": "Primal Strength",
+    "cardCode": "05BC104",
+    "keywords": [
+      "Burst"
+    ],
+    "keywordRefs": [
+      "Burst"
+    ],
+    "spellSpeed": "Burst",
+    "spellSpeedRef": "Burst",
+    "rarity": "COMMON",
+    "rarityRef": "Common",
+    "subtypes": [],
+    "supertype": "",
+    "type": "Spell",
+    "collectible": true,
+    "set": "Set5"
+  },
+  {
+    "associatedCards": [],
+    "associatedCardRefs": [
+      "05BC161T1",
+      "05BC161"
+    ],
+    "assets": [
+      {
+        "gameAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC161T2.png",
+        "fullAbsolutePath": "http://dd.b.pvp.net/3_2_0/set5/en_us/img/cards/05BC161T2-full.png"
+      }
+    ],
+    "regions": [
+      "Bandle City"
+    ],
+    "regionRefs": [
+      "BandleCity"
+    ],
+    "attack": 0,
+    "cost": 3,
+    "health": 0,
+    "description": "Deal 1 to an enemy and <link=keyword.Stun><sprite name=Stunned><style=Keyword>Stun</style></link> it. \r\nCreate a <link=card.level1><style=AssociatedCard>Gnar</style></link> in your deck.",
+    "descriptionRaw": "Deal 1 to an enemy and Stun it. \r\nCreate a Gnar in your deck.",
+    "levelupDescription": "",
+    "levelupDescriptionRaw": "",
+    "flavorText": "\"Ahanga!\" - Gnar",
+    "artistName": "Kudos Productions",
+    "name": "Gnar's Wallop",
+    "cardCode": "05BC161T2",
+    "keywords": [
+      "Fast"
+    ],
+    "keywordRefs": [
+      "Fast"
+    ],
+    "spellSpeed": "Fast",
+    "spellSpeedRef": "Fast",
+    "rarity": "None",
+    "rarityRef": "None",
+    "subtypes": [],
+    "supertype": "Champion",
+    "type": "Spell",
+    "collectible": false,
+    "set": "Set5"
   }
 ]
