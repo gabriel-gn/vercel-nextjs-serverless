@@ -1,10 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import { catchError, concatMap, forkJoin, map, Observable, of, pluck, throwError } from "rxjs";
-import { LoRDeck, MobalyticsDeck, MobalyticsMetaDeck, UserDeck, UserDeckQueryResponse } from "../../shared/models";
+import { catchError, combineLatest, concatMap, forkJoin, map, Observable, of, pluck, throwError } from "rxjs";
+import {
+  DeckStats,
+  LoRDeck,
+  MobalyticsDeck,
+  MobalyticsMetaDeck,
+  UserDeck,
+  UserDeckQueryResponse
+} from "../../shared/models";
 import qs from "qs";
 import { getLoRDecks, mobalyticsDecksToUserDecks } from "../../shared/utils/deck-utils";
 import { SearchDeckLibraryDto } from "./decks.dto";
+import _ from 'lodash';
 
 @Injectable()
 export class HttpDecksService {
@@ -117,6 +125,16 @@ export class HttpDecksService {
       }
       return name;
     }
+
+    const getDeckStats: (metaDeck: any) => DeckStats = (metaDeck: any) => {
+      return {
+        deckCode: metaDeck.deck_code,
+        playRatePercent: metaDeck.pr,
+        winRatePercent: metaDeck.wr,
+        matchesQt: metaDeck.count
+      }
+    }
+
     const request1 = this.http.post(url, defaultPayload, { params: defaultParams }).pipe(map(response => response.data));
 
     const request2 = this.http.post(url, defaultPayload, { params: { ...defaultParams, ...{page: 2} } }).pipe(
@@ -127,17 +145,24 @@ export class HttpDecksService {
     );
     return forkJoin([request1, request2, request3]).pipe(
       map(response => {
-          return [
-            ...response[0].meta.map(metaDeck => metaDeck.deck_code),
-            ...response[1].meta.map(metaDeck => metaDeck.deck_code),
-            ...response[2].meta.map(metaDeck => metaDeck.deck_code)
+          const deckStats = [
+            ...response[0].meta.map(metaDeck => getDeckStats(metaDeck)),
+            ...response[1].meta.map(metaDeck => getDeckStats(metaDeck)),
+            ...response[2].meta.map(metaDeck => getDeckStats(metaDeck))
           ];
+          return { codes: deckStats.map(d => d.deckCode), stats: deckStats.map(d => {return _.omit(d, 'deckCode');}) };
         },
       ),
-      concatMap((deckCodes: string[]) => getLoRDecks(deckCodes)),
-      map((lorDecks: LoRDeck[]) => {
-        return lorDecks.map(deck => {
-          return { deck: deck, title: getDeckName(deck), description: "", username: "" }
+      // @ts-ignore
+      concatMap((deckStats: {codes: string[], stats: DeckStats[]}) => {
+        return forkJoin([
+          getLoRDecks(deckStats.codes),
+          of(deckStats.stats)
+        ]);
+      }),
+      map((deckStats: [LoRDeck[], DeckStats[]]) => {
+        return deckStats[0].map((deck, index) => {
+          return { deck: deck, title: getDeckName(deck), description: "", username: "", stats: deckStats[1][index] }
         });
       }),
       catchError(error => throwError(error))

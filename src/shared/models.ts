@@ -96,12 +96,19 @@ export interface LoRDeck {
   factionCardsQt: {[faction: string]: number};
 }
 
+export interface DeckStats {
+  playRatePercent?: number;
+  winRatePercent?: number;
+  matchesQt?: number;
+}
+
 export interface UserDeck {
   title?: string;
   description?: string;
   badges?: {tier?: string};
   changedAt?: number;
   createdAt?: number;
+  stats?: DeckStats;
   username: string;
   deck: LoRDeck;
 }
