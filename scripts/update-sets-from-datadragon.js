@@ -16,7 +16,7 @@ const fsx = require('fs-extra');
  ************************************/
 
 const setNames = ['set1', 'set2', 'set3', 'set4', 'set5'];
-const langs = ['en_us'];
+const langs = ['en_us', 'pt_br'];
 const isLite = true;
 const tempDir = `${process.cwd()}/tmp`;
 const setsDir = `${tempDir}/sets`;
@@ -96,8 +96,8 @@ async function executeScript() {
     createSetFile(lang); // cria o arquivo json vazio
     for (let setName of setNames) {
       const filename = `${setName}${isLite ? '-lite-' : '-'}${lang}`; // SEM EXTENSÃO!!
-      // await downloadSet(`${downloadUrl}/${filename}`, tempDir);
-      // await extractSet(filename, `${tempDir}/${filename}`);
+      await downloadSet(`${downloadUrl}/${filename}`, tempDir);
+      await extractSet(filename, `${tempDir}/${filename}`);
       updateMetadataFile(filename, lang);
     }
     updateBackendAssets(lang);

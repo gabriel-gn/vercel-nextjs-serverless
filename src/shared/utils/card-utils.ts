@@ -1,4 +1,4 @@
-import { from, map, Observable } from "rxjs";
+import { from, map, Observable, of } from "rxjs";
 import { Card } from "../models";
 import _ from 'lodash';
 
@@ -29,21 +29,10 @@ function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto m
 }
 
 export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
-  return from(
-    Promise.allSettled([
-      require("../../assets/sets/en_us/en_us.json"),
-    ])
-  )
+  const lang = global?.lang ? global.lang : 'en_us';
+  const requireDynamically = eval('require');
+  return of(requireDynamically(`../../assets/sets/${lang}/${lang}.json`))
   .pipe(
-    //@ts-ignore
-    map((response: Array<{value: Card[], status: "fulfilled" | "rejected"}>) => {
-      let cards: Card[] = [];
-      response.forEach(resolved => {
-        // @ts-ignore
-        cards = [...cards, ...resolved.value];
-      });
-      return cards;
-    }),
     map((cards: Card[]) => {
       if (minifyCardData) {
         return minifyCards(cards) as Card[];

@@ -119,22 +119,15 @@ export class DeckFormat {
       essenceCost: 0
     };
     cards.forEach(card => {
-      switch (`${card.card.type}`.toLowerCase()) {
-        case "unit":
-          if (card.card.rarityRef.toLowerCase() === "champion") {
-            deck.cards.champions.push(card);
-          } else {
-            deck.cards.followers.push(card);
-          }
-          break;
-        case "spell":
-          deck.cards.spells.push(card);
-          break;
-        case "landmark":
-          deck.cards.landmarks.push(card);
-          break;
-        default:
-          break;
+      const keywordRefs = card.card.keywordRefs;
+      if (!!card.card.spellSpeedRef) {
+        deck.cards.spells.push(card);
+      } else if (keywordRefs && keywordRefs.length> 0 && keywordRefs.includes('LandmarkVisualOnly')) {
+        deck.cards.landmarks.push(card);
+      } else if (card.card.rarityRef === 'Champion') {
+        deck.cards.champions.push(card);
+      } else {
+        deck.cards.followers.push(card);
       }
       deck.cardCostQt[card.card.cost] += card.count;
       deck.essenceCost += DeckFormat.rarityRefToCost(card.card.rarityRef) * card.count;

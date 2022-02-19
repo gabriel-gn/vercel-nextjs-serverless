@@ -2,9 +2,11 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import { RedocModule, RedocOptions } from "nestjs-redoc";
+import { LanguageInterceptor } from "./shared/interceptors/language.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.useGlobalInterceptors(new LanguageInterceptor());
 
   if (process.env.VERCEL_ENV !== 'production') {
     const swaggerConfig = new DocumentBuilder()
