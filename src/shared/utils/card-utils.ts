@@ -30,8 +30,8 @@ function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto m
 
 export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
   const lang = global?.lang ? global.lang : 'en_us';
-  const requireDynamically = eval('require');
-  return of(requireDynamically(`../../assets/sets/${lang}/${lang}.json`))
+  // const requireDynamically = eval('require');
+  return of(require(`../../assets/sets/${lang}/${lang}.json`))
   .pipe(
     map((cards: Card[]) => {
       if (minifyCardData) {
