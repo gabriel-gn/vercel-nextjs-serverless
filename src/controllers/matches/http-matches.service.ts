@@ -11,8 +11,8 @@ export class HttpMatchesService {
   ) {
   }
 
-    const headers = {"X-Riot-Token": "<TOKEN DA RITO AQUI>"};
   private getRiotHeadersConfig(): {headers: string} {
+    const headers = {"X-Riot-Token": `${process.env.RIOT_TOKEN}`};
     return {headers: headers}
   }
 
