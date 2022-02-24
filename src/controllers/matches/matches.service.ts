@@ -3,6 +3,8 @@ import { HttpMatchesService } from "./http-matches.service";
 import { concatMap, forkJoin, map, Observable, tap, of } from "rxjs";
 import { LoRServerRegion, RiotID } from "../../shared/models/riot-related";
 import { LoRMatch } from "../../shared/models/lor-matches";
+import { getLoRDecks } from "../../shared/utils/deck-utils";
+import { LoRDeck } from "../../shared/models";
 
 @Injectable()
 export class MatchesService {
@@ -11,7 +13,7 @@ export class MatchesService {
   ) {
   }
 
-  getPlayerMatches(from: number = 0, count: number = 0): Observable<LoRMatch[]> {
+  public getPlayerMatches(from: number = 0, count: number = 0): Observable<LoRMatch[]> {
     let playerData: RiotID;
     return this.httpMatchesService.getPlayerData('Book', 'Teemo', 'americas').pipe(
       tap((riotData: RiotID) => {playerData = riotData;}),
@@ -45,6 +47,23 @@ export class MatchesService {
           );
         }));
       })
+    );
+  }
+
+  public getPlayerMatchesWithDeck(from: number = 0, count: number = 0): Observable<LoRMatch[]> {
+    return this.getPlayerMatches(from, count).pipe(
+      concatMap((playerMatches: LoRMatch[]) => forkJoin(playerMatches.map(playerMatch => {
+        const deckCodes = playerMatch.info.players.map(player => player.deck_code);
+        return getLoRDecks(deckCodes).pipe(
+          map((decks: LoRDeck[], index) => {
+            let result = playerMatch;
+            result.info.players = result.info.players.map((playerInfo, index) => {
+              return {...playerInfo, ...{deck: decks[index]}};
+            });
+            return result as LoRMatch;
+          })
+        )
+      })))
     );
   }
 }

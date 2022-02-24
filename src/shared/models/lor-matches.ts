@@ -1,4 +1,5 @@
 import { RiotID } from "./riot-related";
+import { LoRDeck } from "../models";
 
 export interface LoRMatchMetadata {
   data_version: string;
@@ -14,6 +15,7 @@ export interface LoRMatchPlayer {
   game_outcome: string;
   order_of_play: number;
   riotId?: RiotID; // não originário da chamada original
+  deck?: LoRDeck; // não originário da chamada original
 }
 
 export interface LoRMatchInfo {

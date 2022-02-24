@@ -16,6 +16,6 @@ export class MatchesController {
 
   @Get('by-player')
   async getMatchesByPlayer() {
-    return this.matchesService.getPlayerMatches(6, 1);
+    return this.matchesService.getPlayerMatchesWithDeck(0, 4);
   }
 }
