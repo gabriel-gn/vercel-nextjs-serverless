@@ -1,3 +1,5 @@
+import { RiotID } from "./riot-related";
+
 export interface LoRMatchMetadata {
   data_version: string;
   match_id: string;
@@ -11,6 +13,7 @@ export interface LoRMatchPlayer {
   factions: string[];
   game_outcome: string;
   order_of_play: number;
+  riotId?: RiotID; // não originário da chamada original
 }
 
 export interface LoRMatchInfo {

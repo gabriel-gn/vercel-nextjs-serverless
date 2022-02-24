@@ -16,6 +16,6 @@ export class MatchesController {
 
   @Get('by-player')
   async getMatchesByPlayer() {
-    return this.matchesService.getPlayerMatches(0, 5);
+    return this.matchesService.getPlayerMatches(6, 1);
   }
 }

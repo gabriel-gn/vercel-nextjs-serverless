@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import { map, Observable } from "rxjs";
-import { LoRRegions, RiotID, RiotLoRAPIEndpoints } from "../../shared/models/riot-related";
+import { concatMap, map, Observable } from "rxjs";
+import { LoRServerRegion, RiotID, RiotLoRAPIEndpoints } from "../../shared/models/riot-related";
 import { LoRMatch } from "../../shared/models/lor-matches";
 
 @Injectable()
@@ -11,26 +11,58 @@ export class HttpMatchesService {
   ) {
   }
 
-  private getRiotHeadersConfig() {
     const headers = {"X-Riot-Token": "<TOKEN DA RITO AQUI>"};
+  private getRiotHeadersConfig(): {headers: string} {
     return {headers: headers}
   }
 
-  public getPlayerData(gameName: string, tagLine: string, region: LoRRegions): Observable<RiotID> {
+  public getPlayerData(gameName: string, tagLine: string, region: LoRServerRegion): Observable<RiotID> {
     return this.http.get(
-      `${RiotLoRAPIEndpoints[region]}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
+      `${RiotLoRAPIEndpoints[region.toUpperCase()]}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
       this.getRiotHeadersConfig()
     )
     .pipe(
-      map(response => {
-        return {...response.data, ...{LoRRegion: region}} as RiotID;
-      }), // o http do axios da pau se não der .pipe(map(response => response.data))
+      map(response => response.data),
+      concatMap((response: RiotID) => {
+        return this.getPlayerActiveShard(response.puuid, region).pipe(
+          map(activeShard => {
+            return {...response, ...{activeShard: activeShard}} as RiotID;
+          })
+        );
+      })
     );
   }
 
-  public getPlayerMatches(puuid: string): Observable<string[]> {
+  public getPlayerDataByPuuid(puuid: string, region: LoRServerRegion) {
     return this.http.get(
-      `${RiotLoRAPIEndpoints.AMERICAS}/lor/match/v1/matches/by-puuid/${puuid}/ids`,
+      `${RiotLoRAPIEndpoints[region.toUpperCase()]}/riot/account/v1/accounts/by-puuid/${puuid}`,
+      this.getRiotHeadersConfig()
+    )
+    .pipe(
+      map(response => response.data),
+      concatMap((response: RiotID) => {
+        return this.getPlayerActiveShard(response.puuid, region).pipe(
+          map(activeShard => {
+            return {...response, ...{activeShard: activeShard}} as RiotID;
+          })
+        );
+      })
+    )
+  }
+
+  public getPlayerActiveShard(puuid: string, region: LoRServerRegion): Observable<LoRServerRegion> {
+    return this.http.get(
+      `${RiotLoRAPIEndpoints[region.toUpperCase()]}/riot/account/v1/active-shards/by-game/lor/by-puuid/${puuid}`,
+      this.getRiotHeadersConfig()
+    )
+    .pipe(
+      map(response => response.data.activeShard), // o http do axios da pau se não der .pipe(map(response => response.data))
+    );
+  }
+
+  public getPlayerMatches(puuid: string, region: LoRServerRegion): Observable<string[]> {
+    return this.http.get(
+      `${RiotLoRAPIEndpoints[region.toUpperCase()]}/lor/match/v1/matches/by-puuid/${puuid}/ids`,
       this.getRiotHeadersConfig()
     )
     .pipe(
@@ -38,9 +70,9 @@ export class HttpMatchesService {
     );
   }
 
-  public getMatchData(matchId: string): Observable<LoRMatch> {
+  public getMatchData(matchId: string, region: LoRServerRegion): Observable<LoRMatch> {
     return this.http.get(
-      `${RiotLoRAPIEndpoints.AMERICAS}/lor/match/v1/matches/${matchId}`,
+      `${RiotLoRAPIEndpoints[region.toUpperCase()]}/lor/match/v1/matches/${matchId}`,
       this.getRiotHeadersConfig()
     ).pipe(
       map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))

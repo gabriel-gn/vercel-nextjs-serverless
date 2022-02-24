@@ -1,15 +1,14 @@
-export type LoRRegions = 'AMERICAS' | 'EUROPE' | 'ASIA' | 'ESPORTS';
+export type LoRServerRegion = 'americas' | 'europe' | 'sea';
 
 export enum RiotLoRAPIEndpoints {
   AMERICAS = `https://americas.api.riotgames.com`,
-  EUROPE = `https://americas.api.riotgames.com`,
-  ASIA = `https://americas.api.riotgames.com`,
-  ESPORTS = `https://americas.api.riotgames.com`,
+  EUROPE = `https://europe.api.riotgames.com`,
+  SEA = `https://asia.api.riotgames.com`,
 }
 
 export interface RiotID {
   puuid: string;
   gameName: string;
   tagLine: string;
-  LoRRegion: LoRRegions; // não originário da API da RIOT
+  activeShard: LoRServerRegion;
 }
