@@ -9,7 +9,7 @@ import { ConfigModule } from "@nestjs/config";
     ConfigModule.forRoot({
       envFilePath: 'src/environments/environment.env'
     }),
-    AppRoutingModule
+    AppRoutingModule.forRoot()
   ],
   controllers: [AppController],
   providers: [
