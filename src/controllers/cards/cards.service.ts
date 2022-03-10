@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { map, Observable, tap, of } from 'rxjs';
 import { Card } from '../../shared/models';
-import { getCards } from '../../shared/utils/card-utils';
-import { SearchCardsQueryType } from "./cards.dto";
+import { getCards, getCollectibleCards } from "../../shared/utils/card-utils";
+import { SearchCardsQueryType } from './cards.dto';
 
 @Injectable()
 export class CardsService {
@@ -32,7 +32,7 @@ export class CardsService {
       }
     };
 
-    return getCards(false).pipe(
+    return getCollectibleCards(false).pipe(
       map((cards: Card[]) => {
         switch (queryType) {
           case 'code':

@@ -45,3 +45,11 @@ export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
   )
   ;
 }
+
+export function getCollectibleCards(minifyCardData: boolean = true): Observable<Card[]> {
+  return getCards(minifyCardData).pipe(
+    map((cards: Card[]) => {
+      return cards.filter((card) => card.collectible);
+    }),
+  );
+}
