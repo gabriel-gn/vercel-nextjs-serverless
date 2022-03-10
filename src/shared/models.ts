@@ -64,7 +64,17 @@ export enum FactionIdentifiersReverse {
   BC = 'BANDLECITY',
 }
 
-export type Factions =  'DE' | 'FR' | 'IO' | 'NX' | 'PZ' | 'SI' | 'BW' | 'MT' | 'SH' | 'BC';
+export type Factions =
+  | 'DE'
+  | 'FR'
+  | 'IO'
+  | 'NX'
+  | 'PZ'
+  | 'SI'
+  | 'BW'
+  | 'MT'
+  | 'SH'
+  | 'BC';
 
 export enum FactionIdentifiersColors {
   DE = '191,176,131',
@@ -88,12 +98,12 @@ export interface LoRDeck {
     landmarks: DeckCard[];
   };
   cardCostQt: {
-    [cardCost: number]: number
+    [cardCost: number]: number;
   };
   mainFactions: FactionIdentifiers[];
   factions: FactionIdentifiers[];
   essenceCost: number;
-  factionCardsQt: {[faction: string]: number};
+  factionCardsQt: { [faction: string]: number };
 }
 
 export interface DeckStats {
@@ -105,7 +115,7 @@ export interface DeckStats {
 export interface UserDeck {
   title?: string;
   description?: string;
-  badges?: {tier?: string};
+  badges?: { tier?: string };
   changedAt?: number;
   createdAt?: number;
   stats?: DeckStats;
