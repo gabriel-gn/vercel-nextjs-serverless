@@ -1,5 +1,5 @@
-import { RiotID } from "./riot-related";
-import { LoRDeck } from "../models";
+import { RiotID } from './riot-related';
+import { LoRDeck } from '../models';
 
 export interface LoRMatchMetadata {
   data_version: string;
