@@ -19,6 +19,10 @@ export class CardsService {
   public searchCard(query: string, queryType: SearchCardsQueryType, exactMatch: boolean = true): Observable<Card[]> {
     query = `${query}`.toLowerCase();
 
+    if (!query) {
+      return of([]);
+    }
+
     const filterFn: (card: Card, prop: string) => boolean = (card: Card, prop: string) => {
       const cardProp = `${card[prop]}`.toLowerCase();
       if (exactMatch) {
