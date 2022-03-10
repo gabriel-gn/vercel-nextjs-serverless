@@ -2,7 +2,8 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CardsService } from './cards.service';
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
-import { SearchCardsQueryType } from "./cards.dto";
+import { SearchCardsQuery, SearchCardsQueryType } from './cards.dto';
+import { ApiImplicitParam } from "@nestjs/swagger/dist/decorators/api-implicit-param.decorator";
 
 @ApiTags('Cards')
 @Controller()
@@ -24,6 +25,11 @@ export class CardsController {
     name: 'exact',
     required: false,
     type: Boolean,
+  })
+  @ApiImplicitParam({
+    name: 'queryType',
+    required: true,
+    enum: SearchCardsQuery,
   })
   async searchCard(
     @Param('queryType') queryType: SearchCardsQueryType,
