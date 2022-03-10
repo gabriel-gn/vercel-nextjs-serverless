@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { map, Observable, tap, of } from 'rxjs';
 import { Card } from '../../shared/models';
 import { getCards } from '../../shared/utils/card-utils';
+import { SearchCardsQueryType } from "./cards.dto";
 
 @Injectable()
 export class CardsService {
@@ -15,7 +16,7 @@ export class CardsService {
     );
   }
 
-  public searchCard(query: string, queryType: 'code', exactMatch: boolean = true): Observable<Card[]> {
+  public searchCard(query: string, queryType: SearchCardsQueryType, exactMatch: boolean = true): Observable<Card[]> {
     query = `${query}`.toLowerCase();
 
     const filterFn: (card: Card, prop: string) => boolean = (card: Card, prop: string) => {
@@ -32,6 +33,9 @@ export class CardsService {
         switch (queryType) {
           case 'code':
             return cards.filter((card) => filterFn(card, 'cardCode'));
+            break;
+          case 'name':
+            return cards.filter((card) => filterFn(card, 'name'));
             break;
           default:
             return [];
