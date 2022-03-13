@@ -109,22 +109,26 @@ export class HttpDecksService {
     const url = 'https://runeterra.ar/Meta/get/filter/everyone/en_us';
     const defaultPayload = {
       region: [],
-      champ: []
+      champ: [],
     };
     const defaultParams = {
       take: 5,
       type: 'two',
       filter: true,
-    }
+    };
+
     const getDeckName = (deck: LoRDeck) => {
       let name = '';
       if (deck.cards.champions.length > 0) {
-        name = deck.cards.champions.slice(0, 2).map(champion => champion.card.name).join(' / ');
+        name = _.orderBy(deck.cards.champions, ["count"], ["desc"]) //ordena por numero de cartas do campeão
+          .slice(0, 2) // pega apenas os dois campeões mais relevantes
+          .map((champion) => champion.card.name) // retorna o nome deles
+          .join(' / ');
       } else {
         name = '';
       }
       return name;
-    }
+    };
 
     const getDeckStats: (metaDeck: any) => DeckStats = (metaDeck: any) => {
       return {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { map, Observable, tap, of } from 'rxjs';
 import { Card } from '../../shared/models';
-import { getCards, getCollectibleCards } from "../../shared/utils/card-utils";
+import { getCards, getCollectibleCards } from '../../shared/utils/card-utils';
 import { SearchCardsQueryType } from './cards.dto';
 
 @Injectable()

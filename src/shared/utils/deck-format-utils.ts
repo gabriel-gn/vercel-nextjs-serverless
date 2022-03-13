@@ -141,12 +141,15 @@ export class DeckFormat {
     if (deck.mainFactions.length < 2 && deck.factions.length >= 2) { // caso tenha só uma região, verifica se pode ter outra
       deck.mainFactions.push(_.difference(deck.factions, deck.mainFactions)[0]);
     }
+
+    // ordena as cartas por custo
     Object.keys(deck.cards).forEach(key => {
       deck.cards[key] = _.sortBy(deck.cards[key], "card.cost");
       deck.cards[key].forEach(card => {
         deck.factionCardsQt[DeckFormat.getCardMainRegionRef(card.card, deck.mainFactions)] += card.count;
       });
     });
+
     deck.mainFactions = DeckFormat.deckMainRegionRefsOrderedByCardQt(deck);
     deck["code"] = getCodeFromDeck(cards.map(card => {
       return { cardCode: card.card.cardCode, count: card.count } as CardCodeAndCount;
