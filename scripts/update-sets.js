@@ -44,6 +44,18 @@ async function updateSet(setName, lang) {
   return { filename: filename, set: cardSet };
 }
 
+async function commitAll() {
+  const git = simpleGit();
+  const branches = await git.branchLocal();
+  const currentBranch = branches.current;
+
+  console.log(`Iniciando commit na branch ${currentBranch}`);
+  await git.commit(':robot: auto update sets', { '-a': null });
+  await git.push();
+  await git.push('origin', currentBranch);
+  console.log(`Finalizando commit para branch ${currentBranch}`);
+}
+
 /***********************************
  * EXECUÇÃO DO SCRIPT
  ************************************/
@@ -66,12 +78,7 @@ async function executeScript() {
     console.log(filename);
   }
 
-  const git = simpleGit();
-  const branches = await git.branchLocal();
-  const currentBranch = branches.current;
-  await git.commit(':robot: auto update sets', { '-a': null });
-  await git.push();
-  await git.push('origin', currentBranch);
+  await commitAll();
 }
 
 executeScript();
