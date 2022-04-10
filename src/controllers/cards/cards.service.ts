@@ -16,7 +16,14 @@ export class CardsService {
     );
   }
 
-  public searchCard(query: string, queryType: SearchCardsQueryType, exactMatch: boolean = true): Observable<Card[]> {
+  public searchCard(
+      query: string,
+      queryType: SearchCardsQueryType,
+      exactMatch: boolean = true,
+      onlyCollectible: boolean = true,
+      minify: boolean = true,
+      limit: number = 5
+    ): Observable<Card[]> {
     query = `${query}`.toLowerCase();
 
     if (!query) {
@@ -32,19 +39,21 @@ export class CardsService {
       }
     };
 
-    return getCollectibleCards(false).pipe(
+    const cardsObs = onlyCollectible ? getCollectibleCards(minify) : getCards(minify);
+
+    return cardsObs.pipe(
       map((cards: Card[]) => {
+        let cardResult: Card[] = [];
         switch (queryType) {
           case 'code':
-            return cards.filter((card) => filterFn(card, 'cardCode'));
+            cardResult = cards.filter((card) => filterFn(card, 'cardCode'));
             break;
           case 'name':
-            return cards.filter((card) => filterFn(card, 'name'));
-            break;
-          default:
-            return [];
+            cardResult = cards.filter((card) => filterFn(card, 'name'));
             break;
         }
+        cardResult = !!limit ? cardResult.slice(0, limit) : cardResult;
+        return cardResult;
       }),
     );
   }

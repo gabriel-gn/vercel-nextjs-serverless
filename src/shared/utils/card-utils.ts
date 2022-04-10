@@ -6,6 +6,7 @@ function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto m
   const attrsToKeep = [
     'associatedCardRefs',
     'cardCode',
+    'collectible',
     'cost',
     'keywordRefs',
     'name',
@@ -21,6 +22,7 @@ function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto m
   const minifyCard = (card: Card) => {
     return _.pickBy(card, (value, key) => attrsToKeep.includes(key));
   };
+
   if (Array.isArray(cards)) { // se for array retorna um array
     return cards.map(cardFull => {
       return minifyCard(cardFull);
@@ -39,7 +41,7 @@ export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
       if (minifyCardData) {
         return minifyCards(cards) as Card[];
       } else {
-        return cards as unknown as Card[];
+        return cards;
       }
     })
   )
@@ -49,7 +51,7 @@ export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
 export function getCollectibleCards(minifyCardData: boolean = true): Observable<Card[]> {
   return getCards(minifyCardData).pipe(
     map((cards: Card[]) => {
-      return cards.filter((card) => card.collectible);
+      return cards.filter(card => card.collectible);
     }),
   );
 }
