@@ -32,7 +32,7 @@ export class CardsController {
     type: Boolean,
   })
   @ApiImplicitQuery({
-    name: 'collectible',
+    name: 'onlyCollectible',
     required: false,
     type: Boolean,
   })
@@ -50,7 +50,7 @@ export class CardsController {
     @Param('queryType') queryType: SearchCardsQueryType,
     @Query('q') query: string,
     @Query('exact') exactMatch: boolean,
-    @Query('collectible') onlyCollectible: boolean = true,
+    @Query('onlyCollectible') onlyCollectible: boolean = true,
     @Query('minify') minify: boolean = true,
     @Query('limit') limit: number = 5,
   ) {
