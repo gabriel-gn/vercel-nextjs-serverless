@@ -44,6 +44,39 @@ async function updateSet(setName, lang) {
   return { filename: filename, set: cardSet };
 }
 
+async function updateAllSets(lang) {
+  createSetFile(lang); // cria o arquivo json vazio
+  let cardSets = [];
+  for (let setName of setNames) {
+    const result = await updateSet(setName, lang);
+    cardSets.push(result.set);
+    console.log(result.filename);
+  }
+  const allCards = [].concat.apply([], cardSets);
+  const filename = `${lang}.json`;
+  fs.writeFileSync(
+    `./src/assets/sets/${lang}/${filename}`,
+    JSON.stringify(allCards),
+  );
+  console.log(filename);
+}
+
+async function updateGlobals(lang) {
+  const dir = `src/assets/globals`;
+  const filepath = `${dir}/${lang}.json`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(`${filepath}`, JSON.stringify([])); // CRIA O ARQUIVO VAZIO!
+  const downloadPath = `${downloadUrl}/core/${lang}/data/globals-${lang}.json`;
+  let globalsFile = await rxjs.lastValueFrom(
+    new http.HttpService()
+      .get(downloadPath)
+      .pipe(rxjs.map((response) => response.data)),
+  );
+  fs.writeFileSync(`./${filepath}`, JSON.stringify(globalsFile));
+}
+
 async function commitAll() {
   const git = simpleGit();
   const branches = await git.branchLocal();
@@ -62,20 +95,8 @@ async function commitAll() {
 
 async function executeScript() {
   for (let lang of langs) {
-    createSetFile(lang); // cria o arquivo json vazio
-    let cardSets = [];
-    for (let setName of setNames) {
-      const result = await updateSet(setName, lang);
-      cardSets.push(result.set);
-      console.log(result.filename);
-    }
-    const allCards = [].concat.apply([], cardSets);
-    const filename = `${lang}.json`;
-    fs.writeFileSync(
-      `./src/assets/sets/${lang}/${filename}`,
-      JSON.stringify(allCards),
-    );
-    console.log(filename);
+    await updateGlobals(lang);
+    await updateAllSets(lang);
   }
 
   await commitAll();
