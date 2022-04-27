@@ -3,6 +3,7 @@ import { HttpService } from "@nestjs/axios";
 import { concatMap, map, Observable } from "rxjs";
 import { LoRServerRegion, RiotID, RiotLoRAPIEndpoints } from "../../shared/models/riot-related";
 import { LoRMatch } from "../../shared/models/lor-matches";
+import { AxiosRequestConfig } from "axios";
 
 @Injectable()
 export class HttpMatchesService {
@@ -11,15 +12,15 @@ export class HttpMatchesService {
   ) {
   }
 
-  private getRiotHeadersConfig(): {headers: string} {
-    const headers = {"X-Riot-Token": `${process.env.RIOT_TOKEN}`};
-    return {headers: headers}
+  private getRiotHeadersConfig(): { headers: { [stringName: string]: string } } {
+    const headers = { 'X-Riot-Token': `${process.env.RIOT_TOKEN}` };
+    return { headers: headers };
   }
 
   public getPlayerData(gameName: string, tagLine: string, region: LoRServerRegion): Observable<RiotID> {
     return this.http.get(
       `${RiotLoRAPIEndpoints[region.toUpperCase()]}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
-      this.getRiotHeadersConfig()
+      this.getRiotHeadersConfig() as AxiosRequestConfig<any>
     )
     .pipe(
       map(response => response.data),

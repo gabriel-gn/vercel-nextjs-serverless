@@ -36,7 +36,7 @@ export class MatchesService {
             }
           }));
           return playerInfoRequests.pipe(
-            map((players: RiotID) => {
+            map((players: RiotID[]) => {
               const completePlayersInfo = lorMatch.info.players.map(playerInfo => {
                 return { ...playerInfo, ...{ riotId: players.find(x => x.puuid === playerInfo.puuid) } }
               });
