@@ -21,6 +21,7 @@ export class CardsService {
       queryType: SearchCardsQueryType,
       exactMatch: boolean = true,
       onlyCollectible: boolean = true,
+      associatedCards: boolean = false,
       minify: boolean = true,
       limit: number = 5
     ): Observable<Card[]> {
@@ -53,6 +54,15 @@ export class CardsService {
             break;
         }
         cardResult = !!limit ? cardResult.slice(0, limit) : cardResult;
+
+        if (associatedCards === true) {  // adiciona as card refs
+          cardResult.forEach((card) => {
+            card.associatedCardRefs.forEach(cardRef => {
+              card.associatedCards.push(cards.find(lorCard => lorCard.cardCode === cardRef));
+            });
+          });
+        }
+
         return cardResult;
       }),
     );

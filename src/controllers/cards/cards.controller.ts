@@ -32,6 +32,11 @@ export class CardsController {
     type: Boolean,
   })
   @ApiImplicitQuery({
+    name: 'associatedCards',
+    required: false,
+    type: Boolean,
+  })
+  @ApiImplicitQuery({
     name: 'onlyCollectible',
     required: false,
     type: Boolean,
@@ -51,12 +56,14 @@ export class CardsController {
     @Query('q') query: string,
     @Query('exact') exactMatch: boolean,
     @Query('onlyCollectible') onlyCollectible: boolean = true,
+    @Query('associatedCards') associatedCards: boolean = false,
     @Query('minify') minify: boolean = true,
     @Query('limit') limit: number = 5,
   ) {
     exactMatch = `${exactMatch}`.toLowerCase() == 'false';
     onlyCollectible = `${onlyCollectible}`.toLowerCase() === 'true';
+    associatedCards = `${associatedCards}`.toLowerCase() === 'true';
     minify = `${minify}`.toLowerCase() === 'true';
-    return this.cardsService.searchCard(query, queryType, !exactMatch, onlyCollectible, minify, +limit);
+    return this.cardsService.searchCard(query, queryType, !exactMatch, onlyCollectible, associatedCards, minify, +limit);
   }
 }
