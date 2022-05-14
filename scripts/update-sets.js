@@ -11,7 +11,7 @@ const simpleGit = require('simple-git');
  * VARIÁVEIS DO SCRIPT
  ************************************/
 
-const setNames = ['set1', 'set2', 'set3', 'set4', 'set5'];
+const setNames = ['set1', 'set2', 'set3', 'set4', 'set5', 'set6'];
 const langs = ['en_us', 'pt_br'];
 const tempDir = `${process.cwd()}/tmp`;
 const setsDir = `${tempDir}/sets`;
