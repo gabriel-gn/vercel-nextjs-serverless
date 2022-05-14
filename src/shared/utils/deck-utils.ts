@@ -25,15 +25,16 @@ export function getDeckCardsByDeckCode(deckCode: string, cards: Card[] = undefin
         const decodedDeck: Deck = getDeckFromCode(deckCode);
         const finalDeck: DeckCard[] = decodedDeck.map(card => {
           const foundCard = cards.find(lorCard => lorCard.cardCode === card.cardCode);
-          if (foundCard.associatedCardRefs.length > 0) {
-            foundCard.associatedCardRefs = foundCard.associatedCardRefs.sort();
-          }
-          return {
+          // if (foundCard.associatedCardRefs.length > 0) { // organizar as card refs
+          //   foundCard.associatedCardRefs = foundCard.associatedCardRefs.sort();
+          // }
+          return foundCard ? {
             card: foundCard,
             count: card.count
-          };
+          } : null;
         });
-        return finalDeck;
+        // Caso não ache alguma das cartas, envia o deck vazio
+        return finalDeck.some(card => card === null) ? [] : finalDeck;
       })
     )
     ;
