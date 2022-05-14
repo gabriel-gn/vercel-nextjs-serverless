@@ -94,10 +94,10 @@ async function commitAll() {
  ************************************/
 
 async function executeScript() {
-  // for (let lang of langs) {
-  //   await updateGlobals(lang);
-  //   await updateAllSets(lang);
-  // }
+  for (let lang of langs) {
+    await updateGlobals(lang);
+    await updateAllSets(lang);
+  }
 
   await commitAll();
 }
