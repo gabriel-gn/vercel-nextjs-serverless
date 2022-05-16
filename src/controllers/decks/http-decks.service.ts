@@ -1,7 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
-import { catchError, combineLatest, concatMap, forkJoin, map, Observable, of, pluck, throwError } from "rxjs";
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import {
+  catchError,
+  combineLatest,
+  concatMap,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  pluck,
+  throwError,
+} from 'rxjs';
+import {
+  Card,
   DeckStats,
   LoRDeck,
   MobalyticsDeck,
@@ -9,17 +20,21 @@ import {
   UserDeck,
   UserDeckQueryResponse
 } from "../../shared/models";
-import qs from "qs";
-import { getLoRDecks, mobalyticsDecksToUserDecks, runeterraARDecksToUserDecks } from "../../shared/utils/deck-utils";
-import { SearchDeckLibraryDto } from "./decks.dto";
+import qs from 'qs';
+import {
+  getLoRDecks,
+  mobalyticsDecksToUserDecks,
+  runeterraARDecksToUserDecks,
+} from '../../shared/utils/deck-utils';
+import {
+  SearchDeckLibraryDto,
+  SearchDeckLibraryRuneterraArDto,
+} from './decks.dto';
 import _ from 'lodash';
 
 @Injectable()
 export class HttpDecksService {
-  constructor(
-    private http: HttpService
-  ) {
-  }
+  constructor(private http: HttpService) {}
 
   public getMetaDecks(): Observable<UserDeck[]> {
     return this.http.get('https://lor.mobalytics.gg/api/v2/meta/tier-list')
@@ -105,21 +120,57 @@ export class HttpDecksService {
       );
   }
 
-  public getDecksFromLibraryRuneterraAR(): Observable<UserDeckQueryResponse> {
-    const numberOfDecksToGet = 9; // retirado da chamada oficial do site
+  public getDecksFromLibraryRuneterraAR(searchObj: SearchDeckLibraryRuneterraArDto): Observable<UserDeckQueryResponse> {
+    const numberOfDecksToGet = 12; // retirado da chamada oficial do site
     const url = 'https://runeterra.ar/cards/get/public/decks/en_us';
     const defaultParams = {
       take: numberOfDecksToGet,
       server: 'everyone',
     };
+
+    // caso tenha page, verifica se é um numero e adiciona
+    if (searchObj?.page) {
+      if (!isNaN(+searchObj.page) && +searchObj.page > 1) {
+        defaultParams['page'] = +searchObj.page;
+      }
+    }
+
     const payload: {
-      region: { region: string; regionRef: string }[];
-      champ: { name: string; cardCode: string }[];
-    } = {
-      region: [],
-      champ: [],
-    };
-    return this.http.post(url, {},{
+      region?: { region: string; regionRef: string }[];
+      champ?: { name: string; cardCode: string }[];
+    } = {};
+
+    // traduz as abreviações de regiões para o formato que o runeterraAR aceita
+    if (searchObj?.factions && Array.isArray(searchObj.factions)) {
+      let regions = [];
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const globalsRegions = require(`../../assets/globals/en_us.json`).regions;
+      for (const searchRegion of searchObj.factions) {
+        const globalRegion = globalsRegions.find(rg => rg?.abbreviation === `${searchRegion}`.toUpperCase());
+        if (globalRegion) {
+          regions.push({ region: globalRegion.name, regionRef: globalRegion.nameRef });
+        }
+      }
+      regions = _.uniqBy(regions, 'region');
+      payload['region'] = regions;
+    }
+
+    // traduz os cardIds o formato de APENAS CHAMPS que o runeterraAR aceita
+    if (searchObj?.cardIds && Array.isArray(searchObj.cardIds)) {
+      let cardObjects = [];
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const cards: Card[] = require(`../../assets/sets/en_us/en_us.json`);
+      for (const cardId of searchObj.cardIds) {
+        const card = cards.find((cd) => cd?.cardCode === `${cardId}`);
+        if (card) {
+          cardObjects.push({ name: card.name, cardcode: card.cardCode });
+        }
+      }
+      cardObjects = _.uniqBy(cardObjects, 'name');
+      payload['champ'] = cardObjects;
+    }
+
+    return this.http.post(url, payload,{
       params: defaultParams,
       paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
     })
@@ -134,7 +185,7 @@ export class HttpDecksService {
             };
           }),
         ) as Observable<UserDeckQueryResponse>;
-      })
+      }),
     );
   }
 

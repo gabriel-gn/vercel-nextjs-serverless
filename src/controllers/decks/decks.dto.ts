@@ -51,6 +51,11 @@ export class SearchDeckLibraryDto {
 export class SearchDeckLibraryRuneterraArDto {
   @ApiProperty({
     required: false,
+  })
+  page?: number | string;
+
+  @ApiProperty({
+    required: false,
     enum: ['DE', 'FR', 'IO', 'NX', 'PZ', 'SI', 'BW', 'MT', 'SH', 'BC', 'RU'],
     enumName: 'Factions',
     isArray: true,

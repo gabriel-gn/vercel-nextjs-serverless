@@ -1,21 +1,18 @@
-import { Controller, Get } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
-    constructor() {
-    }
+  constructor() {}
 
-    @Get()
-    getHealthcheck() {
-        return `Healthcheck Ok`;
-    }
-
+  @Get()
+  getHealthcheck() {
+    return `Healthcheck Ok`;
+  }
 }
 
 @ApiTags('Models')
 @Controller()
 export class ModelsController {
-    constructor() {
-    }
+  constructor() {}
 }

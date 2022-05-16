@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { DecksService } from './decks.service';
-import { SearchDeckLibraryDto } from './decks.dto';
+import { SearchDeckLibraryDto, SearchDeckLibraryRuneterraArDto } from "./decks.dto";
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Decks')
@@ -36,8 +36,8 @@ export class DecksController {
     return this.decksService.getDecksFromLibrary(searchObj);
   }
 
-  @Get('library-runeterraAR')
-  async getDecksFromLibraryRuneterraAR() {
-    return this.decksService.getDecksFromLibraryRuneterraAR();
+  @Post('library-runeterraAR')
+  async getDecksFromLibraryRuneterraAR(@Body() searchObj: SearchDeckLibraryRuneterraArDto) {
+    return this.decksService.getDecksFromLibraryRuneterraAR(searchObj);
   }
 }

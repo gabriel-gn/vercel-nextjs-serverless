@@ -3,7 +3,7 @@ import { HttpDecksService } from './http-decks.service';
 import { Observable } from 'rxjs';
 import { LoRDeck, UserDeck, UserDeckQueryResponse } from '../../shared/models';
 import { getLoRDeck } from '../../shared/utils/deck-utils';
-import { SearchDeckLibraryDto } from './decks.dto';
+import { SearchDeckLibraryDto, SearchDeckLibraryRuneterraArDto } from "./decks.dto";
 
 @Injectable()
 export class DecksService {
@@ -25,7 +25,7 @@ export class DecksService {
     return this.http.getDecksFromLibrary(searchObj);
   }
 
-  public getDecksFromLibraryRuneterraAR(): Observable<UserDeckQueryResponse> {
-    return this.http.getDecksFromLibraryRuneterraAR();
+  public getDecksFromLibraryRuneterraAR(searchObj: SearchDeckLibraryRuneterraArDto): Observable<UserDeckQueryResponse> {
+    return this.http.getDecksFromLibraryRuneterraAR(searchObj);
   }
 }
