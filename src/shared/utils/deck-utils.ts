@@ -91,13 +91,18 @@ export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibrary
   return getLoRDecks(runeterraArDecks.map(deck => deck.deck_code))
     .pipe(
       map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
+        const dateObjectFromUTC = (s) => {
+          s = s.split(/\D/);
+          return new Date(Date.UTC(+s[0], --s[1], +s[2], +s[3], +s[4], +s[5], 0));
+        };
+
         return {
           ...{ deck: lorDeck },
           ...{
             title: runeterraArDecks[i]?.deck_name,
             description: '',
-            changedAt: new Date(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
-            createdAt: new Date(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
+            changedAt: dateObjectFromUTC(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
+            createdAt: dateObjectFromUTC(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
             username: runeterraArDecks[i]?.gameName,
           },
         };
