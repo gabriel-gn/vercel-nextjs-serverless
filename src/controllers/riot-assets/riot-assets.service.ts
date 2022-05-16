@@ -18,6 +18,7 @@ export class RiotAssetsService {
 
   public getLoRCards(): Observable<Card[]> {
     const lang = global?.lang ? global.lang : 'en_us';
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     return of(require(`../../assets/sets/${lang}/${lang}.json`));
   }
 }

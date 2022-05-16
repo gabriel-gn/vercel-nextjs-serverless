@@ -161,6 +161,70 @@ export interface MobalyticsMetaDeck {
   }[];
 }
 
+export interface RuneterraArLibraryDeck {
+  id: number;
+  uid: string;
+  gameName: string;
+  picture: string;
+  verified: boolean;
+  country: string;
+  date: Date;
+  deck_code: string;
+  deck_name: string;
+  region: {
+    region?: any;
+    regionRef: string;
+  }[];
+  champs: {
+    cardcode: string;
+    count: number;
+    name?: any;
+  }[];
+  privacy: boolean;
+  vip: boolean;
+  creator: boolean;
+  server: string;
+  count: number;
+  champions: {
+    cardcode: string;
+    count: number;
+    name?: any;
+  }[];
+  spells: {
+    cardcode: string;
+    count: number;
+    name?: any;
+  }[];
+  landmarks: {
+    cardcode: string;
+    count: number;
+    name?: any;
+  }[];
+  units: {
+    cardcode: string;
+    count: number;
+    name?: any;
+  }[];
+  region_count: {
+    region?: any;
+    regionRef: string;
+    count: number;
+  }[];
+  like: boolean;
+  like_count: number;
+  wr?: any;
+  matches?: any;
+  users?: any;
+  aid: string;
+  pr?: any;
+  players?: any;
+  rank?: any;
+  lp?: any;
+  engagements_count: number;
+  shared_count: number;
+  exports_count: number;
+}
+
 export interface UserDeckQueryResponse {
   decks: UserDeck[];
   hasNext: boolean;
