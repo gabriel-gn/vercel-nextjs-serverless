@@ -1,4 +1,4 @@
-import { Deck, getDeckFromCode } from "lor-deckcodes-ts";
+import { Deck, getDeckFromCode } from "@gabrielgn-test/lor-deckcodes-ts";
 import { DeckFormat } from "./deck-format-utils";
 import { map, Observable, forkJoin, concatMap, of } from "rxjs";
 import {

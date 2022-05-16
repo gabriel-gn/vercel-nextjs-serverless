@@ -9,7 +9,7 @@ import {
 import {
   getCodeFromDeck,
   CardCodeAndCount,
-} from "lor-deckcodes-ts";
+} from "@gabrielgn-test/lor-deckcodes-ts";
 import _ from "lodash";
 
 export class DeckFormat {
