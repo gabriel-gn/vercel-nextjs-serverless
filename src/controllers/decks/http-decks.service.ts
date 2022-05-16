@@ -162,7 +162,7 @@ export class HttpDecksService {
       const cards: Card[] = require(`../../assets/sets/en_us/en_us.json`);
       for (const cardId of searchObj.cardIds) {
         const card = cards.find((cd) => cd?.cardCode === `${cardId}`);
-        if (card) {
+        if (card && card?.rarityRef === 'Champion') {
           cardObjects.push({ name: card.name, cardcode: card.cardCode });
         }
       }

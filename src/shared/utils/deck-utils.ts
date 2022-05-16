@@ -1,6 +1,6 @@
 import { Deck, getDeckFromCode } from "@gabrielgn-test/lor-deckcodes-ts";
 import { DeckFormat } from "./deck-format-utils";
-import { map, Observable, forkJoin, concatMap, of } from "rxjs";
+import { map, Observable, forkJoin, concatMap, of, catchError } from "rxjs";
 import {
   Card,
   DeckCard,
@@ -68,6 +68,7 @@ export function getLoRDecks(deckCodes: string[]): Observable<LoRDeck[]> {
 }
 
 export function mobalyticsDecksToUserDecks(mobalyticsDecks: MobalyticsDeck[]): Observable<UserDeck[]> {
+  if (mobalyticsDecks.length === 0) { return of([]) };
   return getLoRDecks(mobalyticsDecks.map(deck => deck.exportUID))
     .pipe(
       map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
@@ -86,6 +87,7 @@ export function mobalyticsDecksToUserDecks(mobalyticsDecks: MobalyticsDeck[]): O
 }
 
 export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibraryDeck[]): Observable<UserDeck[]> {
+  if (runeterraArDecks.length === 0) { return of([]) };
   return getLoRDecks(runeterraArDecks.map(deck => deck.deck_code))
     .pipe(
       map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
@@ -100,5 +102,6 @@ export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibrary
           },
         };
       }),
-    ));
+    ),
+  );
 }
