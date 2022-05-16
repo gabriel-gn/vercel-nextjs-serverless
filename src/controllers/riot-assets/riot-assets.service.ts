@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
+import { Card } from '../../shared/models';
 
 @Injectable()
 export class RiotAssetsService {
@@ -13,5 +14,10 @@ export class RiotAssetsService {
     const lang = global?.lang ? global.lang : 'en_us';
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return of(require(`../../assets/globals/${lang}.json`));
+  }
+
+  public getLoRCards(): Observable<Card[]> {
+    const lang = global?.lang ? global.lang : 'en_us';
+    return of(require(`../../assets/sets/${lang}/${lang}.json`));
   }
 }

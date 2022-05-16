@@ -16,4 +16,9 @@ export class RiotAssetsController {
   async getGlobals() {
     return this.riotAssetsService.getLoRGlobals();
   }
+
+  @Get('cards')
+  async getCards() {
+    return this.riotAssetsService.getLoRCards();
+  }
 }

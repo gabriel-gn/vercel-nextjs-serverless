@@ -49,6 +49,7 @@ export enum FactionIdentifiers {
   TARGON = 'MT',
   SHURIMA = 'SH',
   BANDLECITY = 'BC',
+  RUNETERRA = 'RU',
 }
 
 export enum FactionIdentifiersReverse {
@@ -62,6 +63,7 @@ export enum FactionIdentifiersReverse {
   MT = 'TARGON',
   SH = 'SHURIMA',
   BC = 'BANDLECITY',
+  RU = 'RUNETERRA',
 }
 
 export type Factions =
@@ -74,7 +76,8 @@ export type Factions =
   | 'BW'
   | 'MT'
   | 'SH'
-  | 'BC';
+  | 'BC'
+  | 'RU';
 
 export enum FactionIdentifiersColors {
   DE = '191,176,131',
@@ -87,6 +90,7 @@ export enum FactionIdentifiersColors {
   MT = '117,109,213',
   SH = '214,164,62',
   BC = '193,208,85',
+  RU = '245,245,245',
 }
 
 export interface LoRDeck {
