@@ -52,7 +52,7 @@ export class SearchDeckLibraryRuneterraArDto {
   @ApiProperty({
     required: false,
   })
-  page?: number | string;
+  page?: number;
 
   @ApiProperty({
     required: false,
