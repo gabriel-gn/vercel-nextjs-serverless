@@ -35,4 +35,9 @@ export class DecksController {
   async getLibraryDecks(@Body() searchObj: SearchDeckLibraryDto) {
     return this.decksService.getDecksFromLibrary(searchObj);
   }
+
+  @Get('library-runeterraAR')
+  async getDecksFromLibraryRuneterraAR() {
+    return this.decksService.getDecksFromLibraryRuneterraAR();
+  }
 }

@@ -4,7 +4,7 @@ import { map, Observable, forkJoin, concatMap, of } from "rxjs";
 import {
   Card,
   DeckCard,
-  LoRDeck, MobalyticsDeck, UserDeck
+  LoRDeck, MobalyticsDeck, RuneterraArLibraryDeck, UserDeck
 } from "../../shared/models";
 import {
   getCards
@@ -83,4 +83,22 @@ export function mobalyticsDecksToUserDecks(mobalyticsDecks: MobalyticsDeck[]): O
         };
       }))
     );
+}
+
+export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibraryDeck[]): Observable<UserDeck[]> {
+  return getLoRDecks(runeterraArDecks.map(deck => deck.deck_code))
+    .pipe(
+      map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
+        return {
+          ...{ deck: lorDeck },
+          ...{
+            title: runeterraArDecks[i]?.deck_name,
+            description: '',
+            changedAt: new Date(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
+            createdAt: new Date(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
+            username: runeterraArDecks[i]?.gameName,
+          },
+        };
+      }),
+    ));
 }

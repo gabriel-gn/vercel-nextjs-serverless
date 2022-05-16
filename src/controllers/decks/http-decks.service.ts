@@ -10,7 +10,7 @@ import {
   UserDeckQueryResponse
 } from "../../shared/models";
 import qs from "qs";
-import { getLoRDecks, mobalyticsDecksToUserDecks } from "../../shared/utils/deck-utils";
+import { getLoRDecks, mobalyticsDecksToUserDecks, runeterraARDecksToUserDecks } from "../../shared/utils/deck-utils";
 import { SearchDeckLibraryDto } from "./decks.dto";
 import _ from 'lodash';
 
@@ -45,15 +45,16 @@ export class HttpDecksService {
   }
 
   public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeckQueryResponse> {
+    const url = 'https://lor.mobalytics.gg/api/v2/decks/library';
     const defaultParams = {
       sortBy: 'recently_updated',
       from: 0,
       count: 20,
       withUserCards: false,
-    }
-    const addedParams = {}
+    };
+    const addedParams = {};
     for (let key of Object.keys(searchObj)) {
-      switch(key) {
+      switch (key) {
         case 'category':
           addedParams['category'] = searchObj.category;
           break;
@@ -80,7 +81,7 @@ export class HttpDecksService {
           break;
       }
     }
-    return this.http.get('https://lor.mobalytics.gg/api/v2/decks/library',{
+    return this.http.get(url,{
       params: { ...defaultParams, ...addedParams },
       paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
     })
@@ -95,14 +96,46 @@ export class HttpDecksService {
             map(userDecks => {
               return {
                 decks: userDecks,
-                hasNext: response.hasNext
-              }
-            })
+                hasNext: response.hasNext,
+              };
+            }),
           );
         }),
         catchError(error => throwError(error))
-      )
-      ;
+      );
+  }
+
+  public getDecksFromLibraryRuneterraAR(): Observable<UserDeckQueryResponse> {
+    const numberOfDecksToGet = 9; // retirado da chamada oficial do site
+    const url = 'https://runeterra.ar/cards/get/public/decks/en_us';
+    const defaultParams = {
+      take: numberOfDecksToGet,
+      server: 'everyone',
+    };
+    const payload: {
+      region: { region: string; regionRef: string }[];
+      champ: { name: string; cardCode: string }[];
+    } = {
+      region: [],
+      champ: [],
+    };
+    return this.http.post(url, {},{
+      params: defaultParams,
+      paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
+    })
+    .pipe(
+      map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
+      concatMap(response => {
+        return runeterraARDecksToUserDecks(response.decks).pipe(
+          map(userDecks => {
+            return {
+                decks: userDecks,
+                hasNext: response.count === numberOfDecksToGet,
+            };
+          }),
+        ) as Observable<UserDeckQueryResponse>;
+      })
+    );
   }
 
   public getTrendingDecks(): Observable<UserDeck[]> {
@@ -135,9 +168,9 @@ export class HttpDecksService {
         deckCode: metaDeck.deck_code,
         playRatePercent: metaDeck.pr,
         winRatePercent: metaDeck.wr,
-        matchesQt: metaDeck.count
-      }
-    }
+        matchesQt: metaDeck.count,
+      };
+    };
 
     const request1 = this.http.post(url, defaultPayload, { params: defaultParams }).pipe(map(response => response.data));
 

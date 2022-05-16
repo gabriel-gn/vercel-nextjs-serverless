@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CardsService } from './cards.service';
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import { SearchCardsQuery, SearchCardsQueryType } from './cards.dto';
-import { ApiImplicitParam } from "@nestjs/swagger/dist/decorators/api-implicit-param.decorator";
+import { ApiImplicitParam } from '@nestjs/swagger/dist/decorators/api-implicit-param.decorator';
 
 @ApiTags('Cards')
 @Controller()
