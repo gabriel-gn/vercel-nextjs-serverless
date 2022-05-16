@@ -8,7 +8,7 @@
   "scripts": {
     "prebuild": "rimraf dist && npm run install:deckcode",
     "build": "NODE_ENV=production nest build",
-    "install:deckcode": "npm install --prefix ./tggn @gabrielgn-test/lor-deckcodes-ts && cp -a ./tggn/node_modules/@gabrielgn-test/lor-deckcodes-ts ./node_modules/lor-deckcodes-ts && rm -rf ./tggn",
+    "install:deckcode": "npm install --prefix ./tggn @gabrielgn-test/lor-deckcodes-ts && rm -rf ./node_modules/lor-deckcodes-ts && cp -a ./tggn/node_modules/@gabrielgn-test/lor-deckcodes-ts ./node_modules/lor-deckcodes-ts && rm -rf ./tggn",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
