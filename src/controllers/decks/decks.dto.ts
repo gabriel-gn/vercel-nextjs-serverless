@@ -1,12 +1,15 @@
 import { Factions } from '../../shared/models';
 import { ApiProperty } from '@nestjs/swagger';
 
+export type SearchDeckLibraryCategory = 'BUDGET' | 'FEATURED' | 'COMMUNITY';
+export type SearchDeckLibraryPlaystyle = 'AGGRO' | 'COMBO' | 'CONTROL' | 'MIDRANGE';
+
 export class SearchDeckLibraryDto {
   @ApiProperty({
     required: true,
     enum: ['BUDGET', 'FEATURED', 'COMMUNITY'],
   })
-  category: 'BUDGET' | 'FEATURED' | 'COMMUNITY';
+  category: SearchDeckLibraryCategory;
 
   @ApiProperty({
     required: false,
@@ -25,7 +28,7 @@ export class SearchDeckLibraryDto {
     required: false,
     enum: ['AGGRO', 'COMBO', 'CONTROL', 'MIDRANGE'],
   })
-  playStyle?: 'AGGRO' | 'COMBO' | 'CONTROL' | 'MIDRANGE';
+  playStyle?: SearchDeckLibraryPlaystyle;
 
   @ApiProperty({
     required: false,
