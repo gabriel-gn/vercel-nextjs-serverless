@@ -23,7 +23,7 @@ export class DecksController {
     return this.decksService.getTrendingDecks();
   }
 
-  @Post('library')
+  @Post('library-indigo')
   @ApiBody({ type: SearchDeckLibraryDto })
   @ApiResponse({
     status: 201,
@@ -36,7 +36,7 @@ export class DecksController {
     return this.decksService.getDecksFromLibrary(searchObj);
   }
 
-  @Post('library-runeterraAR')
+  @Post('library-carbon')
   async getDecksFromLibraryRuneterraAR(@Body() searchObj: SearchDeckLibraryRuneterraArDto) {
     return this.decksService.getDecksFromLibraryRuneterraAR(searchObj);
   }
