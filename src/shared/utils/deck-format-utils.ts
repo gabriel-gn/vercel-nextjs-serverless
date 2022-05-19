@@ -95,7 +95,7 @@ export class DeckFormat {
 
   public static cardArrayToLorDeck(cards: DeckCard[]): LoRDeck {
     const deck = {
-      code: "",
+      code: '',
       cards: {
         champions: [],
         followers: [],
@@ -154,6 +154,8 @@ export class DeckFormat {
     deck["code"] = getCodeFromDeck(cards.map(card => {
       return { cardCode: card.card.cardCode, count: card.count } as CardCodeAndCount;
     }));
+    // abaixo remove todos os que não são alphanumericos
+    deck.code = deck.code.replace(/[^a-z0-9]/gi, '');
     return deck as LoRDeck;
   }
 }
