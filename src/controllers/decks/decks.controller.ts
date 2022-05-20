@@ -30,6 +30,11 @@ export class DecksController {
     return this.decksService.getTrendingDecks();
   }
 
+  @Get('trending-citrine')
+  async getTrendingDecksRunescola() {
+    return this.decksService.getTrendingDecksRunescola();
+  }
+
   @Post('library-indigo')
   @ApiBody({ type: SearchDeckLibraryDto })
   @ApiResponse({

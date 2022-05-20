@@ -1,14 +1,15 @@
 import { Deck, getDeckFromCode } from "@gabrielgn-test/lor-deckcodes-ts";
 import { DeckFormat } from "./deck-format-utils";
-import { map, Observable, forkJoin, concatMap, of, catchError } from "rxjs";
+import { map, Observable, forkJoin, concatMap, of, catchError, tap } from "rxjs";
 import {
   Card,
   DeckCard,
-  LoRDeck, MobalyticsDeck, RuneterraArLibraryDeck, UserDeck
+  LoRDeck, MobalyticsDeck, RunescolaMetaDeck, RuneterraArLibraryDeck, UserDeck
 } from "../../shared/models";
 import {
   getCards
 } from "./card-utils"
+import _ from "lodash";
 
 export function getDeckCardsByDeckCode(deckCode: string, cards: Card[] = undefined): Observable<DeckCard[]> {
   return of(cards)
@@ -67,6 +68,19 @@ export function getLoRDecks(deckCodes: string[]): Observable<LoRDeck[]> {
   );
 }
 
+export function getDeckName(deck: LoRDeck) {
+  let name = '';
+  if (deck.cards.champions.length > 0) {
+    name = _.orderBy(deck.cards.champions, ["count"], ["desc"]) //ordena por numero de cartas do campeão
+      .slice(0, 2) // pega apenas os dois campeões mais relevantes
+      .map((champion) => champion.card.name) // retorna o nome deles
+      .join(' / ');
+  } else {
+    name = '';
+  }
+  return name;
+}
+
 export function mobalyticsDecksToUserDecks(mobalyticsDecks: MobalyticsDeck[]): Observable<UserDeck[]> {
   if (mobalyticsDecks.length === 0) { return of([]) };
   return getLoRDecks(mobalyticsDecks.map(deck => deck.exportUID))
@@ -109,4 +123,29 @@ export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibrary
       }),
     ),
   );
+}
+
+export function runescolaMetaDecksToUserDecks(runescolaDecks: RunescolaMetaDeck[], date: number = undefined): Observable<UserDeck[]> {
+  if (runescolaDecks.length === 0) { return of([]) };
+  return getLoRDecks(runescolaDecks.map(deck => deck.best_decks[0]))
+    .pipe(
+      map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
+          return {
+            ...{ deck: lorDeck },
+            ...{
+              title: getDeckName(lorDeck),
+              description: '',
+              changedAt: date || new Date().getTime(),
+              createdAt: date || new Date().getTime(),
+              username: '',
+              stats: {
+                playRatePercent: runescolaDecks[i].playrate,
+                winRatePercent: runescolaDecks[i].winrate,
+                matchesQt: runescolaDecks[i].total_matches,
+              }
+            },
+          };
+        }),
+      ),
+    );
 }

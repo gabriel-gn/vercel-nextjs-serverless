@@ -225,6 +225,15 @@ export interface RuneterraArLibraryDeck {
   exports_count: number;
 }
 
+export interface RunescolaMetaDeck {
+  archetype: string;
+  assets: any;
+  total_matches: number;
+  playrate: number;
+  winrate: number;
+  best_decks: string[];
+}
+
 export interface UserDeckQueryResponse {
   decks: UserDeck[];
   hasNext: boolean;

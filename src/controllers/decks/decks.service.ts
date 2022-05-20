@@ -21,6 +21,10 @@ export class DecksService {
     return this.http.getTrendingDecks();
   }
 
+  public getTrendingDecksRunescola(): Observable<UserDeck[]> {
+    return this.http.getTrendingDecksRunescola();
+  }
+
   public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeckQueryResponse> {
     return this.http.getDecksFromLibrary(searchObj);
   }

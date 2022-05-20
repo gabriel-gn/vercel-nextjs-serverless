@@ -22,10 +22,11 @@ import {
 } from "../../shared/models";
 import qs from 'qs';
 import {
+  getDeckName,
   getLoRDecks,
-  mobalyticsDecksToUserDecks,
-  runeterraARDecksToUserDecks,
-} from '../../shared/utils/deck-utils';
+  mobalyticsDecksToUserDecks, runescolaMetaDecksToUserDecks,
+  runeterraARDecksToUserDecks
+} from "../../shared/utils/deck-utils";
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
@@ -201,19 +202,6 @@ export class HttpDecksService {
       filter: true,
     };
 
-    const getDeckName = (deck: LoRDeck) => {
-      let name = '';
-      if (deck.cards.champions.length > 0) {
-        name = _.orderBy(deck.cards.champions, ["count"], ["desc"]) //ordena por numero de cartas do campeão
-          .slice(0, 2) // pega apenas os dois campeões mais relevantes
-          .map((champion) => champion.card.name) // retorna o nome deles
-          .join(' / ');
-      } else {
-        name = '';
-      }
-      return name;
-    };
-
     const getDeckStats: (metaDeck: any) => DeckStats = (metaDeck: any) => {
       return {
         deckCode: metaDeck.deck_code,
@@ -255,5 +243,16 @@ export class HttpDecksService {
       }),
       catchError(error => throwError(error))
     )
+  }
+
+  public getTrendingDecksRunescola(): Observable<UserDeck[]> {
+    const url = 'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
+    return this.http.get(url).pipe(
+      map((response) => response.data),
+      concatMap((runescolaMetaData) => {
+        const decks = runescolaMetaData.stats.seven.slice(0, 15);
+        return runescolaMetaDecksToUserDecks(decks, runescolaMetaData?.info?.last_update);
+      }),
+    ) as unknown as Observable<UserDeck[]>;
   }
 }
