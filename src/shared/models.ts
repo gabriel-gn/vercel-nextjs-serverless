@@ -125,6 +125,7 @@ export interface UserDeck {
   stats?: DeckStats;
   username: string;
   deck: LoRDeck;
+  relatedDecks?: LoRDeck[];
 }
 
 export interface MobalyticsDeck {

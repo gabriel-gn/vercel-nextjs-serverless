@@ -245,13 +245,13 @@ export class HttpDecksService {
     )
   }
 
-  public getTrendingDecksRunescola(): Observable<UserDeck[]> {
+  public getTrendingDecksRunescola(getRelatedDecks: boolean = true): Observable<UserDeck[]> {
     const url = 'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
     return this.http.get(url).pipe(
       map((response) => response.data),
       concatMap((runescolaMetaData) => {
         const decks = runescolaMetaData.stats.seven.slice(0, 15);
-        return runescolaMetaDecksToUserDecks(decks, runescolaMetaData?.info?.last_update);
+        return runescolaMetaDecksToUserDecks(decks, getRelatedDecks, runescolaMetaData?.info?.last_update);
       }),
     ) as unknown as Observable<UserDeck[]>;
   }

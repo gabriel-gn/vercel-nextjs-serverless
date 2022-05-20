@@ -125,27 +125,36 @@ export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibrary
   );
 }
 
-export function runescolaMetaDecksToUserDecks(runescolaDecks: RunescolaMetaDeck[], date: number = undefined): Observable<UserDeck[]> {
+export function runescolaMetaDecksToUserDecks(
+  runescolaDecks: RunescolaMetaDeck[],
+  getRelatedDecks: boolean = true,
+  date: number = undefined
+): Observable<UserDeck[]> {
   if (runescolaDecks.length === 0) { return of([]) };
-  return getLoRDecks(runescolaDecks.map(deck => deck.best_decks[0]))
-    .pipe(
-      map((lorDecks: LoRDeck[]) => lorDecks.map((lorDeck, i) => {
-          return {
-            ...{ deck: lorDeck },
-            ...{
-              title: getDeckName(lorDeck),
-              description: '',
-              changedAt: date || new Date().getTime(),
-              createdAt: date || new Date().getTime(),
-              username: '',
-              stats: {
-                playRatePercent: runescolaDecks[i].playrate,
-                winRatePercent: runescolaDecks[i].winrate,
-                matchesQt: runescolaDecks[i].total_matches,
-              }
+  return forkJoin([
+    getLoRDecks(runescolaDecks.map(deck => deck.best_decks[0])),
+    getLoRDecks(runescolaDecks.map(deck => deck.best_decks[1])), // para ser usado como related deck
+    getLoRDecks(runescolaDecks.map(deck => deck.best_decks[2])), // para ser usado como related deck
+  ])
+  .pipe(
+    map((lorDecks: LoRDeck[][]) => lorDecks[0].map((lorDeck, i) => {
+        return {
+          ...{ deck: lorDeck },
+          ...{
+            title: getDeckName(lorDeck),
+            description: '',
+            changedAt: date || new Date().getTime(),
+            createdAt: date || new Date().getTime(),
+            username: '',
+            stats: {
+              playRatePercent: runescolaDecks[i].playrate,
+              winRatePercent: runescolaDecks[i].winrate,
+              matchesQt: runescolaDecks[i].total_matches,
             },
-          };
-        }),
-      ),
-    );
+            relatedDecks: getRelatedDecks ? [lorDecks[1][i], lorDecks[2][i]] : [],
+          },
+        };
+      }),
+    ),
+  );
 }

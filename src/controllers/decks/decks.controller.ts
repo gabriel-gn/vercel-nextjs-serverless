@@ -31,8 +31,14 @@ export class DecksController {
   }
 
   @Get('trending-citrine')
-  async getTrendingDecksRunescola() {
-    return this.decksService.getTrendingDecksRunescola();
+  @ApiImplicitQuery({
+    name: 'relatedDecks',
+    required: false,
+    type: Boolean,
+  })
+  async getTrendingDecksRunescola(@Query('relatedDecks') relatedDecks: boolean) {
+    relatedDecks = `${relatedDecks}`.toLowerCase() === 'true';
+    return this.decksService.getTrendingDecksRunescola(relatedDecks);
   }
 
   @Post('library-indigo')
