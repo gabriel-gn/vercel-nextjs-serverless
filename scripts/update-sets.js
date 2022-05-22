@@ -99,7 +99,7 @@ async function executeScript() {
     await updateAllSets(lang);
   }
 
-  await commitAll();
+  // await commitAll();
 }
 
 executeScript();

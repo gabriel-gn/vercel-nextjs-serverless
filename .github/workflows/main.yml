@@ -1,0 +1,38 @@
+on:
+  push:
+    branches:
+      - main
+      - feature/auto-update
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Person Who Triggered'
+        required: true
+        default: 'gabriel-gn'
+
+jobs:
+
+  update-sets:
+    name: Auto Update Card Sets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        working-directory: ./
+        run: |
+          echo "*** Iniciando NPM Install ***"
+          npm install
+      - name: Update sets
+        working-directory: ./
+        run: |
+          node ./scripts/update-sets.js
+      - name: Commit and push changes
+        uses: devops-infra/action-commit-push@v0.9.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_message: ":robot: auto update sets"
