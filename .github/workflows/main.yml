@@ -9,6 +9,9 @@ on:
         description: 'Person Who Triggered'
         required: true
         default: 'gabriel-gn'
+  schedule:
+    # "mm hh dd MM dayWeek(0-6 sunday-monday)"
+    - cron: "0 18 * * *"
 
 jobs:
 
