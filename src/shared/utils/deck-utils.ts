@@ -143,8 +143,8 @@ export function runescolaMetaDecksToUserDecks(
           ...{
             title: getDeckName(lorDeck),
             description: '',
-            changedAt: date || new Date().getTime(),
-            createdAt: date || new Date().getTime(),
+            // changedAt: date || new Date().getTime(),
+            // createdAt: date || new Date().getTime(),
             username: '',
             stats: {
               playRatePercent: runescolaDecks[i].playrate,
