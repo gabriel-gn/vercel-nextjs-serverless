@@ -31,8 +31,8 @@ jobs:
         working-directory: ./
         run: |
           node ./scripts/update-sets.js
-      - name: Commit and push changes
-        uses: devops-infra/action-commit-push@v0.9.0
+      - name: Commit & Push changes
+        uses: actions-js/push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: ":robot: auto update sets"
+          message: ":robot: auto update sets"
