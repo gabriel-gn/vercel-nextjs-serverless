@@ -11,12 +11,12 @@ on:
         default: 'gabriel-gn'
   schedule:
     # "mm hh dd MM dayWeek(0-6 sunday-monday)"
-    - cron: "0 18 * * *"
+    - cron: "0 * * * *"
 
 jobs:
 
-  update-sets:
-    name: Auto Update Card Sets
+  update-riot-assets:
+    name: Auto Update Riot Assets
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -30,11 +30,15 @@ jobs:
         run: |
           echo "*** Iniciando NPM Install ***"
           npm install
-      - name: Update sets
+      - name: Update RIOT assets
         working-directory: ./
         run: |
           node ./scripts/update-sets.js
+      - name: Check if there are changes
+        id: changes
+        uses: UnicornGlobal/has-changes-action@v1.0.11
       - name: Commit & Push changes
+        if: steps.changes.outputs.changed == 1
         uses: actions-js/push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
