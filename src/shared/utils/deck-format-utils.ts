@@ -3,30 +3,44 @@ import {
   DeckCard,
   FactionIdentifiers,
   FactionIdentifiersColors,
-  FactionIdentifiersReverse,
+  FactionIdentifiersReverse, Factions,
   LoRDeck
 } from "../models";
 import {
   getCodeFromDeck,
   CardCodeAndCount,
 } from "@gabrielgn-test/lor-deckcodes-ts";
-import _ from "lodash";
+import _, { indexOf } from "lodash";
 
 export class DeckFormat {
   constructor() {
   }
 
   public static deckMainRegionRefsOrderedByCardQt(deck: LoRDeck): FactionIdentifiers[] {
-    let regionRefsOrderedByCardQt = Object.keys(deck.factionCardsQt)
+    let regionRefsOrderedByCardQt: { factionRef: Factions, factionCardsQt: number }[] = Object.keys(deck.factionCardsQt)
       .map(factionRef => {
         return {
-          factionRef,
-          factionCardsQt: deck.factionCardsQt[factionRef]
+          factionRef: factionRef as unknown as Factions,
+          factionCardsQt: deck.factionCardsQt[factionRef],
         };
       })
       .filter(refObj => refObj.factionCardsQt > 0);
     regionRefsOrderedByCardQt = _.reverse(_.sortBy(regionRefsOrderedByCardQt, "factionCardsQt"));
-    return regionRefsOrderedByCardQt.map(refObj => refObj.factionRef) as FactionIdentifiers[];
+    let factionIdentifiers: FactionIdentifiers[] = regionRefsOrderedByCardQt.map(refObj => refObj.factionRef);
+
+    if ( // caso 'Runeterra' seja uma região e não esteja entre as duas primeiras, faz ela ser a segunda
+      factionIdentifiers.includes(FactionIdentifiers.RUNETERRA)
+      && factionIdentifiers.indexOf(FactionIdentifiers.RUNETERRA) > 1
+    ) {
+      const swapArrayLoc = (arr, from, to) => { // mova itens de posição de u; array
+        arr.splice(from, 1, arr.splice(to, 1, arr[from])[0])
+      };
+
+      // move "Runeterra" para a segunda posição do array
+      swapArrayLoc(factionIdentifiers, factionIdentifiers.indexOf(FactionIdentifiers.RUNETERRA), 1);
+    }
+
+    return factionIdentifiers;
   }
 
   public static regionRefToFactionIdentifier(regionRef: string): FactionIdentifiers | "" {
