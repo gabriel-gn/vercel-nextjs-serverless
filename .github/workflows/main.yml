@@ -34,11 +34,11 @@ jobs:
         working-directory: ./
         run: |
           node ./scripts/update-sets.js
-      - name: Check if there are changes
-        id: changes
-        uses: UnicornGlobal/has-changes-action@v1.0.11
+      - name: Check if there is any change
+        id: get_changes
+        run: echo "::set-output name=changed::$(git status --porcelain | wc -l)"
       - name: Commit & Push changes
-        if: steps.changes.outputs.changed == 1
+        if: steps.get_changes.outputs.changed != 0
         uses: actions-js/push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
