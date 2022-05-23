@@ -10,7 +10,7 @@ on:
         required: true
         default: 'gabriel-gn'
   schedule:
-    - cron: "5,10,15 * * * *" # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
+    - cron: '0/2 * * * *' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
 
 jobs:
 
