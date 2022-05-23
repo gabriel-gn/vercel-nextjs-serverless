@@ -1,12 +1,12 @@
 on:
+  schedule:
+    - cron: '*/2 * * * *' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
   workflow_dispatch:
     inputs:
       name:
         description: 'Person Who Triggered'
         required: true
         default: 'gabriel-gn'
-  schedule:
-    - cron: '*/2 * * * *' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
 
 jobs:
 
