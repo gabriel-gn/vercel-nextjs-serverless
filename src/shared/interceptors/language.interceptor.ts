@@ -13,7 +13,9 @@ export class LanguageInterceptor implements NestInterceptor {
       'pt_br'
     ]
 
-    let lang = query?.lang ? `${query.lang}`.toLowerCase() : 'en_us';
+    let lang = query?.lang
+      ? `${query.lang}`.toLowerCase().replace('-', '_')
+      : 'en_us';
     lang = availableLangs.includes(lang) ? lang : 'en_us';
 
     global.lang = lang;
