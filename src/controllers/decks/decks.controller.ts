@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Post, Query } from "@nestjs/common";
 import { DecksService } from './decks.service';
 import {
   SearchDeckLibraryCategory,
@@ -23,6 +23,12 @@ export class DecksController {
   @Get('meta')
   async getMetaDecks() {
     return this.decksService.getMetaDecks();
+  }
+
+  @Get('meta-granite')
+  @Header('content-type', 'application/json')
+  async getMetaDecksGranite() {
+    return this.decksService.getMetaDecksGranite();
   }
 
   @Get('trending')

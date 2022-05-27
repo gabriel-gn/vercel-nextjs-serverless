@@ -17,6 +17,10 @@ export class DecksService {
     return this.http.getMetaDecks();
   }
 
+  public getMetaDecksGranite(): Observable<UserDeck[]> {
+    return this.http.getMetaDecksGranite();
+  }
+
   public getTrendingDecks(): Observable<UserDeck[]> {
     return this.http.getTrendingDecks();
   }

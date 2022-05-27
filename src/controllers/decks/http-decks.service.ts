@@ -4,13 +4,13 @@ import {
   catchError,
   combineLatest,
   concatMap,
-  forkJoin,
+  forkJoin, from,
   map,
   Observable,
   of,
   pluck,
-  throwError,
-} from 'rxjs';
+  throwError
+} from "rxjs";
 import {
   Card,
   DeckStats,
@@ -32,6 +32,7 @@ import {
   SearchDeckLibraryRuneterraArDto,
 } from './decks.dto';
 import _ from 'lodash';
+import { JSDOM } from 'jsdom';
 
 @Injectable()
 export class HttpDecksService {
@@ -58,6 +59,26 @@ export class HttpDecksService {
         catchError(error => throwError(error))
       )
       ;
+  }
+
+  public getMetaDecksGranite(): Observable<UserDeck[]> {
+    const url = 'https://runeterraccg.com/metagame';
+
+    const axiosConfig = {
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+
+    return this.http.get(url, axiosConfig).pipe(
+      map((response) => response.data),
+      map((html) => {
+        const dom = new JSDOM(html);
+        const deckBlocks = [...dom.window.document.getElementsByClassName('deck-block')].map(i => i.innerHTML);
+        return deckBlocks;
+      }),
+    ) as unknown as Observable<UserDeck[]>;
   }
 
   public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeckQueryResponse> {
