@@ -2,15 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import {
   catchError,
-  combineLatest,
   concatMap,
-  forkJoin, from,
+  forkJoin,
   map,
   Observable,
   of,
   pluck,
-  throwError
-} from "rxjs";
+  throwError,
+} from 'rxjs';
 import {
   Card,
   DeckStats,
@@ -18,21 +17,21 @@ import {
   MobalyticsDeck,
   MobalyticsMetaDeck,
   UserDeck,
-  UserDeckQueryResponse
-} from "../../shared/models";
+  UserDeckQueryResponse,
+} from '../../shared/models';
 import qs from 'qs';
 import {
   getDeckName,
   getLoRDecks,
-  mobalyticsDecksToUserDecks, runescolaMetaDecksToUserDecks,
-  runeterraARDecksToUserDecks
-} from "../../shared/utils/deck-utils";
+  mobalyticsDecksToUserDecks,
+  runescolaMetaDecksToUserDecks,
+  runeterraARDecksToUserDecks,
+} from '../../shared/utils/deck-utils';
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
 } from './decks.dto';
 import _ from 'lodash';
-import { JSDOM } from 'jsdom';
 
 @Injectable()
 export class HttpDecksService {
@@ -62,21 +61,18 @@ export class HttpDecksService {
   }
 
   public getMetaDecksGranite(): Observable<UserDeck[]> {
-    const url = 'https://runeterraccg.com/metagame';
+    const url = 'https://gist.githubusercontent.com/gabriel-gn/905a30e387ac90d4e6f897c504f85b86/raw/190a313283b37978986686cea7e7de5b9d924349/runeterraccg-meta.json';
 
-    const axiosConfig = {
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*',
-      },
-    };
-
-    return this.http.get(url, axiosConfig).pipe(
+    return this.http.get(url).pipe(
       map((response) => response.data),
-      map((html) => {
-        const dom = new JSDOM(html);
-        const deckBlocks = [...dom.window.document.getElementsByClassName('deck-block')].map(i => i.innerHTML);
-        return deckBlocks;
+      concatMap((decks: UserDeck[]) => {
+        return getLoRDecks(decks.map(deck => deck.deck)).pipe(
+          map((lorDecks) => {
+            return lorDecks.map((deck, i) => {
+              return {...decks[i], ...{deck: lorDecks[i]}};
+            });
+          }),
+        );
       }),
     ) as unknown as Observable<UserDeck[]>;
   }
