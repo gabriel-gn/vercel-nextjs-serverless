@@ -61,7 +61,7 @@ export class HttpDecksService {
   }
 
   public getMetaDecksGranite(): Observable<UserDeck[]> {
-    const url = 'https://gist.githubusercontent.com/gabriel-gn/905a30e387ac90d4e6f897c504f85b86/raw/190a313283b37978986686cea7e7de5b9d924349/runeterraccg-meta.json';
+    const url = 'https://gist.githubusercontent.com/gabriel-gn/905a30e387ac90d4e6f897c504f85b86/raw/runeterraccg-meta.json';
 
     return this.http.get(url).pipe(
       map((response) => response.data),
