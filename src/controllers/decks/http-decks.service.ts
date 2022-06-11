@@ -66,7 +66,7 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       concatMap((decks: UserDeck[]) => {
-        return getLoRDecks(decks.map(deck => deck.deck)).pipe(
+        return getLoRDecks(decks.map((deck) => `${deck.deck}`)).pipe(
           map((lorDecks) => {
             return lorDecks.map((deck, i) => {
               return {...decks[i], ...{deck: lorDecks[i]}};
