@@ -16,7 +16,7 @@ export class DeckFormat {
   constructor() {
   }
 
-  public static deckMainRegionRefsOrderedByCardQt(deck: LoRDeck): FactionIdentifiers[] {
+  public static deckMainRegionRefsOrderedByCardQt(deck: LoRDeck): Factions[] {
     let regionRefsOrderedByCardQt: { factionRef: Factions, factionCardsQt: number }[] = Object.keys(deck.factionCardsQt)
       .map(factionRef => {
         return {
@@ -26,7 +26,7 @@ export class DeckFormat {
       })
       .filter(refObj => refObj.factionCardsQt > 0);
     regionRefsOrderedByCardQt = _.reverse(_.sortBy(regionRefsOrderedByCardQt, "factionCardsQt"));
-    let factionIdentifiers: FactionIdentifiers[] = regionRefsOrderedByCardQt.map(refObj => refObj.factionRef);
+    let factionIdentifiers: Factions[] = regionRefsOrderedByCardQt.map(refObj => refObj.factionRef);
 
     if ( // caso 'Runeterra' seja uma região e não esteja entre as duas primeiras, faz ela ser a segunda
       factionIdentifiers.includes(FactionIdentifiers.RUNETERRA)
