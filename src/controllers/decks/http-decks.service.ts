@@ -139,11 +139,11 @@ export class HttpDecksService {
   }
 
   public getDecksFromLibraryRuneterraAR(searchObj: SearchDeckLibraryRuneterraArDto): Observable<UserDeckQueryResponse> {
-    const numberOfDecksToGet = 12; // retirado da chamada oficial do site
-    const url = 'https://runeterra.ar/cards/get/public/decks/en_us';
+    const numberOfDecksToGet = 18; // retirado da chamada oficial do site
+    const url = 'https://runeterra.ar/deck/getdecks';
     const defaultParams = {
       take: numberOfDecksToGet,
-      server: 'everyone',
+      // server: 'everyone',
     };
 
     // caso tenha page, verifica se é um numero e adiciona
