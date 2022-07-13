@@ -113,7 +113,9 @@ export function runeterraARDecksToUserDecks(runeterraArDecks: RuneterraArLibrary
         return {
           ...{ deck: lorDeck },
           ...{
-            title: runeterraArDecks[i]?.deck_name.split('\n')[0],
+            title: runeterraArDecks[i]?.deck_name
+              .split('\n')[0]
+              .replace(/<\/?[^>]+(>|$)/g, ''),
             description: '',
             changedAt: dateObjectFromUTC(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
             createdAt: dateObjectFromUTC(runeterraArDecks[i]?.date).getTime() || new Date().getTime(),
