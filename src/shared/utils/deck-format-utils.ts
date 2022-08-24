@@ -114,7 +114,8 @@ export class DeckFormat {
         champions: [],
         followers: [],
         spells: [],
-        landmarks: []
+        landmarks: [],
+        equipments: [],
       },
       cardCostQt: {
         // cria um objeto com chaves numéricas de 0-N de acordo com o numero dentro do argumento Array()
@@ -138,6 +139,8 @@ export class DeckFormat {
         deck.cards.spells.push(card);
       } else if (keywordRefs && keywordRefs.length> 0 && keywordRefs.includes('LandmarkVisualOnly')) {
         deck.cards.landmarks.push(card);
+      } else if (keywordRefs && keywordRefs.length> 0 && keywordRefs.includes('Equipment')) {
+        deck.cards.equipments.push(card);
       } else if (card.card.rarityRef === 'Champion') {
         deck.cards.champions.push(card);
       } else {
