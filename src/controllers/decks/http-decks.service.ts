@@ -267,7 +267,7 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       concatMap((runescolaMetaData) => {
-        const decks = runescolaMetaData.stats.seven.slice(0, 15);
+        const decks = runescolaMetaData.stats.three.slice(0, 15);
         return runescolaMetaDecksToUserDecks(decks, getRelatedDecks, runescolaMetaData?.info?.last_update);
       }),
     ) as unknown as Observable<UserDeck[]>;
