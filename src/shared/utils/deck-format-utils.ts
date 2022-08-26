@@ -103,7 +103,7 @@ export class DeckFormat {
         regionRefs,
         card.regionRefs.map(ref => DeckFormat.regionRefToFactionIdentifier(ref))
       );
-      return regionRefsForCard[0];
+      return regionRefsForCard[0] || DeckFormat.regionRefToFactionIdentifier(card.regionRefs[0]);
     }
   }
 
