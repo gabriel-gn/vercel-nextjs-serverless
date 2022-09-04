@@ -20,48 +20,58 @@ import {
   UserDeckQueryResponse,
 } from '../../shared/models';
 import qs from 'qs';
-import {
-  getDeckName,
-  getLoRDecks,
-  mobalyticsDecksToUserDecks,
-  runescolaMetaDecksToUserDecks,
-  runeterraARDecksToUserDecks,
-} from '../../shared/utils/deck-utils';
+import { getDeckName, getLoRDecks } from '../../shared/utils/deck-utils';
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
 } from './decks.dto';
 import _ from 'lodash';
+import {
+  mobalyticsDecksToUserDecks,
+  runescolaMetaDecksToUserDecks,
+  runeterraARDecksToUserDecks,
+} from '../../shared/utils/external-deck-converters';
 
 @Injectable()
 export class HttpDecksService {
   constructor(private http: HttpService) {}
 
   public getMetaDecks(): Observable<UserDeck[]> {
-    return this.http.get('https://lor.mobalytics.gg/api/v2/meta/tier-list')
+    return this.http
+      .get('https://lor.mobalytics.gg/api/v2/meta/tier-list')
       .pipe(
-        map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
+        map((response) => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
         pluck('archetypes'),
         concatMap((metaDecks: MobalyticsMetaDeck[]) => {
-          const mobalyticsDecks: MobalyticsDeck[] = metaDecks.map(metaDeck => {
-            return { ...metaDeck.mostPopularDeck, ...{title: metaDeck.title, description: metaDeck.whyToBuild} }
-          });
-          const userDecks: Observable<UserDeck[]> = mobalyticsDecksToUserDecks(mobalyticsDecks).pipe(
+          const mobalyticsDecks: MobalyticsDeck[] = metaDecks.map(
+            (metaDeck) => {
+              return {
+                ...metaDeck.mostPopularDeck,
+                ...{ title: metaDeck.title, description: metaDeck.whyToBuild },
+              };
+            },
+          );
+          const userDecks: Observable<UserDeck[]> = mobalyticsDecksToUserDecks(
+            mobalyticsDecks,
+          ).pipe(
             map((rawUserDecks: UserDeck[]) => {
               return rawUserDecks.map((rawUserDeck, index) => {
-                return {...rawUserDeck, ...{badges: {tier: metaDecks[index].tier}}};
-              }) as UserDeck[]
-            })
+                return {
+                  ...rawUserDeck,
+                  ...{ badges: { tier: metaDecks[index].tier } },
+                };
+              }) as UserDeck[];
+            }),
           );
           return userDecks;
         }),
-        catchError(error => throwError(error))
-      )
-      ;
+        catchError((error) => throwError(error)),
+      );
   }
 
   public getMetaDecksGranite(): Observable<UserDeck[]> {
-    const url = 'https://gist.githubusercontent.com/gabriel-gn/905a30e387ac90d4e6f897c504f85b86/raw/runeterraccg-meta.json';
+    const url =
+      'https://gist.githubusercontent.com/gabriel-gn/905a30e387ac90d4e6f897c504f85b86/raw/runeterraccg-meta.json';
 
     return this.http.get(url).pipe(
       map((response) => response.data),
@@ -69,7 +79,7 @@ export class HttpDecksService {
         return getLoRDecks(decks.map((deck) => `${deck.deck}`)).pipe(
           map((lorDecks) => {
             return lorDecks.map((deck, i) => {
-              return {...decks[i], ...{deck: lorDecks[i]}};
+              return { ...decks[i], ...{ deck: lorDecks[i] } };
             });
           }),
         );
@@ -77,7 +87,9 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeckQueryResponse> {
+  public getDecksFromLibrary(
+    searchObj: SearchDeckLibraryDto,
+  ): Observable<UserDeckQueryResponse> {
     const url = 'https://lor.mobalytics.gg/api/v2/decks/library';
     const defaultParams = {
       sortBy: 'recently_updated',
@@ -86,7 +98,7 @@ export class HttpDecksService {
       withUserCards: false,
     };
     const addedParams = {};
-    for (let key of Object.keys(searchObj)) {
+    for (const key of Object.keys(searchObj)) {
       switch (key) {
         case 'category':
           addedParams['category'] = searchObj.category;
@@ -114,19 +126,21 @@ export class HttpDecksService {
           break;
       }
     }
-    return this.http.get(url,{
-      params: { ...defaultParams, ...addedParams },
-      paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
-    })
+    return this.http
+      .get(url, {
+        params: { ...defaultParams, ...addedParams },
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: 'repeat' }),
+      })
       .pipe(
-        map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
+        map((response) => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
         concatMap((response: any) => {
           return of(response).pipe(
             pluck('decks'),
             concatMap((mobalyticsDecks: MobalyticsDeck[]) => {
               return mobalyticsDecksToUserDecks(mobalyticsDecks);
             }),
-            map(userDecks => {
+            map((userDecks) => {
               return {
                 decks: userDecks,
                 hasNext: response.hasNext,
@@ -134,11 +148,13 @@ export class HttpDecksService {
             }),
           );
         }),
-        catchError(error => throwError(error))
+        catchError((error) => throwError(error)),
       );
   }
 
-  public getDecksFromLibraryRuneterraAR(searchObj: SearchDeckLibraryRuneterraArDto): Observable<UserDeckQueryResponse> {
+  public getDecksFromLibraryRuneterraAR(
+    searchObj: SearchDeckLibraryRuneterraArDto,
+  ): Observable<UserDeckQueryResponse> {
     const numberOfDecksToGet = 18; // retirado da chamada oficial do site
     const url = 'https://runeterra.ar/deck/getdecks';
     const defaultParams = {
@@ -164,9 +180,14 @@ export class HttpDecksService {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const globalsRegions = require(`../../assets/globals/en_us.json`).regions;
       for (const searchRegion of searchObj.factions) {
-        const globalRegion = globalsRegions.find(rg => rg?.abbreviation === `${searchRegion}`.toUpperCase());
+        const globalRegion = globalsRegions.find(
+          (rg) => rg?.abbreviation === `${searchRegion}`.toUpperCase(),
+        );
         if (globalRegion) {
-          regions.push({ region: globalRegion.name, regionRef: globalRegion.nameRef });
+          regions.push({
+            region: globalRegion.name,
+            regionRef: globalRegion.nameRef,
+          });
         }
       }
       regions = _.uniqBy(regions, 'region');
@@ -188,23 +209,25 @@ export class HttpDecksService {
       payload['champ'] = cardObjects;
     }
 
-    return this.http.post(url, payload,{
-      params: defaultParams,
-      paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
-    })
-    .pipe(
-      map(response => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
-      concatMap(response => {
-        return runeterraARDecksToUserDecks(response.decks).pipe(
-          map(userDecks => {
-            return {
+    return this.http
+      .post(url, payload, {
+        params: defaultParams,
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: 'repeat' }),
+      })
+      .pipe(
+        map((response) => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
+        concatMap((response) => {
+          return runeterraARDecksToUserDecks(response.decks).pipe(
+            map((userDecks) => {
+              return {
                 decks: userDecks,
                 hasNext: response.count === numberOfDecksToGet,
-            };
-          }),
-        ) as Observable<UserDeckQueryResponse>;
-      }),
-    );
+              };
+            }),
+          ) as Observable<UserDeckQueryResponse>;
+        }),
+      );
   }
 
   public getTrendingDecks(): Observable<UserDeck[]> {
@@ -228,47 +251,67 @@ export class HttpDecksService {
       };
     };
 
-    const request1 = this.http.post(url, defaultPayload, { params: defaultParams }).pipe(map(response => response.data));
+    const request1 = this.http
+      .post(url, defaultPayload, { params: defaultParams })
+      .pipe(map((response) => response.data));
 
-    const request2 = this.http.post(url, defaultPayload, { params: { ...defaultParams, ...{page: 2} } }).pipe(
-      map(response => response.data),
-    );
-    const request3 = this.http.post(url, defaultPayload, { params: { ...defaultParams, ...{page: 3} } }).pipe(
-      map(response => response.data),
-    );
+    const request2 = this.http
+      .post(url, defaultPayload, {
+        params: { ...defaultParams, ...{ page: 2 } },
+      })
+      .pipe(map((response) => response.data));
+    const request3 = this.http
+      .post(url, defaultPayload, {
+        params: { ...defaultParams, ...{ page: 3 } },
+      })
+      .pipe(map((response) => response.data));
     return forkJoin([request1, request2, request3]).pipe(
-      map(response => {
-          const deckStats = [
-            ...response[0].meta.map(metaDeck => getDeckStats(metaDeck)),
-            ...response[1].meta.map(metaDeck => getDeckStats(metaDeck)),
-            ...response[2].meta.map(metaDeck => getDeckStats(metaDeck))
-          ];
-          return { codes: deckStats.map(d => d.deckCode), stats: deckStats.map(d => {return _.omit(d, 'deckCode');}) };
-        },
-      ),
+      map((response) => {
+        const deckStats = [
+          ...response[0].meta.map((metaDeck) => getDeckStats(metaDeck)),
+          ...response[1].meta.map((metaDeck) => getDeckStats(metaDeck)),
+          ...response[2].meta.map((metaDeck) => getDeckStats(metaDeck)),
+        ];
+        return {
+          codes: deckStats.map((d) => d.deckCode),
+          stats: deckStats.map((d) => {
+            return _.omit(d, 'deckCode');
+          }),
+        };
+      }),
       // @ts-ignore
-      concatMap((deckStats: {codes: string[], stats: DeckStats[]}) => {
-        return forkJoin([
-          getLoRDecks(deckStats.codes),
-          of(deckStats.stats)
-        ]);
+      concatMap((deckStats: { codes: string[]; stats: DeckStats[] }) => {
+        return forkJoin([getLoRDecks(deckStats.codes), of(deckStats.stats)]);
       }),
       map((deckStats: [LoRDeck[], DeckStats[]]) => {
         return deckStats[0].map((deck, index) => {
-          return { deck: deck, title: getDeckName(deck), description: "", username: "", stats: deckStats[1][index] }
+          return {
+            deck: deck,
+            title: getDeckName(deck),
+            description: '',
+            username: '',
+            stats: deckStats[1][index],
+          };
         });
       }),
-      catchError(error => throwError(error))
-    )
+      catchError((error) => throwError(error)),
+    );
   }
 
-  public getTrendingDecksRunescola(getRelatedDecks: boolean = true): Observable<UserDeck[]> {
-    const url = 'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
+  public getTrendingDecksRunescola(
+    getRelatedDecks = true,
+  ): Observable<UserDeck[]> {
+    const url =
+      'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
     return this.http.get(url).pipe(
       map((response) => response.data),
       concatMap((runescolaMetaData) => {
         const decks = runescolaMetaData.stats.three.slice(0, 15);
-        return runescolaMetaDecksToUserDecks(decks, getRelatedDecks, runescolaMetaData?.info?.last_update);
+        return runescolaMetaDecksToUserDecks(
+          decks,
+          getRelatedDecks,
+          runescolaMetaData?.info?.last_update,
+        );
       }),
     ) as unknown as Observable<UserDeck[]>;
   }

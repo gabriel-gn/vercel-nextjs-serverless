@@ -1,8 +1,9 @@
-import { from, map, Observable, of } from "rxjs";
-import { Card } from "../models";
+import { from, map, Observable, of } from 'rxjs';
+import { Card } from '../models';
 import _ from 'lodash';
 
-function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto menor!!
+function minifyCards(cards: Card | Card[]): Card | Card[] {
+  // deixar o objeto menor!!
   const attrsToKeep = [
     'associatedCardRefs',
     'cardCode',
@@ -23,35 +24,35 @@ function minifyCards(cards: Card | Card[]): Card | Card[] { // deixar o objeto m
     return _.pickBy(card, (value, key) => attrsToKeep.includes(key));
   };
 
-  if (Array.isArray(cards)) { // se for array retorna um array
-    return cards.map(cardFull => {
+  if (Array.isArray(cards)) {
+    // se for array retorna um array
+    return cards.map((cardFull) => {
       return minifyCard(cardFull);
     }) as Card[];
-  } else { // se NÃO for array retorna a carta filtrada
+  } else {
+    // se NÃO for array retorna a carta filtrada
     return minifyCard(cards) as Card;
   }
 }
 
-export function getCards(minifyCardData: boolean = true): Observable<Card[]> {
+export function getCards(minifyCardData = true): Observable<Card[]> {
   const lang = global?.lang ? global.lang : 'en_us';
   // const requireDynamically = eval('require');
-  return of(require(`../../assets/sets/${lang}/${lang}.json`))
-  .pipe(
+  return of(require(`../../assets/sets/${lang}/${lang}.json`)).pipe(
     map((cards: Card[]) => {
       if (minifyCardData) {
         return minifyCards(cards) as Card[];
       } else {
         return cards;
       }
-    })
-  )
-  ;
+    }),
+  );
 }
 
-export function getCollectibleCards(minifyCardData: boolean = true): Observable<Card[]> {
+export function getCollectibleCards(minifyCardData = true): Observable<Card[]> {
   return getCards(minifyCardData).pipe(
     map((cards: Card[]) => {
-      return cards.filter(card => card.collectible);
+      return cards.filter((card) => card.collectible);
     }),
   );
 }
