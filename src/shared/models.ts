@@ -100,7 +100,7 @@ export interface LoRDeck {
     followers: DeckCard[];
     spells: DeckCard[];
     landmarks: DeckCard[];
-    equipaments: DeckCard[];
+    equipments: DeckCard[];
   };
   cardCostQt: {
     [cardCost: number]: number;
