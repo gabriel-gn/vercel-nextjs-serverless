@@ -62,7 +62,7 @@ async function updateAllSets(lang) {
   const filename = `${lang}.json`;
   const filenamePath = `./src/assets/sets/${lang}/${filename}`;
   if (appendOnly) {
-    cardSet = [
+    allCards = [
       ...JSON.parse(fs.readFileSync(filenamePath)),
       ...allCards,
     ];
