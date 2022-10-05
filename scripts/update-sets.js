@@ -15,7 +15,9 @@ const setNames = ['set1', 'set2', 'set3', 'set4', 'set5', 'set6', 'set6cde'];
 const langs = ['en_us', 'pt_br'];
 const tempDir = `${process.cwd()}/tmp`;
 const setsDir = `${tempDir}/sets`;
+// ex: https://dd.b.pvp.net/3_17_0/set6/pt_br/data/set6-pt_br.json
 const downloadUrl = `https://dd.b.pvp.net/latest`;
+const appendOnly = false; // caso seja true, não sobrescreve o arquivo, apenas adiciona o resultado ao ja existente
 
 /***********************************
  * MÉTODOS DO SCRIPT
@@ -31,31 +33,42 @@ function createSetFile(lang) {
 
 async function updateSet(setName, lang) {
   const filename = `${setName}-${lang}.json`;
+  const filenamePath = `./src/assets/sets/${lang}/${filename}`;
   const downloadPath = `${downloadUrl}/${setName}/${lang}/data/${filename}`;
   let cardSet = await rxjs.lastValueFrom(
     new http.HttpService()
       .get(downloadPath)
       .pipe(rxjs.map((response) => response.data)),
   );
-  fs.writeFileSync(
-    `./src/assets/sets/${lang}/${filename}`,
-    JSON.stringify(cardSet),
-  );
+  if (appendOnly) { // caso seja só append, adiciona o resultado no objeto
+    cardSet = [
+      ...JSON.parse(fs.readFileSync(filenamePath)),
+      ...cardSet,
+    ];
+  }
+  fs.writeFileSync(filenamePath, JSON.stringify(cardSet));
   return { filename: filename, set: cardSet };
 }
 
 async function updateAllSets(lang) {
-  createSetFile(lang); // cria o arquivo json vazio
+  createSetFile(lang); // cria o arquivo json vazio e o diretório
   let cardSets = [];
   for (let setName of setNames) {
     const result = await updateSet(setName, lang);
     cardSets.push(result.set);
     console.log(result.filename);
   }
-  const allCards = [].concat.apply([], cardSets);
+  let allCards = [].concat.apply([], cardSets);
   const filename = `${lang}.json`;
+  const filenamePath = `./src/assets/sets/${lang}/${filename}`;
+  if (appendOnly) {
+    cardSet = [
+      ...JSON.parse(fs.readFileSync(filenamePath)),
+      ...allCards,
+    ];
+  }
   fs.writeFileSync(
-    `./src/assets/sets/${lang}/${filename}`,
+    filenamePath,
     JSON.stringify(allCards),
   );
   console.log(filename);
