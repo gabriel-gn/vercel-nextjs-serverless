@@ -1,12 +1,18 @@
+name: Update assets
+
 on:
   schedule:
     - cron: '0 19 * * 3' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
   workflow_dispatch:
     inputs:
-      name:
-        description: 'Person Who Triggered'
+      patch:
+        description: 'Patch to update from'
         required: true
-        default: 'gabriel-gn'
+        default: 'latest'
+      appendOnly:
+        description: 'Append latest instead of updating it'
+        required: false
+        default: false
 
 jobs:
 
@@ -29,6 +35,9 @@ jobs:
         working-directory: ./
         run: |
           node ./scripts/update-sets.js
+        env:
+          PATCH: ${{ github.event.inputs.patch }}
+          APPEND_ONLY: ${{ github.event.inputs.appendOnly }}
       - name: Check if there is any change
         id: get_changes
         run: echo "::set-output name=changed::$(git status --porcelain | wc -l)"

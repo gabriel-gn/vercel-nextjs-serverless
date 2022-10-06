@@ -28,7 +28,7 @@ let tempDir = `${process.cwd()}/tmp`;
 let setsDir = `${tempDir}/sets`;
 // ex: https://dd.b.pvp.net/3_17_0/set6/pt_br/data/set6-pt_br.json
 let downloadUrl = `https://dd.b.pvp.net/latest`;
-let appendOnly = false; // caso seja true, não sobrescreve o arquivo, apenas adiciona o resultado ao ja existente
+let appendOnly = process.env.APPEND_ONLY || false; // caso seja true, não sobrescreve o arquivo, apenas adiciona o resultado ao ja existente
 
 /***********************************
  * MÉTODOS DO SCRIPT
@@ -49,7 +49,10 @@ async function updateSet(setName, lang) {
   let cardSet = await rxjs.lastValueFrom(
     new http.HttpService()
       .get(downloadPath)
-      .pipe(rxjs.map((response) => response.data)),
+      .pipe(
+        // rxjs.tap((response) => {console.log(`Request GET: ${downloadPath}`)}),
+        rxjs.map((response) => response.data)
+      ),
   );
   if (appendOnly) { // caso seja só append, adiciona o resultado no objeto
     cardSet = [
@@ -58,6 +61,7 @@ async function updateSet(setName, lang) {
     ];
   }
   fs.writeFileSync(filenamePath, JSON.stringify(cardSet));
+  console.log(`ARQUIVO ${filename} atualizado!`);
   return { filename: filename, set: cardSet };
 }
 
@@ -67,7 +71,6 @@ async function updateAllSets(lang) {
   for (let setName of setNames) {
     const result = await updateSet(setName, lang);
     cardSets.push(result.set);
-    console.log(result.filename);
   }
   let allCards = [].concat.apply([], cardSets);
   const filename = `${lang}.json`;
@@ -82,7 +85,7 @@ async function updateAllSets(lang) {
     filenamePath,
     JSON.stringify(allCards),
   );
-  console.log(filename);
+  console.log(`ARQUIVO ${filename} atualizado para a lang ${lang}`, '\n');
 }
 
 async function updateAllGlobals(lang) {
@@ -94,9 +97,10 @@ async function updateAllGlobals(lang) {
   fs.writeFileSync(`${filepath}`, JSON.stringify([])); // CRIA O ARQUIVO VAZIO!
   const downloadPath = `${downloadUrl}/core/${lang}/data/globals-${lang}.json`;
   let globalsFile = await rxjs.lastValueFrom(
-    new http.HttpService()
-      .get(downloadPath)
-      .pipe(rxjs.map((response) => response.data)),
+    new http.HttpService().get(downloadPath).pipe(
+      // rxjs.tap((response) => {console.log(`Request GET: ${downloadPath}`)}),
+      rxjs.map((response) => response.data),
+    ),
   );
   fs.writeFileSync(`./${filepath}`, JSON.stringify(globalsFile));
 }
@@ -109,7 +113,7 @@ async function updateAll(patch = 'latest') {
     await updateAllSets(lang);
   }
   downloadUrl = `${latestDownloadUrl}`; // volta a ser a latest
-  console.log(`Sets e Globals atualizados pela versão ${patch}!`);
+  console.log(`Sets e Globals atualizados pela versão ${patch}!`, '\n');
 }
 
 /**
@@ -127,7 +131,7 @@ async function updateSetsFromCurrentPatchAppendingLastSet(currentPatch) {
   setNames = [setNames[setNames.length - 1]]; // pega apenas o último set
   appendOnly = true;
   await updateAll(); // latest
-  console.log(`Sets ${setNames} atualizados apenas dando append pela versão ${currentPatch}!`);
+  console.log(`Sets [${setNames}] atualizados apenas dando append pela versão ${currentPatch}!`, '\n');
 }
 
 async function commitAll() {
@@ -147,10 +151,20 @@ async function commitAll() {
  ************************************/
 
 async function executeScript() {
-  await updateAll();
-  // await updateSetsFromCurrentPatchAppendingLastSet('3_16_0');
+  const patch = process.env.PATCH || 'latest';
+  console.log(`CONFIG patch: ${patch}`);
+  console.log(`CONFIG appendOnly: ${appendOnly}`, '\n');
 
+  console.log(`*** Iniciando Script ***`);
+  if (appendOnly) {
+    console.log(`*** Iniciando Update de assets do patch ${patch} com append do latest ***`);
+    await updateSetsFromCurrentPatchAppendingLastSet(patch);
+  } else {
+    console.log(`*** Iniciando Update de assets do patch ${patch} ***`);
+    await updateAll(patch);
+  }
   // await commitAll();
+  console.log(`*** Finalizando Script ***`);
 }
 
 executeScript();
