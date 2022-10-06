@@ -11,13 +11,24 @@ const simpleGit = require('simple-git');
  * VARIÁVEIS DO SCRIPT
  ************************************/
 
-const setNames = ['set1', 'set2', 'set3', 'set4', 'set5', 'set6', 'set6cde'];
-const langs = ['en_us', 'pt_br'];
-const tempDir = `${process.cwd()}/tmp`;
-const setsDir = `${tempDir}/sets`;
+let setNames = [
+  'set1',
+  'set2',
+  'set3',
+  'set4',
+  'set5',
+  'set6',
+  'set6cde',
+];
+let langs = [
+  'en_us',
+  'pt_br',
+];
+let tempDir = `${process.cwd()}/tmp`;
+let setsDir = `${tempDir}/sets`;
 // ex: https://dd.b.pvp.net/3_17_0/set6/pt_br/data/set6-pt_br.json
-const downloadUrl = `https://dd.b.pvp.net/latest`;
-const appendOnly = false; // caso seja true, não sobrescreve o arquivo, apenas adiciona o resultado ao ja existente
+let downloadUrl = `https://dd.b.pvp.net/latest`;
+let appendOnly = false; // caso seja true, não sobrescreve o arquivo, apenas adiciona o resultado ao ja existente
 
 /***********************************
  * MÉTODOS DO SCRIPT
@@ -74,7 +85,7 @@ async function updateAllSets(lang) {
   console.log(filename);
 }
 
-async function updateGlobals(lang) {
+async function updateAllGlobals(lang) {
   const dir = `src/assets/globals`;
   const filepath = `${dir}/${lang}.json`;
   if (!fs.existsSync(dir)) {
@@ -88,6 +99,35 @@ async function updateGlobals(lang) {
       .pipe(rxjs.map((response) => response.data)),
   );
   fs.writeFileSync(`./${filepath}`, JSON.stringify(globalsFile));
+}
+
+async function updateAll(patch = 'latest') {
+  const latestDownloadUrl = `${downloadUrl}`; // latest por padrão
+  downloadUrl = downloadUrl.replace('latest', patch);
+  for (let lang of langs) {
+    await updateAllGlobals(lang);
+    await updateAllSets(lang);
+  }
+  downloadUrl = `${latestDownloadUrl}`; // volta a ser a latest
+  console.log(`Sets e Globals atualizados pela versão ${patch}!`);
+}
+
+/**
+ *  Por algum motivo a riot nas revelações de sets, colocou o "latest" como sendo as cartas novas apenas!
+ *  Esse método atualiza os sets com a versão do patch atual, e junta com o "latest" do último set
+ *  O resultado deve ser todas as cartas atuais + as revelações adicionadas no último set
+ *  * @returns {Promise<void>}
+ */
+async function updateSetsFromCurrentPatchAppendingLastSet(currentPatch) {
+  // dá update nos sets com a versão do patch atual
+  appendOnly = false;
+  await updateAll(currentPatch);
+
+  // altera as variáveis necessárias para dar update em todos os sets
+  setNames = [setNames[setNames.length - 1]]; // pega apenas o último set
+  appendOnly = true;
+  await updateAll(); // latest
+  console.log(`Sets ${setNames} atualizados apenas dando append pela versão ${currentPatch}!`);
 }
 
 async function commitAll() {
@@ -107,10 +147,8 @@ async function commitAll() {
  ************************************/
 
 async function executeScript() {
-  for (let lang of langs) {
-    await updateGlobals(lang);
-    await updateAllSets(lang);
-  }
+  await updateAll();
+  // await updateSetsFromCurrentPatchAppendingLastSet('3_16_0');
 
   // await commitAll();
 }
