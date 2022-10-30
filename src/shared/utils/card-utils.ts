@@ -1,8 +1,10 @@
-import { from, map, Observable, of } from 'rxjs';
-import { Card } from '../models';
+import { map, Observable, of } from 'rxjs';
 import _ from 'lodash';
+import { RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
 
-function minifyCards(cards: Card | Card[]): Card | Card[] {
+function minifyCards(
+  cards: RiotLoRCard | RiotLoRCard[],
+): RiotLoRCard | RiotLoRCard[] {
   // deixar o objeto menor!!
   const attrsToKeep = [
     'associatedCardRefs',
@@ -20,7 +22,7 @@ function minifyCards(cards: Card | Card[]): Card | Card[] {
     'supertype',
     'type',
   ];
-  const minifyCard = (card: Card) => {
+  const minifyCard = (card: RiotLoRCard) => {
     return _.pickBy(card, (value, key) => attrsToKeep.includes(key));
   };
 
@@ -28,20 +30,20 @@ function minifyCards(cards: Card | Card[]): Card | Card[] {
     // se for array retorna um array
     return cards.map((cardFull) => {
       return minifyCard(cardFull);
-    }) as Card[];
+    }) as RiotLoRCard[];
   } else {
     // se NÃO for array retorna a carta filtrada
-    return minifyCard(cards) as Card;
+    return minifyCard(cards) as RiotLoRCard;
   }
 }
 
-export function getCards(minifyCardData = true): Observable<Card[]> {
+export function getCards(minifyCardData = true): Observable<RiotLoRCard[]> {
   const lang = global?.lang ? global.lang : 'en_us';
   // const requireDynamically = eval('require');
   return of(require(`../../assets/sets/${lang}/${lang}.json`)).pipe(
-    map((cards: Card[]) => {
+    map((cards: RiotLoRCard[]) => {
       if (minifyCardData) {
-        return minifyCards(cards) as Card[];
+        return minifyCards(cards) as RiotLoRCard[];
       } else {
         return cards;
       }
@@ -49,9 +51,11 @@ export function getCards(minifyCardData = true): Observable<Card[]> {
   );
 }
 
-export function getCollectibleCards(minifyCardData = true): Observable<Card[]> {
+export function getCollectibleCards(
+  minifyCardData = true,
+): Observable<RiotLoRCard[]> {
   return getCards(minifyCardData).pipe(
-    map((cards: Card[]) => {
+    map((cards: RiotLoRCard[]) => {
       return cards.filter((card) => card.collectible);
     }),
   );

@@ -1,29 +1,14 @@
 import { Deck, getDeckFromCode } from 'lor-deckcodes-ts';
 import { DeckFormat } from './deck-format-utils';
-import {
-  map,
-  Observable,
-  forkJoin,
-  concatMap,
-  of,
-  catchError,
-  tap,
-} from 'rxjs';
-import {
-  Card,
-  DeckCard,
-  LoRDeck,
-  MobalyticsDeck,
-  RunescolaMetaDeck,
-  RuneterraArLibraryDeck,
-  UserDeck,
-} from '../../shared/models';
+import { concatMap, forkJoin, map, Observable, of } from 'rxjs';
+import { DeckCard } from '../../shared/models';
 import { getCards } from './card-utils';
 import _ from 'lodash';
+import { LoRDeck, RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
 
 export function getDeckCardsByDeckCode(
   deckCode: string,
-  cards: Card[] = undefined,
+  cards: RiotLoRCard[] = undefined,
 ): Observable<DeckCard[]> {
   return of(cards).pipe(
     // caso seja passado as cartas, não requer de novo o json

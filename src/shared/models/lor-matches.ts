@@ -1,5 +1,5 @@
 import { RiotID } from './riot-related';
-import { LoRDeck } from '../models';
+import { LoRDeck } from '@gabrielgn-test/runeterra-tools';
 
 export interface LoRMatchMetadata {
   data_version: string;
