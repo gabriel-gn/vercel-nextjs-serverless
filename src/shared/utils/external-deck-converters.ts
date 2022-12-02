@@ -1,5 +1,4 @@
 import {
-  LoRDeck,
   MobalyticsDeck,
   RunescolaMetaDeck,
   RuneterraArLibraryDeck,
@@ -7,6 +6,7 @@ import {
 } from '../models';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { getDeckName, getLoRDecks } from './deck-utils';
+import { LoRDeck } from "@gabrielgn-test/runeterra-tools";
 
 export function mobalyticsDecksToUserDecks(
   mobalyticsDecks: MobalyticsDeck[],

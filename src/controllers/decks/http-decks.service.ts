@@ -11,9 +11,7 @@ import {
   throwError,
 } from 'rxjs';
 import {
-  Card,
   DeckStats,
-  LoRDeck,
   MobalyticsDeck,
   MobalyticsMetaDeck,
   UserDeck,
@@ -31,6 +29,7 @@ import {
   runescolaMetaDecksToUserDecks,
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
+import { LoRDeck, RiotLoRCard } from "@gabrielgn-test/runeterra-tools";
 
 @Injectable()
 export class HttpDecksService {
@@ -198,7 +197,7 @@ export class HttpDecksService {
     if (searchObj?.cardIds && Array.isArray(searchObj.cardIds)) {
       let cardObjects = [];
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const cards: Card[] = require(`../../assets/sets/en_us/en_us.json`);
+      const cards: RiotLoRCard[] = require(`../../assets/sets/en_us/en_us.json`);
       for (const cardId of searchObj.cardIds) {
         const card = cards.find((cd) => cd?.cardCode === `${cardId}`);
         if (card && card?.rarityRef === 'Champion') {
