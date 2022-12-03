@@ -111,14 +111,18 @@ export class DeckFormat {
     });
 
     // deck.mainFactions = DeckFormat.deckMainRegionOrderedByCardQt(deck);
-    deck['mainFactionCardsQt'] = getDeckMainRegions(deck);
-    deck.mainFactions = Object.keys(deck['mainFactionCardsQt']);
+    try {
+      deck['mainFactionCardsQt'] = getDeckMainRegions(deck);
+      deck.mainFactions = Object.keys(deck['mainFactionCardsQt']);
+    } catch (e) {
+      cards = [];
+    }
 
     deck['code'] = getCodeFromDeck(
       cards.map((card) => {
         return {
-          cardCode: card.card.cardCode,
-          count: card.count,
+          cardCode: card?.card?.cardCode,
+          count: card?.count,
         } as CardCodeAndCount;
       }),
     );
