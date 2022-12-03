@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { map, Observable, of } from 'rxjs';
-import { Card } from '../../shared/models';
+import { RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
 
 @Injectable()
 export class RiotAssetsService {
@@ -16,7 +16,7 @@ export class RiotAssetsService {
     return of(require(`../../assets/globals/${lang}.json`));
   }
 
-  public getLoRCards(): Observable<Card[]> {
+  public getLoRCards(): Observable<RiotLoRCard[]> {
     const lang = global?.lang ? global.lang : 'en_us';
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return of(require(`../../assets/sets/${lang}/${lang}.json`));

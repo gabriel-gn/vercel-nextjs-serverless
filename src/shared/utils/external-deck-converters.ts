@@ -5,8 +5,8 @@ import {
   UserDeck,
 } from '../models';
 import { forkJoin, map, Observable, of } from 'rxjs';
-import { getDeckName, getLoRDecks } from './deck-utils';
-import { LoRDeck } from "@gabrielgn-test/runeterra-tools";
+import { getLoRDecks } from './deck-utils';
+import { generateDeckName, LoRDeck } from '@gabrielgn-test/runeterra-tools';
 
 export function mobalyticsDecksToUserDecks(
   mobalyticsDecks: MobalyticsDeck[],
@@ -87,7 +87,7 @@ export function runescolaMetaDecksToUserDecks(
         return {
           ...{ deck: lorDeck },
           ...{
-            title: getDeckName(lorDeck),
+            title: generateDeckName(lorDeck),
             description: '',
             // changedAt: date || new Date().getTime(),
             // createdAt: date || new Date().getTime(),

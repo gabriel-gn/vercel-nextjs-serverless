@@ -18,7 +18,7 @@ import {
   UserDeckQueryResponse,
 } from '../../shared/models';
 import qs from 'qs';
-import { getDeckName, getLoRDecks } from '../../shared/utils/deck-utils';
+import { getLoRDecks } from '../../shared/utils/deck-utils';
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
@@ -29,7 +29,7 @@ import {
   runescolaMetaDecksToUserDecks,
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
-import { LoRDeck, RiotLoRCard } from "@gabrielgn-test/runeterra-tools";
+import { generateDeckName, LoRDeck, RiotLoRCard } from "@gabrielgn-test/runeterra-tools";
 
 @Injectable()
 export class HttpDecksService {
@@ -286,7 +286,7 @@ export class HttpDecksService {
         return deckStats[0].map((deck, index) => {
           return {
             deck: deck,
-            title: getDeckName(deck),
+            title: generateDeckName(deck),
             description: '',
             username: '',
             stats: deckStats[1][index],

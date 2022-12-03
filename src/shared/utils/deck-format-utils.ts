@@ -5,7 +5,8 @@ import {
   CardRegionAbbreviation,
   DeckCard,
   getCardMainRegion,
-  getCardType,
+  getCardMainRegionFromDeck,
+  getCardType, getDeckMainRegions,
   LoRDeck,
   rarityRefToCardCost,
   regionRefToRegionAbbreviation
@@ -97,18 +98,8 @@ export class DeckFormat {
       card.card.regionRefs.forEach((regionRef) =>
         deck.factions.push(regionRefToRegionAbbreviation(regionRef)),
       );
-      if (card.card.regionRefs.length === 1) {
-        deck.mainFactions.push(
-          regionRefToRegionAbbreviation(card.card.regionRefs[0]),
-        );
-      }
     });
     deck.factions = _.uniq(deck.factions);
-    deck.mainFactions = _.uniq(deck.mainFactions);
-    if (deck.mainFactions.length < 2 && deck.factions.length >= 2) {
-      // caso tenha só uma região, verifica se pode ter outra
-      deck.mainFactions.push(_.difference(deck.factions, deck.mainFactions)[0]);
-    }
 
     // ordena as cartas por custo
     Object.keys(deck.cards).forEach((key) => {
@@ -119,7 +110,10 @@ export class DeckFormat {
       });
     });
 
-    deck.mainFactions = DeckFormat.deckMainRegionOrderedByCardQt(deck);
+    // deck.mainFactions = DeckFormat.deckMainRegionOrderedByCardQt(deck);
+    deck['mainFactionCardsQt'] = getDeckMainRegions(deck);
+    deck.mainFactions = Object.keys(deck['mainFactionCardsQt']);
+
     deck['code'] = getCodeFromDeck(
       cards.map((card) => {
         return {

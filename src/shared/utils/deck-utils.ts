@@ -64,16 +64,3 @@ export function getLoRDecks(deckCodes: string[]): Observable<LoRDeck[]> {
     }),
   );
 }
-
-export function getDeckName(deck: LoRDeck) {
-  let name = '';
-  if (deck.cards.champions.length > 0) {
-    name = _.orderBy(deck.cards.champions, ['count'], ['desc']) //ordena por numero de cartas do campeão
-      .slice(0, 2) // pega apenas os dois campeões mais relevantes
-      .map((champion) => champion.card.name) // retorna o nome deles
-      .join(' / ');
-  } else {
-    name = '';
-  }
-  return name;
-}

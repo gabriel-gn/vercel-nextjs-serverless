@@ -1,37 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { map, Observable, tap, of } from 'rxjs';
-import { Card } from '../../shared/models';
 import { getCards, getCollectibleCards } from '../../shared/utils/card-utils';
 import { SearchCardsQueryType } from './cards.dto';
+import { RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
 
 @Injectable()
 export class CardsService {
   constructor() {}
 
-  public getCardByCode(cardCode: string): Observable<Card> {
+  public getCardByCode(cardCode: string): Observable<RiotLoRCard> {
     return getCards(false).pipe(
-      map((cards: Card[]) => {
+      map((cards: RiotLoRCard[]) => {
         return cards.find((card) => card.cardCode === cardCode);
       }),
     );
   }
 
   public searchCard(
-      query: string,
-      queryType: SearchCardsQueryType,
-      exactMatch: boolean = true,
-      onlyCollectible: boolean = true,
-      associatedCards: boolean = false,
-      minify: boolean = true,
-      limit: number = 5
-    ): Observable<Card[]> {
+    query: string,
+    queryType: SearchCardsQueryType,
+    exactMatch = true,
+    onlyCollectible = true,
+    associatedCards = false,
+    minify = true,
+    limit = 5,
+  ): Observable<RiotLoRCard[]> {
     query = `${query}`.toLowerCase();
 
     if (!query) {
       return of([]);
     }
 
-    const filterFn: (card: Card, prop: string) => boolean = (card: Card, prop: string) => {
+    const filterFn: (card: RiotLoRCard, prop: string) => boolean = (
+      card: RiotLoRCard,
+      prop: string,
+    ) => {
       const cardProp = `${card[prop]}`.toLowerCase();
       if (exactMatch) {
         return cardProp === query;
@@ -40,11 +43,13 @@ export class CardsService {
       }
     };
 
-    const cardsObs = onlyCollectible ? getCollectibleCards(minify) : getCards(minify);
+    const cardsObs = onlyCollectible
+      ? getCollectibleCards(minify)
+      : getCards(minify);
 
     return cardsObs.pipe(
-      map((cards: Card[]) => {
-        let cardResult: Card[] = [];
+      map((cards: RiotLoRCard[]) => {
+        let cardResult: RiotLoRCard[] = [];
         switch (queryType) {
           case 'code':
             cardResult = cards.filter((card) => filterFn(card, 'cardCode'));
@@ -55,10 +60,13 @@ export class CardsService {
         }
         cardResult = !!limit ? cardResult.slice(0, limit) : cardResult;
 
-        if (associatedCards === true) {  // adiciona as card refs
+        if (associatedCards === true) {
+          // adiciona as card refs
           cardResult.forEach((card) => {
-            card.associatedCardRefs.forEach(cardRef => {
-              card.associatedCards.push(cards.find(lorCard => lorCard.cardCode === cardRef));
+            card.associatedCardRefs.forEach((cardRef) => {
+              card.associatedCards.push(
+                cards.find((lorCard) => lorCard.cardCode === cardRef),
+              );
             });
           });
         }

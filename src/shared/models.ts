@@ -1,4 +1,4 @@
-import { LoRDeck, RiotLoRCard } from "@gabrielgn-test/runeterra-tools";
+import { LoRDeck, RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
 
 export interface DeckCard {
   card: RiotLoRCard;
