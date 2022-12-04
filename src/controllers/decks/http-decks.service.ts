@@ -29,7 +29,11 @@ import {
   runescolaMetaDecksToUserDecks,
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
-import { generateDeckName, LoRDeck, RiotLoRCard } from "@gabrielgn-test/runeterra-tools";
+import {
+  generateDeckName,
+  LoRDeck,
+  RiotLoRCard,
+} from '@gabrielgn-test/runeterra-tools';
 
 @Injectable()
 export class HttpDecksService {
@@ -278,6 +282,7 @@ export class HttpDecksService {
           }),
         };
       }),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       concatMap((deckStats: { codes: string[]; stats: DeckStats[] }) => {
         return forkJoin([getLoRDecks(deckStats.codes), of(deckStats.stats)]);
