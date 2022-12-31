@@ -21,7 +21,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "vercel:dev": "vercel dev",
-    "copy:assets": "cp -rv src/assets dist/assets"
+    "copy:assets": "cp -rv src/assets dist/"
   },
   "dependencies": {
     "@gabrielgn-test/runeterra-tools": "^0.0.19",
