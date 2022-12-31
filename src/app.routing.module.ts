@@ -4,7 +4,8 @@ import { DecksModule } from './controllers/decks/decks.module';
 import { MatchesModule } from './controllers/matches/matches.module';
 import { CardsModule } from './controllers/cards/cards.module';
 import { RiotAssetsModule } from './controllers/riot-assets/riot-assets.module';
-import { ServerInfoModule } from "./controllers/server-info/server-info.module";
+import { ServerInfoModule } from './controllers/server-info/server-info.module';
+import { MatchupsModule } from './controllers/matchups/matchups.module';
 
 @Module({})
 export class AppRoutingModule {
@@ -17,6 +18,7 @@ export class AppRoutingModule {
         DecksModule,
         MatchesModule,
         CardsModule,
+        MatchupsModule,
         RiotAssetsModule,
         RouterModule.register([
           {
@@ -38,6 +40,10 @@ export class AppRoutingModule {
           {
             path: '/cards',
             module: CardsModule,
+          },
+          {
+            path: '/matchups',
+            module: MatchupsModule,
           },
         ]),
       ],
