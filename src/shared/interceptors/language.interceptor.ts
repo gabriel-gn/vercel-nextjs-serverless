@@ -1,17 +1,18 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class LanguageInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-
     const http = context.switchToHttp();
     const request = http.getRequest();
     const query = request.query;
-    const availableLangs = [
-      'en_us',
-      'pt_br'
-    ]
+    const availableLangs = ['en_us', 'pt_br'];
 
     let lang = query?.lang
       ? `${query.lang}`.toLowerCase().replace('-', '_')

@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HttpDecksService } from './http-decks.service';
 import { Observable } from 'rxjs';
-import { LoRDeck, UserDeck, UserDeckQueryResponse } from '../../shared/models';
+import { UserDeckQueryResponse } from '../../shared/models';
 import { getLoRDeck } from '../../shared/utils/deck-utils';
-import { SearchDeckLibraryDto, SearchDeckLibraryRuneterraArDto } from "./decks.dto";
+import {
+  SearchDeckLibraryDto,
+  SearchDeckLibraryRuneterraArDto,
+} from './decks.dto';
+import { LoRDeck, UserDeck } from '@gabrielgn-test/runeterra-tools';
 
 @Injectable()
 export class DecksService {
@@ -25,15 +29,21 @@ export class DecksService {
     return this.http.getTrendingDecks();
   }
 
-  public getTrendingDecksRunescola(getRelatedDecks: boolean = true): Observable<UserDeck[]> {
+  public getTrendingDecksRunescola(
+    getRelatedDecks = true,
+  ): Observable<UserDeck[]> {
     return this.http.getTrendingDecksRunescola(getRelatedDecks);
   }
 
-  public getDecksFromLibrary(searchObj: SearchDeckLibraryDto): Observable<UserDeckQueryResponse> {
+  public getDecksFromLibrary(
+    searchObj: SearchDeckLibraryDto,
+  ): Observable<UserDeckQueryResponse> {
     return this.http.getDecksFromLibrary(searchObj);
   }
 
-  public getDecksFromLibraryRuneterraAR(searchObj: SearchDeckLibraryRuneterraArDto): Observable<UserDeckQueryResponse> {
+  public getDecksFromLibraryRuneterraAR(
+    searchObj: SearchDeckLibraryRuneterraArDto,
+  ): Observable<UserDeckQueryResponse> {
     return this.http.getDecksFromLibraryRuneterraAR(searchObj);
   }
 }

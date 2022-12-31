@@ -1,5 +1,5 @@
-import { Factions } from '../../shared/models';
 import { ApiProperty } from '@nestjs/swagger';
+import { CardRegionAbbreviation } from "@gabrielgn-test/runeterra-tools";
 
 export type SearchDeckLibraryCategory = 'BUDGET' | 'FEATURED' | 'COMMUNITY';
 export type SearchDeckLibraryPlaystyle = 'AGGRO' | 'COMBO' | 'CONTROL' | 'MIDRANGE';
@@ -22,7 +22,7 @@ export class SearchDeckLibraryDto {
     enumName: 'Factions',
     isArray: true,
   })
-  factions?: Factions[];
+  factions?: CardRegionAbbreviation[];
 
   @ApiProperty({
     required: false,
@@ -63,7 +63,7 @@ export class SearchDeckLibraryRuneterraArDto {
     enumName: 'Factions',
     isArray: true,
   })
-  factions?: Factions[];
+  factions?: CardRegionAbbreviation[];
 
   @ApiProperty({
     required: false,

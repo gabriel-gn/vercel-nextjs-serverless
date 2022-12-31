@@ -1,14 +1,22 @@
-import { Body, Controller, Get, Header, Param, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { DecksService } from './decks.service';
 import {
   SearchDeckLibraryCategory,
   SearchDeckLibraryDto,
   SearchDeckLibraryPlaystyle,
-  SearchDeckLibraryRuneterraArDto
-} from "./decks.dto";
+  SearchDeckLibraryRuneterraArDto,
+} from './decks.dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
-import { Factions } from "../../shared/models";
+import { CardRegionAbbreviation } from '@gabrielgn-test/runeterra-tools';
 
 @ApiTags('Decks')
 @Controller()
@@ -42,7 +50,9 @@ export class DecksController {
     required: false,
     type: Boolean,
   })
-  async getTrendingDecksRunescola(@Query('relatedDecks') relatedDecks: boolean) {
+  async getTrendingDecksRunescola(
+    @Query('relatedDecks') relatedDecks: boolean,
+  ) {
     relatedDecks = `${relatedDecks}`.toLowerCase() === 'true';
     return this.decksService.getTrendingDecksRunescola(relatedDecks);
   }
@@ -73,20 +83,23 @@ export class DecksController {
     @Query('playStyle') playStyle: SearchDeckLibraryPlaystyle,
     @Query('searchTerm') searchTerm: string,
     @Query('cardIds') cardIds: string[],
-    @Query('factions') factions: Factions[],
+    @Query('factions') factions: CardRegionAbbreviation[],
     @Query('keywords') keywords: string[],
     @Query('count') count: number,
     @Query('from') from: number,
   ) {
     category = `${category}`.toUpperCase() as SearchDeckLibraryCategory;
-    category = ['BUDGET', 'FEATURED', 'COMMUNITY'].includes(category) ? category : 'COMMUNITY';
+    category = ['BUDGET', 'FEATURED', 'COMMUNITY'].includes(category)
+      ? category
+      : 'COMMUNITY';
 
     const searchObj: SearchDeckLibraryDto = {
       category: category,
     };
 
     if (!!playStyle) {
-      searchObj.playStyle = `${playStyle}`.toUpperCase() as SearchDeckLibraryPlaystyle;
+      searchObj.playStyle =
+        `${playStyle}`.toUpperCase() as SearchDeckLibraryPlaystyle;
     }
 
     if (!!searchTerm) {
@@ -99,7 +112,7 @@ export class DecksController {
     }
 
     if (!!factions) {
-      factions = `${factions}`.split(',') as Factions[];
+      factions = `${factions}`.split(',') as CardRegionAbbreviation[];
       searchObj.factions = factions;
     }
 
@@ -128,7 +141,9 @@ export class DecksController {
       type: 'UserDeckQueryResponse',
     },
   })
-  async postDecksFromLibraryRuneterraAR(@Body() searchObj: SearchDeckLibraryRuneterraArDto) {
+  async postDecksFromLibraryRuneterraAR(
+    @Body() searchObj: SearchDeckLibraryRuneterraArDto,
+  ) {
     return this.decksService.getDecksFromLibraryRuneterraAR(searchObj);
   }
 

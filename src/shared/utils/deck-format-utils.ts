@@ -1,42 +1,45 @@
+import { CardCodeAndCount, getCodeFromDeck } from 'lor-deckcodes-ts';
+import _ from 'lodash';
 import {
-  Card,
+  CARD_REGION_ABBREVIATION,
+  CardRegionAbbreviation,
   DeckCard,
-  FactionIdentifiers,
-  FactionIdentifiersColors,
-  FactionIdentifiersReverse,
-  Factions,
+  getCardMainRegion,
+  getCardMainRegionFromDeck,
+  getCardType, getDeckMainRegions,
   LoRDeck,
-} from '../models';
-import { getCodeFromDeck, CardCodeAndCount } from 'lor-deckcodes-ts';
-import _, { indexOf } from 'lodash';
+  rarityRefToCardCost,
+  regionRefToRegionAbbreviation
+} from "@gabrielgn-test/runeterra-tools";
 
 export class DeckFormat {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
-  public static deckMainRegionRefsOrderedByCardQt(deck: LoRDeck): Factions[] {
+  public static deckMainRegionOrderedByCardQt(
+    deck: LoRDeck,
+  ): CardRegionAbbreviation[] {
     let regionRefsOrderedByCardQt: {
-      factionRef: Factions;
+      faction: CardRegionAbbreviation;
       factionCardsQt: number;
     }[] = Object.keys(deck.factionCardsQt)
-      .map((factionRef) => {
+      .map((faction) => {
         return {
-          factionRef: factionRef as unknown as Factions,
-          factionCardsQt: deck.factionCardsQt[factionRef],
+          faction: faction as unknown as CardRegionAbbreviation,
+          factionCardsQt: deck.factionCardsQt[faction],
         };
       })
       .filter((refObj) => refObj.factionCardsQt > 0);
     regionRefsOrderedByCardQt = _.reverse(
       _.sortBy(regionRefsOrderedByCardQt, 'factionCardsQt'),
     );
-    const factionIdentifiers: Factions[] = regionRefsOrderedByCardQt.map(
-      (refObj) => refObj.factionRef,
-    );
+    const factionIdentifiers: CardRegionAbbreviation[] =
+      regionRefsOrderedByCardQt.map((refObj) => refObj.faction);
 
     if (
       // caso 'Runeterra' seja uma região e não esteja entre as duas primeiras, faz ela ser a segunda
-      factionIdentifiers.includes(FactionIdentifiers.RUNETERRA) &&
-      factionIdentifiers.indexOf(FactionIdentifiers.RUNETERRA) > 1
+      factionIdentifiers.includes(CARD_REGION_ABBREVIATION.RUNETERRA) &&
+      factionIdentifiers.indexOf(CARD_REGION_ABBREVIATION.RUNETERRA) > 1
     ) {
       const swapArrayLoc = (arr, from, to) => {
         // mova itens de posição de u; array
@@ -46,112 +49,12 @@ export class DeckFormat {
       // move "Runeterra" para a segunda posição do array
       swapArrayLoc(
         factionIdentifiers,
-        factionIdentifiers.indexOf(FactionIdentifiers.RUNETERRA),
+        factionIdentifiers.indexOf(CARD_REGION_ABBREVIATION.RUNETERRA),
         1,
       );
     }
 
     return factionIdentifiers;
-  }
-
-  public static regionRefToFactionIdentifier(
-    regionRef: string,
-  ): FactionIdentifiers | '' {
-    try {
-      return FactionIdentifiers[regionRef.toUpperCase()];
-    } catch (e) {
-      return '';
-    }
-  }
-
-  public static getCardType(
-    card: Card,
-  ): 'champion' | 'follower' | 'spell' | 'landmark' | 'equipment' {
-    if (!!card.spellSpeedRef) {
-      return 'spell';
-    } else if (
-      card.keywordRefs &&
-      card.keywordRefs.length > 0 &&
-      card.keywordRefs.includes('LandmarkVisualOnly')
-    ) {
-      return 'landmark';
-    } else if (
-      card.keywordRefs &&
-      card.keywordRefs.length > 0 &&
-      card.keywordRefs.includes('Equipment')
-    ) {
-      return 'equipment';
-    } else if (card.rarityRef === 'Champion') {
-      return 'champion';
-    } else {
-      return 'follower';
-    }
-  }
-
-  public static rarityRefToCost(rarityRef: string): number {
-    switch (rarityRef.toUpperCase()) {
-      case 'CHAMPION':
-        return 3000;
-        break;
-      case 'EPIC':
-        return 1200;
-        break;
-      case 'RARE':
-        return 300;
-        break;
-      case 'COMMON':
-        return 100;
-        break;
-      default:
-        return 0;
-        break;
-    }
-  }
-
-  public static getFactionColor(
-    faction: FactionIdentifiers | string,
-    type: 'rgb' | 'hex' = 'rgb',
-  ): string | number[] {
-    const componentToHex = (c) => {
-      const hex = c.toString(16);
-      return hex.length === 1 ? '0' + hex : hex;
-    };
-
-    const rgbToHex = (r, g, b) => {
-      return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
-    };
-
-    const colorRgb = FactionIdentifiersColors[faction].split(',').map(Number);
-    if (type === 'rgb') {
-      return colorRgb;
-    } else {
-      // @ts-ignore
-      return rgbToHex(...colorRgb);
-    }
-  }
-
-  public static getCardRegionRef(card: Card): FactionIdentifiersReverse {
-    return FactionIdentifiersReverse[card.cardCode.substring(2, 4)];
-  }
-
-  public static getCardMainRegionRef(card: Card, regionRefs: string[]): string {
-    const mainRegionRef = DeckFormat.regionRefToFactionIdentifier(
-      DeckFormat.getCardRegionRef(card),
-    );
-    if (regionRefs.includes(mainRegionRef)) {
-      return mainRegionRef;
-    } else {
-      const regionRefsForCard = _.intersection(
-        regionRefs,
-        card.regionRefs.map((ref) =>
-          DeckFormat.regionRefToFactionIdentifier(ref),
-        ),
-      );
-      return (
-        regionRefsForCard[0] ||
-        DeckFormat.regionRefToFactionIdentifier(card.regionRefs[0])
-      );
-    }
   }
 
   public static cardArrayToLorDeck(cards: DeckCard[]): LoRDeck {
@@ -179,7 +82,7 @@ export class DeckFormat {
       factions: [],
       factionCardsQt: {
         ..._.transform(
-          Object.values(FactionIdentifiers),
+          Object.entries(CARD_REGION_ABBREVIATION).map((e) => e[1]),
           (result, n) => {
             result[n] = 0;
           },
@@ -189,59 +92,37 @@ export class DeckFormat {
       essenceCost: 0,
     };
     cards.forEach((card) => {
-      switch (this.getCardType(card.card)) {
-        case 'champion':
-          deck.cards.champions.push(card);
-          break;
-        case 'follower':
-          deck.cards.followers.push(card);
-          break;
-        case 'spell':
-          deck.cards.spells.push(card);
-          break;
-        case 'landmark':
-          deck.cards.landmarks.push(card);
-          break;
-        case 'equipment':
-          deck.cards.equipments.push(card);
-          break;
-      }
-
+      deck.cards[`${getCardType(card.card).toLowerCase()}s`].push(card);
       deck.cardCostQt[card.card.cost] += card.count;
-      deck.essenceCost +=
-        DeckFormat.rarityRefToCost(card.card.rarityRef) * card.count;
+      deck.essenceCost += rarityRefToCardCost(card.card.rarityRef) * card.count;
       card.card.regionRefs.forEach((regionRef) =>
-        deck.factions.push(DeckFormat.regionRefToFactionIdentifier(regionRef)),
+        deck.factions.push(regionRefToRegionAbbreviation(regionRef)),
       );
-      if (card.card.regionRefs.length === 1) {
-        deck.mainFactions.push(
-          DeckFormat.regionRefToFactionIdentifier(card.card.regionRefs[0]),
-        );
-      }
     });
     deck.factions = _.uniq(deck.factions);
-    deck.mainFactions = _.uniq(deck.mainFactions);
-    if (deck.mainFactions.length < 2 && deck.factions.length >= 2) {
-      // caso tenha só uma região, verifica se pode ter outra
-      deck.mainFactions.push(_.difference(deck.factions, deck.mainFactions)[0]);
-    }
 
     // ordena as cartas por custo
     Object.keys(deck.cards).forEach((key) => {
       deck.cards[key] = _.sortBy(deck.cards[key], 'card.cost');
       deck.cards[key].forEach((card) => {
-        deck.factionCardsQt[
-          DeckFormat.getCardMainRegionRef(card.card, deck.mainFactions)
-        ] += card.count;
+        deck.factionCardsQt[getCardMainRegion(card.card, deck.mainFactions)] +=
+          card.count;
       });
     });
 
-    deck.mainFactions = DeckFormat.deckMainRegionRefsOrderedByCardQt(deck);
+    // deck.mainFactions = DeckFormat.deckMainRegionOrderedByCardQt(deck);
+    try {
+      deck['mainFactionCardsQt'] = getDeckMainRegions(deck);
+      deck.mainFactions = Object.keys(deck['mainFactionCardsQt']);
+    } catch (e) {
+      cards = [];
+    }
+
     deck['code'] = getCodeFromDeck(
       cards.map((card) => {
         return {
-          cardCode: card.card.cardCode,
-          count: card.count,
+          cardCode: card?.card?.cardCode,
+          count: card?.count,
         } as CardCodeAndCount;
       }),
     );

@@ -11,16 +11,14 @@ import {
   throwError,
 } from 'rxjs';
 import {
-  Card,
   DeckStats,
-  LoRDeck,
   MobalyticsDeck,
   MobalyticsMetaDeck,
   UserDeck,
   UserDeckQueryResponse,
 } from '../../shared/models';
 import qs from 'qs';
-import { getDeckName, getLoRDecks } from '../../shared/utils/deck-utils';
+import { getLoRDecks } from '../../shared/utils/deck-utils';
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
@@ -31,6 +29,11 @@ import {
   runescolaMetaDecksToUserDecks,
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
+import {
+  generateDeckName,
+  LoRDeck,
+  RiotLoRCard,
+} from '@gabrielgn-test/runeterra-tools';
 
 @Injectable()
 export class HttpDecksService {
@@ -198,7 +201,7 @@ export class HttpDecksService {
     if (searchObj?.cardIds && Array.isArray(searchObj.cardIds)) {
       let cardObjects = [];
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const cards: Card[] = require(`../../assets/sets/en_us/en_us.json`);
+      const cards: RiotLoRCard[] = require(`../../assets/sets/en_us/en_us.json`);
       for (const cardId of searchObj.cardIds) {
         const card = cards.find((cd) => cd?.cardCode === `${cardId}`);
         if (card && card?.rarityRef === 'Champion') {
@@ -279,6 +282,7 @@ export class HttpDecksService {
           }),
         };
       }),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       concatMap((deckStats: { codes: string[]; stats: DeckStats[] }) => {
         return forkJoin([getLoRDecks(deckStats.codes), of(deckStats.stats)]);
@@ -287,7 +291,7 @@ export class HttpDecksService {
         return deckStats[0].map((deck, index) => {
           return {
             deck: deck,
-            title: getDeckName(deck),
+            title: generateDeckName(deck),
             description: '',
             username: '',
             stats: deckStats[1][index],

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RiotAssetsService } from './riot-assets.service';
 
-@ApiTags('Matches')
+@ApiTags('Riot Assets')
 @Controller()
 export class RiotAssetsController {
   constructor(private readonly riotAssetsService: RiotAssetsService) {}
