@@ -20,7 +20,7 @@ export class MatchupsService {
     csvPath: string,
     removeHeaders = true,
   ): Observable<any> {
-    const csvFilePath = path.resolve(__dirname, csvPath);
+    const csvFilePath = path.join(process.cwd(), csvPath);
     const headers = [
       'playerDeck', // deck’s archetype of the playerDeck
       'opponentDeck', // deck’s archetype of the opponentDeck
@@ -62,7 +62,7 @@ export class MatchupsService {
 
   public get(): Observable<any> {
     return this.getCsvContent(
-      '../../assets/matchups_data/latest/latest_diamond.csv',
+      'src/assets/matchups_data/latest/latest_diamond.csv',
     );
   }
 
