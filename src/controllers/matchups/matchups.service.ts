@@ -62,7 +62,7 @@ export class MatchupsService {
 
   public get(): Observable<any> {
     return this.getCsvContent(
-      '../assets/matchups_data/latest/latest_diamond.csv',
+      '../../../assets/matchups_data/latest/latest_diamond.csv',
     );
   }
 
