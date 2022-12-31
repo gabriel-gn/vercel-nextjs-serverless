@@ -67,14 +67,6 @@
     "tsconfig-paths": "^3.10.1",
     "typescript": "^4.3.5"
   },
-  "pkg": {
-    "assets": [
-      "src/assets/**/*"
-    ],
-    "targets": [
-      "node8"
-    ]
-  },
   "jest": {
     "moduleFileExtensions": [
       "js",
