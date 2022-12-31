@@ -1,6 +1,6 @@
 import { map, Observable, of } from 'rxjs';
-import _ from 'lodash';
 import { RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
+import { pickBy } from 'lodash';
 
 function minifyCards(
   cards: RiotLoRCard | RiotLoRCard[],
@@ -23,7 +23,7 @@ function minifyCards(
     'type',
   ];
   const minifyCard = (card: RiotLoRCard) => {
-    return _.pickBy(card, (value, key) => attrsToKeep.includes(key));
+    return pickBy(card, (value, key) => attrsToKeep.includes(key));
   };
 
   if (Array.isArray(cards)) {

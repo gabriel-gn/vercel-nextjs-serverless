@@ -1,16 +1,17 @@
 import { CardCodeAndCount, getCodeFromDeck } from 'lor-deckcodes-ts';
-import _ from 'lodash';
 import {
   CARD_REGION_ABBREVIATION,
   CardRegionAbbreviation,
   DeckCard,
   getCardMainRegion,
   getCardMainRegionFromDeck,
-  getCardType, getDeckMainRegions,
+  getCardType,
+  getDeckMainRegions,
   LoRDeck,
   rarityRefToCardCost,
-  regionRefToRegionAbbreviation
-} from "@gabrielgn-test/runeterra-tools";
+  regionRefToRegionAbbreviation,
+} from '@gabrielgn-test/runeterra-tools';
+import { reverse, sortBy, transform, uniq } from 'lodash';
 
 export class DeckFormat {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -30,8 +31,8 @@ export class DeckFormat {
         };
       })
       .filter((refObj) => refObj.factionCardsQt > 0);
-    regionRefsOrderedByCardQt = _.reverse(
-      _.sortBy(regionRefsOrderedByCardQt, 'factionCardsQt'),
+    regionRefsOrderedByCardQt = reverse(
+      sortBy(regionRefsOrderedByCardQt, 'factionCardsQt'),
     );
     const factionIdentifiers: CardRegionAbbreviation[] =
       regionRefsOrderedByCardQt.map((refObj) => refObj.faction);
@@ -70,7 +71,7 @@ export class DeckFormat {
       cardCostQt: {
         // cria um objeto com chaves numéricas de 0-N de acordo com o numero dentro do argumento Array()
         // caso apareça alguma carta com custo 20+, alterar aqui
-        ..._.transform(
+        ...transform(
           Array.from(Array(21).keys()),
           (result, n) => {
             result[n] = 0;
@@ -81,7 +82,7 @@ export class DeckFormat {
       mainFactions: [],
       factions: [],
       factionCardsQt: {
-        ..._.transform(
+        ...transform(
           Object.entries(CARD_REGION_ABBREVIATION).map((e) => e[1]),
           (result, n) => {
             result[n] = 0;
@@ -99,11 +100,11 @@ export class DeckFormat {
         deck.factions.push(regionRefToRegionAbbreviation(regionRef)),
       );
     });
-    deck.factions = _.uniq(deck.factions);
+    deck.factions = uniq(deck.factions);
 
     // ordena as cartas por custo
     Object.keys(deck.cards).forEach((key) => {
-      deck.cards[key] = _.sortBy(deck.cards[key], 'card.cost');
+      deck.cards[key] = sortBy(deck.cards[key], 'card.cost');
       deck.cards[key].forEach((card) => {
         deck.factionCardsQt[getCardMainRegion(card.card, deck.mainFactions)] +=
           card.count;

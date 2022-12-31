@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { concatMap, from, map, Observable, of } from "rxjs";
+import { concatMap, from, map, Observable, of } from 'rxjs';
 import { parse } from 'csv-parse';
 import * as fs from 'fs';
 import * as path from 'path';
 import { getLoRDeck } from '../../shared/utils/deck-utils';
-import { generateDeckName, LoRDeck, RiotLoRCard } from "@gabrielgn-test/runeterra-tools";
-import _ from 'lodash';
-import { getCards } from "../../shared/utils/card-utils";
+import {
+  generateDeckName,
+  LoRDeck,
+  RiotLoRCard,
+} from '@gabrielgn-test/runeterra-tools';
+import { getCards } from '../../shared/utils/card-utils';
+import { orderBy } from 'lodash';
 
 @Injectable()
 export class MatchupsService {
@@ -76,7 +80,7 @@ export class MatchupsService {
     return this.getCI(matchupEntry) <= CI_OK;
   };
 
-  public getFromDeckCode(deckCode: string, limit: number = 10): Observable<any> {
+  public getFromDeckCode(deckCode: string, limit = 10): Observable<any> {
     let csvContent = [];
     return this.get().pipe(
       // retorna LoR Deck
@@ -104,25 +108,24 @@ export class MatchupsService {
       }),
       // limita os resultados, ordena por taxa de vitórias e adiciona o range do intervalo de confiança no winRate
       map((matchupEntries: any) => {
-        matchupEntries = _.orderBy(
-          matchupEntries,
-          ['muGames'],
-          ['desc'],
-        ).splice(0, limit);
+        matchupEntries = orderBy(matchupEntries, ['muGames'], ['desc']).splice(
+          0,
+          limit,
+        );
         matchupEntries = matchupEntries.map((entry: any) => {
           return { ...entry, ...{ ciRange: this.getCI(entry) } };
         });
-        matchupEntries = _.orderBy(matchupEntries, ['muWR'], ['desc']);
+        matchupEntries = orderBy(matchupEntries, ['muWR'], ['desc']);
         return matchupEntries;
       }),
       // transforma os nomes dos campeões nas chaves em seu código de carta
       concatMap((matchupEntries: any) => {
         // return of(matchupEntries);
         const toAlphaNum = (str) => {
-          return `${str}`.toLowerCase().replace(/[^a-z0-9]/gi,'');
+          return `${str}`.toLowerCase().replace(/[^a-z0-9]/gi, '');
         };
 
-        return getCards().pipe(
+        return getCards(false).pipe(
           map((allCards: RiotLoRCard[]) => {
             const keysToConvert = ['opponentDeck', 'playerDeck'];
             matchupEntries.forEach((entry: any) => {
@@ -130,13 +133,22 @@ export class MatchupsService {
                 const championCardCodes = `${entry[key]}`
                   .slice(0, `${entry[key]}`.lastIndexOf(' ')) // pega apenas os nomes de champs
                   .split('/')
-                  .map((champName) => allCards.find((c) => toAlphaNum(c.name) === toAlphaNum(champName))?.cardCode)
-                const regionAbbreviations = `${entry[key]}`.slice(`${entry[key]}`.lastIndexOf(' '))
+                  .map(
+                    (champName) =>
+                      allCards.find(
+                        (c) => toAlphaNum(c.name) === toAlphaNum(champName),
+                      )?.cardCode,
+                  );
+                const regionAbbreviations = `${entry[key]}`
+                  .slice(`${entry[key]}`.lastIndexOf(' '))
                   .replaceAll('(', '')
                   .replaceAll(')', '')
                   .replaceAll(' ', '')
                   .split('/');
-                entry[key] = {championCodes: championCardCodes, regions: regionAbbreviations}
+                entry[key] = {
+                  championCodes: championCardCodes,
+                  regions: regionAbbreviations,
+                };
               });
             });
             return matchupEntries;
