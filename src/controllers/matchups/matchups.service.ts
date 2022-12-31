@@ -76,7 +76,7 @@ export class MatchupsService {
     return this.getCI(matchupEntry) <= CI_OK;
   };
 
-  public getFromDeckCode(deckCode: string): Observable<any> {
+  public getFromDeckCode(deckCode: string, limit: number = 10): Observable<any> {
     let csvContent = [];
     return this.get().pipe(
       // retorna LoR Deck
@@ -102,12 +102,17 @@ export class MatchupsService {
           );
         });
       }),
-      // ordena por taxa de vitórias e adiciona o range do intervalo de confiança no winRate
+      // limita os resultados, ordena por taxa de vitórias e adiciona o range do intervalo de confiança no winRate
       map((matchupEntries: any) => {
-        matchupEntries = _.orderBy(matchupEntries, ['muWR'], ['desc']);
+        matchupEntries = _.orderBy(
+          matchupEntries,
+          ['muGames'],
+          ['desc'],
+        ).splice(0, limit);
         matchupEntries = matchupEntries.map((entry: any) => {
           return { ...entry, ...{ ciRange: this.getCI(entry) } };
         });
+        matchupEntries = _.orderBy(matchupEntries, ['muWR'], ['desc']);
         return matchupEntries;
       }),
       // transforma os nomes dos campeões nas chaves em seu código de carta
