@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { concatMap, from, map, Observable } from 'rxjs';
+import { concatMap, from, map, Observable, of } from "rxjs";
 import { parse } from 'csv-parse';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -112,6 +112,7 @@ export class MatchupsService {
       }),
       // transforma os nomes dos campeões nas chaves em seu código de carta
       concatMap((matchupEntries: any) => {
+        // return of(matchupEntries);
         const toAlphaNum = (str) => {
           return `${str}`.toLowerCase().replace(/[^a-z0-9]/gi,'');
         };
