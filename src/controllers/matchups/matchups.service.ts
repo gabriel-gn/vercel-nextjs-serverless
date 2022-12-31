@@ -122,12 +122,16 @@ export class MatchupsService {
             const keysToConvert = ['opponentDeck', 'playerDeck'];
             matchupEntries.forEach((entry: any) => {
               keysToConvert.forEach((key: string) => {
-                const championNames = `${entry[key]}`
-                  .split(' ')[0] // pega apenas os nomes de champs
+                const championCardCodes = `${entry[key]}`
+                  .slice(0, `${entry[key]}`.lastIndexOf(' ')) // pega apenas os nomes de champs
                   .split('/')
                   .map((champName) => allCards.find((c) => toAlphaNum(c.name) === toAlphaNum(champName))?.cardCode)
-                  .join('/');
-                entry[key] = `${championNames} ` + `${entry[key]}`.split(' ')[1];
+                const regionAbbreviations = `${entry[key]}`.slice(`${entry[key]}`.lastIndexOf(' '))
+                  .replaceAll('(', '')
+                  .replaceAll(')', '')
+                  .replaceAll(' ', '')
+                  .split('/');
+                entry[key] = {championCodes: championCardCodes, regions: regionAbbreviations}
               });
             });
             return matchupEntries;
