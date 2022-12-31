@@ -7,7 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "NODE_ENV=production nest build",
+    "build": "NODE_ENV=production nest build && npm run copy:assets",
+    "build:vercel": "vercel build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -19,7 +20,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "vercel:dev": "vercel dev"
+    "vercel:dev": "vercel dev",
+    "copy:assets": "cp -rv src/assets dist/assets"
   },
   "dependencies": {
     "@gabrielgn-test/runeterra-tools": "^0.0.19",
