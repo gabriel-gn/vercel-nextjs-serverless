@@ -132,14 +132,14 @@ async function addChampionAndRegions(matchupArray) {
             const championCardCodes = `${entry[key]}`
               .slice(0, `${entry[key]}`.lastIndexOf(' ')) // pega apenas os nomes de champs
               .split('/')
-              // .map((champName) => {
-              //   const champCard = allCards.find((c) => toAlphaNum(c.name) === toAlphaNum(champName));
-              //   if (!!champCard) {
-              //     return champCard.cardCode;
-              //   } else {
-              //     return '';
-              //   }
-              // });
+              .map((champName) => {
+                const champCard = allCards.find((c) => toAlphaNum(c.name) === toAlphaNum(champName));
+                if (!!champCard) {
+                  return champCard.cardCode;
+                } else {
+                  return '';
+                }
+              });
             const regionAbbreviations = `${entry[key]}`
               .slice(`${entry[key]}`.lastIndexOf(' '))
               .replaceAll('(', '')
@@ -163,7 +163,7 @@ async function createJsonFileFromCsv(filepath) {
   fileContentAsJsObj = fileContentAsJsObj.splice(1); // remove headers
   fileContentAsJsObj = formatJsonValues(fileContentAsJsObj); // transforma os valores em primitivos javascript
   fileContentAsJsObj = addCIRangeToJson(fileContentAsJsObj); // adiciona CI Range
-  // fileContentAsJsObj = addChampionAndRegions(fileContentAsJsObj); // adiciona campeões e regiões
+  fileContentAsJsObj = await addChampionAndRegions(fileContentAsJsObj); // adiciona campeões e regiões
   const newFilename = filepath.replace('.csv', '.json');
   fs.writeFileSync(newFilename, JSON.stringify(fileContentAsJsObj));
 }
