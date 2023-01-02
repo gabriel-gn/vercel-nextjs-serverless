@@ -3,6 +3,7 @@ import { concatMap, map, Observable, of, tap } from 'rxjs';
 import { getLoRDeck } from '../../shared/utils/deck-utils';
 import { LoRDeck } from '@gabrielgn-test/runeterra-tools';
 import { intersection, orderBy } from 'lodash';
+import { LoRMatchup } from '../../shared/models/lor-matchups';
 
 @Injectable()
 export class MatchupsService {
@@ -13,18 +14,18 @@ export class MatchupsService {
     return matchupEntry.ciRange <= CI_OK;
   };
 
-  public getFromDeckCode(deckCode: string, limit = 10): Observable<any> {
+  public getFromDeckCode(deckCode: string, limit = 10): Observable<LoRMatchup[]> {
     return getLoRDeck(deckCode).pipe(
       // retorna entradas do arquivo em que o jogador usou deck inputado E ESTÁ DENTRO de intervalo de confiança aceitável
       concatMap((lorDeck: LoRDeck) => {
         return of(
           require(`../../assets/matchups/latest/latest_diamond.json`),
         ).pipe(
-          map((matchups: any) => {
+          map((matchups: LoRMatchup[]) => {
             const championCodes = lorDeck.cards.champions.map(
               (c) => c.card.cardCode,
             );
-            return matchups.filter((matchupEntry: any) => {
+            return matchups.filter((matchupEntry: LoRMatchup) => {
               return (
                 intersection(
                   championCodes,
@@ -33,11 +34,10 @@ export class MatchupsService {
               );
             });
           }),
-          tap((a) => console.log(a)),
         );
       }),
       // limita os resultados, ordena por taxa de vitórias e adiciona o range do intervalo de confiança no winRate
-      map((matchupEntries: any) => {
+      map((matchupEntries: LoRMatchup[]) => {
         matchupEntries = orderBy(matchupEntries, ['muGames'], ['desc']).splice(
           0,
           limit,
