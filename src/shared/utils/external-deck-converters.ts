@@ -7,6 +7,7 @@ import {
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { getLoRDecks } from './deck-utils';
 import { generateDeckName, LoRDeck } from '@gabrielgn-test/runeterra-tools';
+import _ from "lodash";
 
 export function mobalyticsDecksToUserDecks(
   mobalyticsDecks: MobalyticsDeck[],
@@ -51,9 +52,11 @@ export function runeterraARDecksToUserDecks(
         return {
           ...{ deck: lorDeck },
           ...{
-            title: runeterraArDecks[i]?.deck_name
-              .split('\n')[0]
-              .replace(/<\/?[^>]+(>|$)/g, ''),
+            title: _.unescape(
+              runeterraArDecks[i]?.deck_name
+                .split('\n')[0]
+                .replace(/<\/?[^>]+(>|$)/g, ''),
+            ),
             description: '',
             changedAt:
               dateObjectFromUTC(runeterraArDecks[i]?.date).getTime() ||
