@@ -19,7 +19,7 @@ export class MatchupsService {
       // retorna entradas do arquivo em que o jogador usou deck inputado E ESTÁ DENTRO de intervalo de confiança aceitável
       concatMap((lorDeck: LoRDeck) => {
         return of(
-          require(`../../assets/matchups/latest/latest_diamond.json`),
+          require(`../../assets/matchups/latest/latest_master.json`),
         ).pipe(
           map((matchups: LoRMatchup[]) => {
             const championCodes = lorDeck.cards.champions.map(
