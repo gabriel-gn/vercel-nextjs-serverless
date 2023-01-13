@@ -1,23 +1,19 @@
-name: Update assets
+name: Update matchups
 
 on:
   schedule:
-    - cron: '0 19 * * 3' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
+    - cron: '0 0 */2 * *' # A cada 2 dias
   workflow_dispatch:
     inputs:
-      patch:
-        description: 'Patch to update from'
-        required: true
-        default: 'latest'
-      appendOnly:
-        description: 'Append latest instead of updating it'
+      person:
+        description: 'who uploaded'
         required: false
-        default: false
+        default: 'gabriel-gn'
 
 jobs:
 
-  update-riot-assets:
-    name: Auto Update Riot Assets
+  update-matchup-assets:
+    name: Auto Update Matchup Assets
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -31,10 +27,10 @@ jobs:
         run: |
           echo "*** Iniciando NPM Install ***"
           npm install
-      - name: Update RIOT assets
+      - name: Update MATCHUP assets
         working-directory: ./
         run: |
-          node ./scripts/update-sets.js
+          node ./scripts/update-matchups.js
         env:
           PATCH: ${{ github.event.inputs.patch }}
           APPEND_ONLY: ${{ github.event.inputs.appendOnly }}
@@ -46,4 +42,4 @@ jobs:
         uses: actions-js/push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          message: ":robot: auto update sets"
+          message: ":robot: auto update matchups"

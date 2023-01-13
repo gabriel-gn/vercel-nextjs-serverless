@@ -121,7 +121,7 @@ function formatArchetypes(matchupArray) {
     },
     {
       archetypeName: 'Pirates',
-      replaceTo: 'Miss Fortune/Gangplank', // pirates mantém as regiões utilizadas
+      replaceTo: 'Miss Fortune/Twisted Fate', // pirates mantém as regiões utilizadas
     },
   ];
 
