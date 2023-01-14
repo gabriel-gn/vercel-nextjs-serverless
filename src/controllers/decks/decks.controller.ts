@@ -30,7 +30,12 @@ export class DecksController {
 
   @Get('meta')
   async getMetaDecks() {
-    return this.decksService.getMetaDecks();
+    return this.decksService.getMetaDecksOpal();
+  }
+
+  @Get('meta-indigo')
+  async getMetaDecksIndigo() {
+    return this.decksService.getMetaDecksIndigo();
   }
 
   @Get('meta-granite')
@@ -39,9 +44,20 @@ export class DecksController {
     return this.decksService.getMetaDecksGranite();
   }
 
+  @Get('meta-opal')
+  @Header('content-type', 'application/json')
+  async getMetaDecksOpal() {
+    return this.decksService.getMetaDecksOpal();
+  }
+
   @Get('trending')
   async getTrendingDecks() {
-    return this.decksService.getTrendingDecks();
+    return this.decksService.getTrendingDecksCarbon();
+  }
+
+  @Get('trending-carbon')
+  async getTrendingDecksCarbon() {
+    return this.decksService.getTrendingDecksCarbon();
   }
 
   @Get('trending-citrine')
@@ -50,11 +66,11 @@ export class DecksController {
     required: false,
     type: Boolean,
   })
-  async getTrendingDecksRunescola(
+  async getTrendingDecksCitrine(
     @Query('relatedDecks') relatedDecks: boolean,
   ) {
     relatedDecks = `${relatedDecks}`.toLowerCase() === 'true';
-    return this.decksService.getTrendingDecksRunescola(relatedDecks);
+    return this.decksService.getTrendingDecksCitrine(relatedDecks);
   }
 
   @Post('library-indigo')
@@ -67,7 +83,7 @@ export class DecksController {
     },
   })
   async postLibraryDecks(@Body() searchObj: SearchDeckLibraryDto) {
-    return this.decksService.getDecksFromLibrary(searchObj);
+    return this.decksService.getDecksFromLibraryIndigo(searchObj);
   }
 
   @Get('library-indigo')
@@ -78,7 +94,7 @@ export class DecksController {
       type: 'UserDeckQueryResponse',
     },
   })
-  async getLibraryDecks(
+  async getLibraryDecksIndigo(
     @Query('category') category: SearchDeckLibraryCategory,
     @Query('playStyle') playStyle: SearchDeckLibraryPlaystyle,
     @Query('searchTerm') searchTerm: string,
@@ -129,7 +145,7 @@ export class DecksController {
       searchObj.from = +from;
     }
 
-    return this.decksService.getDecksFromLibrary(searchObj);
+    return this.decksService.getDecksFromLibraryIndigo(searchObj);
   }
 
   @Post('library-carbon')
@@ -141,10 +157,10 @@ export class DecksController {
       type: 'UserDeckQueryResponse',
     },
   })
-  async postDecksFromLibraryRuneterraAR(
+  async postDecksFromLibraryCarbon(
     @Body() searchObj: SearchDeckLibraryRuneterraArDto,
   ) {
-    return this.decksService.getDecksFromLibraryRuneterraAR(searchObj);
+    return this.decksService.getDecksFromLibraryCarbon(searchObj);
   }
 
   @Get('library-carbon')
@@ -170,7 +186,7 @@ export class DecksController {
       type: 'UserDeckQueryResponse',
     },
   })
-  async getDecksFromLibraryRuneterraAR(
+  async getDecksFromLibraryCarbon(
     @Query('page') page: number,
     @Query('factions') factions: string[],
     @Query('cardIds') cardIds: string[],
@@ -191,6 +207,6 @@ export class DecksController {
       searchObj['cardIds'] = cardIds;
     }
 
-    return this.decksService.getDecksFromLibraryRuneterraAR(searchObj);
+    return this.decksService.getDecksFromLibraryCarbon(searchObj);
   }
 }

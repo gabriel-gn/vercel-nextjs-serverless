@@ -17,33 +17,37 @@ export class DecksService {
     return getLoRDeck(deckCode);
   }
 
-  public getMetaDecks(): Observable<UserDeck[]> {
-    return this.http.getMetaDecks();
+  public getMetaDecksIndigo(): Observable<UserDeck[]> {
+    return this.http.getMetaDecksIndigo();
   }
 
   public getMetaDecksGranite(): Observable<UserDeck[]> {
     return this.http.getMetaDecksGranite();
   }
 
-  public getTrendingDecks(): Observable<UserDeck[]> {
-    return this.http.getTrendingDecks();
+  public getMetaDecksOpal(): Observable<UserDeck[]> {
+    return this.http.getMetaDecksOpal();
   }
 
-  public getTrendingDecksRunescola(
+  public getTrendingDecksCarbon(): Observable<UserDeck[]> {
+    return this.http.getTrendingDecksCarbon();
+  }
+
+  public getTrendingDecksCitrine(
     getRelatedDecks = true,
   ): Observable<UserDeck[]> {
-    return this.http.getTrendingDecksRunescola(getRelatedDecks);
+    return this.http.getTrendingDecksCitrine(getRelatedDecks);
   }
 
-  public getDecksFromLibrary(
+  public getDecksFromLibraryIndigo(
     searchObj: SearchDeckLibraryDto,
   ): Observable<UserDeckQueryResponse> {
-    return this.http.getDecksFromLibrary(searchObj);
+    return this.http.getDecksFromLibraryIndigo(searchObj);
   }
 
-  public getDecksFromLibraryRuneterraAR(
+  public getDecksFromLibraryCarbon(
     searchObj: SearchDeckLibraryRuneterraArDto,
   ): Observable<UserDeckQueryResponse> {
-    return this.http.getDecksFromLibraryRuneterraAR(searchObj);
+    return this.http.getDecksFromLibraryCarbon(searchObj);
   }
 }

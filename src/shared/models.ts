@@ -130,6 +130,30 @@ export interface RunescolaMetaDeck {
   best_decks: string[];
 }
 
+export interface LorMasterMetaDeck {
+  _id: string;
+  decks: {
+    deck_code: string;
+    play_num: number;
+    play_rate: number;
+    win_rate: number;
+  }[];
+  match_num: number;
+  play_num: number;
+  play_rate: number;
+  players: {
+    _id: string;
+    count: number;
+    deck_code: string;
+    riot_id: string;
+    server: string;
+    win_num: number;
+    win_rate: number;
+  }[];
+  win_num: number;
+  win_rate: number;
+}
+
 export interface UserDeckQueryResponse {
   decks: UserDeck[];
   hasNext: boolean;

@@ -12,6 +12,7 @@ import {
 } from 'rxjs';
 import {
   DeckStats,
+  LorMasterMetaDeck,
   MobalyticsDeck,
   MobalyticsMetaDeck,
   UserDeck,
@@ -25,6 +26,7 @@ import {
 } from './decks.dto';
 import _ from 'lodash';
 import {
+  lorMasterDecksToUserDecks,
   mobalyticsDecksToUserDecks,
   runescolaMetaDecksToUserDecks,
   runeterraARDecksToUserDecks,
@@ -39,7 +41,7 @@ import {
 export class HttpDecksService {
   constructor(private http: HttpService) {}
 
-  public getMetaDecks(): Observable<UserDeck[]> {
+  public getMetaDecksIndigo(): Observable<UserDeck[]> {
     return this.http
       .get('https://lor.mobalytics.gg/api/v2/meta/tier-list')
       .pipe(
@@ -90,7 +92,26 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getDecksFromLibrary(
+  public getMetaDecksOpal(deckLimit: number = 20): Observable<UserDeck[]> {
+    const url = 'https://lormaster.herokuapp.com/archetypes/all/7';
+
+    return this.http.get(url).pipe(
+      map((response) => response.data),
+      map((data) => {
+        let metaStats = _.orderBy(data.data, 'match_num', 'desc').slice(0, deckLimit);
+        metaStats = _.orderBy(metaStats, 'win_rate', 'desc');
+        const maxWr = _.max(metaStats.map((m) => m.win_rate));
+        const minWr = _.min(metaStats.map((m) => m.win_rate));
+        console.log(maxWr, minWr);
+        return metaStats;
+      }),
+      concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
+        return lorMasterDecksToUserDecks(lorMasterDecks);
+      }),
+    ) as unknown as Observable<UserDeck[]>;
+  }
+
+  public getDecksFromLibraryIndigo(
     searchObj: SearchDeckLibraryDto,
   ): Observable<UserDeckQueryResponse> {
     const url = 'https://lor.mobalytics.gg/api/v2/decks/library';
@@ -155,7 +176,7 @@ export class HttpDecksService {
       );
   }
 
-  public getDecksFromLibraryRuneterraAR(
+  public getDecksFromLibraryCarbon(
     searchObj: SearchDeckLibraryRuneterraArDto,
   ): Observable<UserDeckQueryResponse> {
     const numberOfDecksToGet = 18; // retirado da chamada oficial do site
@@ -233,7 +254,7 @@ export class HttpDecksService {
       );
   }
 
-  public getTrendingDecks(): Observable<UserDeck[]> {
+  public getTrendingDecksCarbon(): Observable<UserDeck[]> {
     const url = 'https://runeterra.ar/Meta/get/filter/everyone/en_us';
     const defaultPayload = {
       region: [],
@@ -302,7 +323,7 @@ export class HttpDecksService {
     );
   }
 
-  public getTrendingDecksRunescola(
+  public getTrendingDecksCitrine(
     getRelatedDecks = true,
   ): Observable<UserDeck[]> {
     const url =
