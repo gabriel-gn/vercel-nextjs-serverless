@@ -114,6 +114,7 @@ export function runescolaMetaDecksToUserDecks(
 export function lorMasterDecksToUserDecks(
   lorMasterDecks: LorMasterMetaDeck[],
   getRelatedDecks = true,
+  addTierBadge = false,
   date: number = undefined,
 ): Observable<UserDeck[]> {
   if (lorMasterDecks.length === 0) {
@@ -159,7 +160,9 @@ export function lorMasterDecksToUserDecks(
             // changedAt: date || new Date().getTime(),
             // createdAt: date || new Date().getTime(),
             username: '',
-            badges: { tier: getDeckTierByWR(lorMasterDecks[i]) },
+            badges: addTierBadge
+              ? { tier: getDeckTierByWR(lorMasterDecks[i]) }
+              : {},
             stats: {
               playRatePercent: lorMasterDecks[i].play_rate * 100,
               winRatePercent: lorMasterDecks[i].win_rate * 100,

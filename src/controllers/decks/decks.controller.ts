@@ -209,4 +209,9 @@ export class DecksController {
 
     return this.decksService.getDecksFromLibraryCarbon(searchObj);
   }
+
+  @Get('hidden-gems')
+  async getHiddenGems() {
+    return this.decksService.getHiddenGemsDecksOpal();
+  }
 }

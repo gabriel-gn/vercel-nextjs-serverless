@@ -98,15 +98,12 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       map((data) => {
-        let metaStats = _.orderBy(data.data, 'match_num', 'desc').slice(0, deckLimit);
-        metaStats = _.orderBy(metaStats, 'win_rate', 'desc');
-        const maxWr = _.max(metaStats.map((m) => m.win_rate));
-        const minWr = _.min(metaStats.map((m) => m.win_rate));
-        console.log(maxWr, minWr);
-        return metaStats;
+        let matches = _.orderBy(data.data, 'match_num', 'desc').slice(0, deckLimit);
+        matches = _.orderBy(matches, 'win_rate', 'desc');
+        return matches;
       }),
       concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
-        return lorMasterDecksToUserDecks(lorMasterDecks);
+        return lorMasterDecksToUserDecks(lorMasterDecks, true, true);
       }),
     ) as unknown as Observable<UserDeck[]>;
   }
@@ -337,6 +334,24 @@ export class HttpDecksService {
           getRelatedDecks,
           runescolaMetaData?.info?.last_update,
         );
+      }),
+    ) as unknown as Observable<UserDeck[]>;
+  }
+
+  public getLowPlayRateHighWinrateOpal(deckLimit: number = 15) {
+    const url = 'https://lormaster.herokuapp.com/archetypes/all';
+
+    return this.http.get(url).pipe(
+      map((response) => response.data),
+      map((data) => {
+        let matches = _.orderBy(data.data, 'win_rate', 'desc')
+          .filter((matchStats) => matchStats.match_num < 300)
+          .slice(0, deckLimit);
+        matches = _.orderBy(matches, 'win_rate', 'desc');
+        return matches;
+      }),
+      concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
+        return lorMasterDecksToUserDecks(lorMasterDecks);
       }),
     ) as unknown as Observable<UserDeck[]>;
   }

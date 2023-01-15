@@ -27,6 +27,7 @@ export class DecksService {
 
   public getMetaDecksOpal(): Observable<UserDeck[]> {
     return this.http.getMetaDecksOpal();
+    return this.http.getLowPlayRateHighWinrateOpal();
   }
 
   public getTrendingDecksCarbon(): Observable<UserDeck[]> {
@@ -49,5 +50,11 @@ export class DecksService {
     searchObj: SearchDeckLibraryRuneterraArDto,
   ): Observable<UserDeckQueryResponse> {
     return this.http.getDecksFromLibraryCarbon(searchObj);
+  }
+
+  public getHiddenGemsDecksOpal(
+    limit = 15,
+  ): Observable<UserDeck[]> {
+    return this.http.getLowPlayRateHighWinrateOpal(limit);
   }
 }
