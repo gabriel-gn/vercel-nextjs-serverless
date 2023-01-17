@@ -125,7 +125,7 @@ export function lorMasterDecksToUserDecks(
   const minWr = _.min(lorMasterDecks.map((m) => m.win_rate));
   const wrIntervals = (maxWr - minWr) / 5;
   const badgeTier = {
-    S: maxWr - 1.2 * wrIntervals,
+    S: maxWr - 1 * wrIntervals,
     A: maxWr - 2 * wrIntervals,
     B: maxWr - 3 * wrIntervals,
     C: maxWr - 4 * wrIntervals,
