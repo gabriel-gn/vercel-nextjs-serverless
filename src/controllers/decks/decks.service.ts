@@ -54,7 +54,8 @@ export class DecksService {
 
   public getHiddenGemsDecksOpal(
     limit = 15,
+    relatedDecks = true,
   ): Observable<UserDeck[]> {
-    return this.http.getLowPlayRateHighWinrateOpal(limit);
+    return this.http.getLowPlayRateHighWinrateOpal(limit, relatedDecks);
   }
 }

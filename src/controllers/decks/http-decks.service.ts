@@ -338,7 +338,7 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getLowPlayRateHighWinrateOpal(deckLimit: number = 15) {
+  public getLowPlayRateHighWinrateOpal(deckLimit: number = 15, relatedDecks: boolean = true) {
     const url = 'https://lormaster.herokuapp.com/archetypes/all';
 
     return this.http.get(url).pipe(
@@ -351,7 +351,7 @@ export class HttpDecksService {
         return matches;
       }),
       concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
-        return lorMasterDecksToUserDecks(lorMasterDecks);
+        return lorMasterDecksToUserDecks(lorMasterDecks, relatedDecks);
       }),
     ) as unknown as Observable<UserDeck[]>;
   }

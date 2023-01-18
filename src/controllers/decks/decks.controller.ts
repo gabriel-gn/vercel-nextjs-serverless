@@ -211,7 +211,13 @@ export class DecksController {
   }
 
   @Get('hidden-gems')
-  async getHiddenGems() {
-    return this.decksService.getHiddenGemsDecksOpal();
+  @ApiImplicitQuery({
+    name: 'relatedDecks',
+    required: false,
+    type: Boolean,
+  })
+  async getHiddenGems(@Query('relatedDecks') relatedDecks: boolean) {
+    relatedDecks = `${relatedDecks}`.toLowerCase() === 'true';
+    return this.decksService.getHiddenGemsDecksOpal(15, relatedDecks);
   }
 }

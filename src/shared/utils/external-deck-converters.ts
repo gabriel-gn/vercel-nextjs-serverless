@@ -116,6 +116,7 @@ export function lorMasterDecksToUserDecks(
   getRelatedDecks = true,
   addTierBadge = false,
   date: number = undefined,
+  maxRelatedDecks: number = 2,
 ): Observable<UserDeck[]> {
   if (lorMasterDecks.length === 0) {
     return of([]);
@@ -145,14 +146,24 @@ export function lorMasterDecksToUserDecks(
     }
   };
 
-  return forkJoin([
-    getLoRDecks(lorMasterDecks.map((deck) => deck.decks[0].deck_code)),
-    getLoRDecks(lorMasterDecks.map((deck) => deck.decks[1].deck_code)), // para ser usado como related deck
-    getLoRDecks(lorMasterDecks.map((deck) => deck.decks[2].deck_code)), // para ser usado como related deck
-  ]).pipe(
+  let lorDecksArray: Observable<LoRDeck[]>[];
+
+  if (getRelatedDecks === true) {
+    lorDecksArray = [
+      getLoRDecks(lorMasterDecks.map((deck) => deck.decks[0].deck_code)),
+      getLoRDecks(lorMasterDecks.map((deck) => deck.decks[1].deck_code)), // para ser usado como related deck
+      getLoRDecks(lorMasterDecks.map((deck) => deck.decks[2].deck_code)), // para ser usado como related deck
+    ];
+  } else {
+    lorDecksArray = [
+      getLoRDecks(lorMasterDecks.map((deck) => deck.decks[0].deck_code)),
+    ];
+  }
+
+  return forkJoin(lorDecksArray).pipe(
     map((lorDecks: LoRDeck[][]) =>
       lorDecks[0].map((lorDeck, i) => {
-        return {
+        const result = {
           ...{ deck: lorDeck },
           ...{
             title: generateDeckName(lorDeck),
@@ -160,9 +171,7 @@ export function lorMasterDecksToUserDecks(
             // changedAt: date || new Date().getTime(),
             // createdAt: date || new Date().getTime(),
             username: '',
-            badges: addTierBadge
-              ? { tier: getDeckTierByWR(lorMasterDecks[i]) }
-              : {},
+            badges: { tier: getDeckTierByWR(lorMasterDecks[i]) },
             stats: {
               playRatePercent: lorMasterDecks[i].play_rate * 100,
               winRatePercent: lorMasterDecks[i].win_rate * 100,
@@ -173,6 +182,10 @@ export function lorMasterDecksToUserDecks(
               : [],
           },
         };
+        if (addTierBadge === false) {
+          delete result.badges;
+        }
+        return result;
       }),
     ),
   );
