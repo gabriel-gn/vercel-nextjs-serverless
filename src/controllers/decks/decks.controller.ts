@@ -218,6 +218,6 @@ export class DecksController {
   })
   async getHiddenGems(@Query('relatedDecks') relatedDecks: boolean) {
     relatedDecks = `${relatedDecks}`.toLowerCase() === 'true';
-    return this.decksService.getHiddenGemsDecksOpal(15, relatedDecks);
+    return this.decksService.getHiddenGemsDecksOpal(20, relatedDecks);
   }
 }
