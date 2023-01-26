@@ -1,8 +1,8 @@
 name: Update matchups
 
 on:
-  schedule:
-    - cron: '0 0 */2 * *' # A cada 2 dias
+#  schedule:
+#    - cron: '0 0 */2 * *' # A cada 2 dias
   workflow_dispatch:
     inputs:
       person:

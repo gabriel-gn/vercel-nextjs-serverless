@@ -92,13 +92,16 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getMetaDecksOpal(deckLimit: number = 20): Observable<UserDeck[]> {
+  public getMetaDecksOpal(deckLimit = 15): Observable<UserDeck[]> {
     const url = 'https://lormaster.herokuapp.com/archetypes/all/7';
 
     return this.http.get(url).pipe(
       map((response) => response.data),
       map((data) => {
-        let matches = _.orderBy(data.data, 'match_num', 'desc').slice(0, deckLimit);
+        let matches = _.orderBy(data.data, 'match_num', 'desc').slice(
+          0,
+          deckLimit,
+        );
         matches = _.orderBy(matches, 'win_rate', 'desc');
         return matches;
       }),

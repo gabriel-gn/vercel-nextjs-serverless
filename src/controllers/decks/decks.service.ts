@@ -27,7 +27,6 @@ export class DecksService {
 
   public getMetaDecksOpal(): Observable<UserDeck[]> {
     return this.http.getMetaDecksOpal();
-    return this.http.getLowPlayRateHighWinrateOpal();
   }
 
   public getTrendingDecksCarbon(): Observable<UserDeck[]> {
