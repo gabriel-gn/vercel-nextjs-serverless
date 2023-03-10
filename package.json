@@ -45,7 +45,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "simple-git": "^3.5.0",
-    "swagger-ui-express": "^4.3.0"
+    "swagger-ui-express": "^4.3.0",
+    "zip-local": "^0.3.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

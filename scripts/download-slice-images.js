@@ -6,8 +6,10 @@ const Axios = require('axios');
 const _ = require('lodash');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cards = require(`../src/assets/sets/en_us/en_us.json`);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const zipper = require('zip-local');
 
-const cardSliceDirName = 'card-slices';
+const cardSliceDirName = 'card-tiles';
 
 async function downloadImage(cardCode) {
   cardCode = `${cardCode}`.toUpperCase();
@@ -43,14 +45,24 @@ function getMissingCards() {
   return _.difference(allCardCodes, allCardImages);
 }
 
+function zipFolder() {
+  console.log(`Iniciando processo de zipagem`);
+  zipper.sync.zip(`./${cardSliceDirName}/`).compress().save('latest-tiles.zip');
+  console.log(`Tiles zipados em latest-tiles.zip`);
+}
+
 async function executeScript() {
   const timeStart = new Date();
   for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
-    console.log(`Baixando imagem ${i} (${card.name})`);
-    await downloadImage(card.cardCode);
+    // ignora os tokens, cartas com código maior que 7
+    if (card.cardCode.length === 7) {
+      console.log(`Baixando imagem ${i} (${card.name})`);
+      await downloadImage(card.cardCode);
+    }
   }
   console.log(`Cartas faltantes: ${getMissingCards()} (${getMissingCards().length})`);
+  zipFolder();
   const timeElapsed = new Date() - timeStart;
   console.log(`Tempo de execução: ${Math.floor(timeElapsed / 1000)}s)`);
 }

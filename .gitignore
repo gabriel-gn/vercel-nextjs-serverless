@@ -38,5 +38,7 @@ tmp/
 !.vscode/extensions.json
 
 .vercel
-/card-slices
-card-slices*
+/card-tiles
+card-tiles*
+/latest-tiles
+latest-tiles*
