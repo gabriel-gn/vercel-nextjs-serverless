@@ -47,8 +47,8 @@ function getMissingCards() {
 
 function zipFolder() {
   console.log(`Iniciando processo de zipagem`);
-  zipper.sync.zip(`./${cardSliceDirName}/`).compress().save('latest-tiles.zip');
-  console.log(`Tiles zipados em latest-tiles.zip`);
+  zipper.sync.zip(`./${cardSliceDirName}/`).compress().save('latest.zip');
+  console.log(`Tiles zipados em latest.zip`);
 }
 
 async function executeScript() {
