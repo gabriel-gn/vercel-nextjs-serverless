@@ -38,3 +38,4 @@ tmp/
 !.vscode/extensions.json
 
 .vercel
+/card-slices
