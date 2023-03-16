@@ -11,4 +11,9 @@ export class ServerInfoController {
   async get() {
     return this.serverInfoService.get();
   }
+
+  @Get('lor-decks')
+  async getLorDecksInfo() {
+    return this.serverInfoService.getLorDecksInfo();
+  }
 }
