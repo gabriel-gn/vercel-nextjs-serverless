@@ -6,7 +6,7 @@ import {
   UserDeck,
 } from '../models';
 import { forkJoin, map, Observable, of } from 'rxjs';
-import { getLoRDecks } from './deck-utils';
+import { addLoRDeckBadges, getLoRDeckBadges, getLoRDecks } from './deck-utils';
 import { generateDeckName, LoRDeck } from '@gabrielgn-test/runeterra-tools';
 import _ from 'lodash';
 
@@ -19,7 +19,7 @@ export function mobalyticsDecksToUserDecks(
   return getLoRDecks(mobalyticsDecks.map((deck) => deck.exportUID)).pipe(
     map((lorDecks: LoRDeck[]) =>
       lorDecks.map((lorDeck, i) => {
-        return {
+        const userDeck = {
           ...{ deck: lorDeck },
           ...{
             title: mobalyticsDecks[i]?.title,
@@ -29,6 +29,7 @@ export function mobalyticsDecksToUserDecks(
             username: mobalyticsDecks[i]?.owner?.name,
           },
         };
+        return addLoRDeckBadges(userDeck);
       }),
     ),
   );
@@ -50,7 +51,7 @@ export function runeterraARDecksToUserDecks(
           );
         };
 
-        return {
+        const userDeck = {
           ...{ deck: lorDeck },
           ...{
             title: _.unescape(
@@ -68,6 +69,7 @@ export function runeterraARDecksToUserDecks(
             username: runeterraArDecks[i]?.gameName,
           },
         };
+        return addLoRDeckBadges(userDeck);
       }),
     ),
   );
@@ -88,7 +90,7 @@ export function runescolaMetaDecksToUserDecks(
   ]).pipe(
     map((lorDecks: LoRDeck[][]) =>
       lorDecks[0].map((lorDeck, i) => {
-        return {
+        const userDeck = {
           ...{ deck: lorDeck },
           ...{
             title: generateDeckName(lorDeck),
@@ -106,6 +108,7 @@ export function runescolaMetaDecksToUserDecks(
               : [],
           },
         };
+        return addLoRDeckBadges(userDeck);
       }),
     ),
   );
@@ -163,7 +166,7 @@ export function lorMasterDecksToUserDecks(
   return forkJoin(lorDecksArray).pipe(
     map((lorDecks: LoRDeck[][]) =>
       lorDecks[0].map((lorDeck, i) => {
-        const result = {
+        const userDeck = {
           ...{ deck: lorDeck },
           ...{
             title: generateDeckName(lorDeck),
@@ -183,9 +186,9 @@ export function lorMasterDecksToUserDecks(
           },
         };
         if (addTierBadge === false) {
-          delete result.badges;
+          delete userDeck.badges;
         }
-        return result;
+        return addLoRDeckBadges(userDeck);
       }),
     ),
   );

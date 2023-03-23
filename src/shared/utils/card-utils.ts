@@ -21,6 +21,7 @@ function minifyCards(
     'subtypes',
     'supertype',
     'type',
+    'formatRefs',
   ];
   const minifyCard = (card: RiotLoRCard) => {
     return pickBy(card, (value, key) => attrsToKeep.includes(key));

@@ -4,7 +4,12 @@ import { concatMap, forkJoin, map, Observable, of } from 'rxjs';
 import { DeckCard } from '../../shared/models';
 import { getCards } from './card-utils';
 import _ from 'lodash';
-import { LoRDeck, RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
+import {
+  isRiotLorStandardFormat,
+  LoRDeck,
+  RiotLoRCard,
+  UserDeck,
+} from '@gabrielgn-test/runeterra-tools';
 
 export function getDeckCardsByDeckCode(
   deckCode: string,
@@ -63,4 +68,34 @@ export function getLoRDecks(deckCodes: string[]): Observable<LoRDeck[]> {
       );
     }),
   );
+}
+
+export function getLoRDeckBadges(deck: LoRDeck): any {
+  const badges: any = {};
+  const deckCards: RiotLoRCard[] = Object.values(deck.cards)
+    .flat()
+    .map((c) => c.card);
+  const formats = [
+    ...new Set(deckCards.map((c) => c?.formatRefs).flat(1)),
+  ].sort();
+  for (const format of formats) {
+    if (deckCards.every((c) => c?.formatRefs?.includes(format))) {
+      if (badges.hasOwnProperty('formats')) {
+        badges.formats.push(format);
+      } else {
+        badges.formats = [format];
+      }
+    }
+  }
+  return badges;
+}
+
+export function addLoRDeckBadges(deck: UserDeck): UserDeck {
+  const defaultDeckBadges = getLoRDeckBadges(deck.deck);
+  if (deck.hasOwnProperty('badges')) {
+    deck.badges = { ...deck.badges, ...defaultDeckBadges };
+  } else {
+    _.set(deck, 'badges', defaultDeckBadges);
+  }
+  return deck;
 }
