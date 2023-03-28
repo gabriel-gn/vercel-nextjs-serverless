@@ -153,8 +153,9 @@ export class HttpDecksService {
     return this.http
       .get(url, {
         params: { ...defaultParams, ...addedParams },
-        paramsSerializer: (params) =>
-          qs.stringify(params, { arrayFormat: 'repeat' }),
+        paramsSerializer: {
+          indexes: null, // by default: false
+        },
       })
       .pipe(
         map((response) => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))
@@ -236,8 +237,9 @@ export class HttpDecksService {
     return this.http
       .post(url, payload, {
         params: defaultParams,
-        paramsSerializer: (params) =>
-          qs.stringify(params, { arrayFormat: 'repeat' }),
+        paramsSerializer: {
+          indexes: null, // by default: false
+        },
       })
       .pipe(
         map((response) => response.data), // o http do axios da pau se não der .pipe(map(response => response.data))

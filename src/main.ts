@@ -70,8 +70,8 @@ async function bootstrap() {
     };
 
     // Instead of using SwaggerModule.setup() you call this module
-    await RedocModule.setup('/docs', app, document, redocOptions);
-    // SwaggerModule.setup('docs', app, document);
+    // await RedocModule.setup('/docs', app, document, redocOptions);
+    SwaggerModule.setup('docs', app, document);
   }
 
   await app.listen(3000);
