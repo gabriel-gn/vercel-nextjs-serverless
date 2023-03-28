@@ -18,7 +18,10 @@ export class ServerInfoService {
   public getLorDecksInfo(): Observable<any> {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     return of({
-      latest_version: '2.2.0',
+      latestVersion: '2.2.0',
+      cardTilesSource: 'diamond',
+      cardImageSource: 'indigo',
+      cardFullArtSource: 'sapphire',
     });
   }
 }
