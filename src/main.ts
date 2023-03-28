@@ -5,7 +5,7 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { RedocModule, RedocOptions } from 'nestjs-redoc';
+import { RedocModule, RedocOptions } from '@nicholas.braun/nestjs-redoc';
 import { LanguageInterceptor } from './shared/interceptors/language.interceptor';
 
 async function bootstrap() {
