@@ -5,7 +5,7 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { RedocModule, RedocOptions } from 'nestjs-redoc';
+import { RedocModule, RedocOptions } from '@nicholas.braun/nestjs-redoc';
 import { LanguageInterceptor } from './shared/interceptors/language.interceptor';
 
 async function bootstrap() {
@@ -70,6 +70,8 @@ async function bootstrap() {
     };
 
     // Instead of using SwaggerModule.setup() you call this module
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     await RedocModule.setup('/docs', app, document, redocOptions);
     // SwaggerModule.setup('docs', app, document);
   }
