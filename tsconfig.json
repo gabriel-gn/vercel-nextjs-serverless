@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021"],
+    "lib": ["esnext"],
     "module": "CommonJS",
-    "target": "ES2021",
+    "target": "esnext",
     "resolveJsonModule": true,
+    "moduleResolution": "node",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
