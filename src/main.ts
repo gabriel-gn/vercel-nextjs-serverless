@@ -60,7 +60,14 @@ async function bootstrap() {
       tagGroups: [
         {
           name: 'General',
-          tags: ['Decks', 'Matches', 'Cards', 'Riot Assets', 'Matchups'],
+          tags: [
+            'Decks',
+            'Matches',
+            'Cards',
+            'Riot Assets',
+            'Matchups',
+            'News',
+          ],
         },
         {
           name: 'Models',
