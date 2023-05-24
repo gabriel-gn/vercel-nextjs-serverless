@@ -6,11 +6,11 @@ import {
   getCardMainRegion,
   getCardMainRegionFromDeck,
   getCardType,
-  getDeckMainRegions,
+  getDeckMainRegions, getRiotLorDeckFormats,
   LoRDeck,
   rarityRefToCardCost,
-  regionRefToRegionAbbreviation,
-} from '@gabrielgn-test/runeterra-tools';
+  regionRefToRegionAbbreviation
+} from "@gabrielgn-test/runeterra-tools";
 import { reverse, sortBy, transform, uniq } from 'lodash';
 
 export class DeckFormat {
@@ -113,11 +113,13 @@ export class DeckFormat {
 
     // deck.mainFactions = DeckFormat.deckMainRegionOrderedByCardQt(deck);
     try {
-      deck['mainFactionCardsQt'] = getDeckMainRegions(deck);
+      deck['mainFactionCardsQt'] = getDeckMainRegions(deck as LoRDeck);
       deck.mainFactions = Object.keys(deck['mainFactionCardsQt']);
     } catch (e) {
       cards = [];
     }
+
+    deck['formats'] = getRiotLorDeckFormats(deck as LoRDeck);
 
     deck['code'] = getCodeFromDeck(
       cards.map((card) => {
