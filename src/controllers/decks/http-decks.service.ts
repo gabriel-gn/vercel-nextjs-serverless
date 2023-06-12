@@ -267,6 +267,14 @@ export class HttpDecksService {
       type: 'two',
       filter: true,
     };
+    const paramsStandard = {
+      ...defaultParams,
+      format: 'client_Formats_Standard_name',
+    };
+    const paramsEternal = {
+      ...defaultParams,
+      format: 'client_Formats_Eternal_name',
+    };
 
     const getDeckStats: (metaDeck: any) => DeckStats = (metaDeck: any) => {
       return {
@@ -278,25 +286,30 @@ export class HttpDecksService {
     };
 
     const request1 = this.http
-      .post(url, defaultPayload, { params: defaultParams })
+      .post(url, defaultPayload, { params: paramsStandard })
       .pipe(map((response) => response.data));
 
     const request2 = this.http
       .post(url, defaultPayload, {
-        params: { ...defaultParams, ...{ page: 2 } },
+        params: { ...paramsStandard, ...{ page: 2 } },
       })
       .pipe(map((response) => response.data));
     const request3 = this.http
+      .post(url, defaultPayload, { params: paramsEternal })
+      .pipe(map((response) => response.data));
+
+    const request4 = this.http
       .post(url, defaultPayload, {
-        params: { ...defaultParams, ...{ page: 3 } },
+        params: { ...paramsEternal, ...{ page: 2 } },
       })
       .pipe(map((response) => response.data));
-    return forkJoin([request1, request2, request3]).pipe(
+    return forkJoin([request1, request2, request3, request4]).pipe(
       map((response) => {
         const deckStats = [
           ...response[0].meta.map((metaDeck) => getDeckStats(metaDeck)),
           ...response[1].meta.map((metaDeck) => getDeckStats(metaDeck)),
           ...response[2].meta.map((metaDeck) => getDeckStats(metaDeck)),
+          ...response[3].meta.map((metaDeck) => getDeckStats(metaDeck)),
         ];
         return {
           codes: deckStats.map((d) => d.deckCode),
@@ -311,7 +324,7 @@ export class HttpDecksService {
         return forkJoin([getLoRDecks(deckStats.codes), of(deckStats.stats)]);
       }),
       map((deckStats: [LoRDeck[], DeckStats[]]) => {
-        return deckStats[0].map((deck, index) => {
+        const resultDecks = deckStats[0].map((deck, index) => {
           return {
             deck: deck,
             title: generateDeckName(deck),
@@ -320,6 +333,7 @@ export class HttpDecksService {
             stats: deckStats[1][index],
           };
         });
+        return _.orderBy(resultDecks, 'stats.matchesQt', 'desc') as any[];
       }),
       catchError((error) => throwError(error)),
     );
