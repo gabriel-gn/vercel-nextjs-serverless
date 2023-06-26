@@ -17,6 +17,7 @@ import {
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 import { CardRegionAbbreviation } from '@gabrielgn-test/runeterra-tools';
+import { catchError } from 'rxjs';
 
 @ApiTags('Decks')
 @Controller()
@@ -30,7 +31,10 @@ export class DecksController {
 
   @Get('meta')
   async getMetaDecks() {
-    return this.decksService.getMetaDecksOpal();
+    return this.decksService.getMetaDecksOpal().pipe(
+      catchError(() => this.decksService.getMetaDecksGranite()),
+      catchError(() => this.decksService.getMetaDecksIndigo()),
+    );
   }
 
   @Get('meta-indigo')
@@ -52,7 +56,9 @@ export class DecksController {
 
   @Get('trending')
   async getTrendingDecks() {
-    return this.decksService.getTrendingDecksCarbon();
+    return this.decksService
+      .getTrendingDecksCarbon()
+      .pipe(catchError(() => this.decksService.getTrendingDecksCitrine()));
   }
 
   @Get('trending-carbon')
@@ -66,9 +72,7 @@ export class DecksController {
     required: false,
     type: Boolean,
   })
-  async getTrendingDecksCitrine(
-    @Query('relatedDecks') relatedDecks: boolean,
-  ) {
+  async getTrendingDecksCitrine(@Query('relatedDecks') relatedDecks: boolean) {
     relatedDecks = `${relatedDecks}`.toLowerCase() === 'true';
     return this.decksService.getTrendingDecksCitrine(relatedDecks);
   }
