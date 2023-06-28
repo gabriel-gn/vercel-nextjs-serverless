@@ -32,8 +32,8 @@ export class DecksController {
   @Get('meta')
   async getMetaDecks() {
     return this.decksService.getMetaDecksOpal().pipe(
-      catchError(() => this.decksService.getMetaDecksGranite()),
       catchError(() => this.decksService.getMetaDecksIndigo()),
+      catchError(() => this.decksService.getMetaDecksGranite()),
     );
   }
 
