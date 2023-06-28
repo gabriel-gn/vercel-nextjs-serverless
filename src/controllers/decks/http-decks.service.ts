@@ -7,9 +7,9 @@ import {
   map,
   Observable,
   of,
-  pluck,
-  throwError,
-} from 'rxjs';
+  pluck, tap,
+  throwError
+} from "rxjs";
 import {
   DeckStats,
   LorMasterMetaDeck,
@@ -181,7 +181,7 @@ export class HttpDecksService {
     searchObj: SearchDeckLibraryRuneterraArDto,
   ): Observable<UserDeckQueryResponse> {
     const numberOfDecksToGet = 18; // retirado da chamada oficial do site
-    const url = 'https://runeterra.ar/deck/getdecks';
+    const url = 'https://runeterra.ar/api/deck/getdecks';
     const defaultParams = {
       take: numberOfDecksToGet,
       // server: 'everyone',
