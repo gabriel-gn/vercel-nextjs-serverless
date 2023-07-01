@@ -11,18 +11,19 @@ function minifyCards(
     'cardCode',
     'collectible',
     'cost',
+    'formatRefs',
+    'formats',
     'keywordRefs',
     'name',
     'rarity',
     'rarityRef',
     'regionRefs',
     'regions',
+    'set',
     'spellSpeedRef',
     'subtypes',
     'supertype',
     'type',
-    'formatRefs',
-    'formats',
   ];
   const minifyCard = (card: RiotLoRCard) => {
     return pickBy(card, (value, key) => attrsToKeep.includes(key));
