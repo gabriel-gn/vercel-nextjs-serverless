@@ -32,6 +32,7 @@ export class DecksController {
   @Get('meta')
   async getMetaDecks() {
     return this.decksService.getMetaDecksOpal().pipe(
+      catchError(() => this.decksService.getMetaDecksCitrine()),
       catchError(() => this.decksService.getMetaDecksIndigo()),
       catchError(() => this.decksService.getMetaDecksGranite()),
     );
@@ -52,6 +53,12 @@ export class DecksController {
   @Header('content-type', 'application/json')
   async getMetaDecksOpal() {
     return this.decksService.getMetaDecksOpal();
+  }
+
+  @Get('meta-citrine')
+  @Header('content-type', 'application/json')
+  async getMetaDecksCitrine() {
+    return this.decksService.getMetaDecksCitrine();
   }
 
   @Get('trending')

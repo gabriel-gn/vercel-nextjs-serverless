@@ -14,10 +14,10 @@ import {
   DeckStats,
   LorMasterMetaDeck,
   MobalyticsDeck,
-  MobalyticsMetaDeck,
+  MobalyticsMetaDeck, RunescolaMetaDeck,
   UserDeck,
-  UserDeckQueryResponse,
-} from '../../shared/models';
+  UserDeckQueryResponse
+} from "../../shared/models";
 import qs from 'qs';
 import { getLoRDecks } from '../../shared/utils/deck-utils';
 import {
@@ -107,6 +107,35 @@ export class HttpDecksService {
       }),
       concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
         return lorMasterDecksToUserDecks(lorMasterDecks, true, true);
+      }),
+    ) as unknown as Observable<UserDeck[]>;
+  }
+
+  public getMetaDecksCitrine(
+    getRelatedDecks = true,
+  ): Observable<UserDeck[]> {
+    const url =
+      'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
+    return this.http.get(url).pipe(
+      map((response) => response.data),
+      map((runescolaMetaData) => {
+        let matches: RunescolaMetaDeck[] = _.orderBy(
+          runescolaMetaData.stats.seven,
+          'total_matches',
+          'desc',
+        ).slice(0, 15);
+        matches = _.orderBy(matches, 'winrate', 'desc');
+        runescolaMetaData.stats.seven = matches;
+        return runescolaMetaData;
+      }),
+      concatMap((runescolaMetaData) => {
+        const decks = runescolaMetaData.stats.seven;
+        return runescolaMetaDecksToUserDecks(
+          decks,
+          getRelatedDecks,
+          true,
+          runescolaMetaData?.info?.last_update,
+        );
       }),
     ) as unknown as Observable<UserDeck[]>;
   }
@@ -351,6 +380,7 @@ export class HttpDecksService {
         return runescolaMetaDecksToUserDecks(
           decks,
           getRelatedDecks,
+          false,
           runescolaMetaData?.info?.last_update,
         );
       }),

@@ -29,6 +29,10 @@ export class DecksService {
     return this.http.getMetaDecksOpal();
   }
 
+  public getMetaDecksCitrine(): Observable<UserDeck[]> {
+    return this.http.getMetaDecksCitrine();
+  }
+
   public getTrendingDecksCarbon(): Observable<UserDeck[]> {
     return this.http.getTrendingDecksCarbon();
   }

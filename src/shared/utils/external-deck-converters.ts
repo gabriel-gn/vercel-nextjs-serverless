@@ -78,11 +78,36 @@ export function runeterraARDecksToUserDecks(
 export function runescolaMetaDecksToUserDecks(
   runescolaDecks: RunescolaMetaDeck[],
   getRelatedDecks = true,
+  addTierBadge = false,
   date: number = undefined,
 ): Observable<UserDeck[]> {
   if (runescolaDecks.length === 0) {
     return of([]);
   }
+
+  const maxWr = _.max(runescolaDecks.map((m) => m.winrate));
+  const minWr = _.min(runescolaDecks.map((m) => m.winrate));
+  const wrIntervals = (maxWr - minWr) / 5;
+  const badgeTier = {
+    S: maxWr - 0.5 * wrIntervals,
+    A: maxWr - 1.5 * wrIntervals,
+    B: maxWr - 2.5 * wrIntervals,
+    C: maxWr - 3.8 * wrIntervals,
+  };
+  const getDeckTierByWR = (lorMasterDeck: RunescolaMetaDeck) => {
+    if (lorMasterDeck.winrate < badgeTier.C) {
+      return 'D';
+    } else if (lorMasterDeck.winrate < badgeTier.B) {
+      return 'C';
+    } else if (lorMasterDeck.winrate < badgeTier.A) {
+      return 'B';
+    } else if (lorMasterDeck.winrate < badgeTier.S) {
+      return 'A';
+    } else {
+      return 'S';
+    }
+  };
+
   return forkJoin([
     getLoRDecks(runescolaDecks.map((deck) => deck.best_decks[0])),
     getLoRDecks(runescolaDecks.map((deck) => deck.best_decks[1])), // para ser usado como related deck
@@ -90,7 +115,7 @@ export function runescolaMetaDecksToUserDecks(
   ]).pipe(
     map((lorDecks: LoRDeck[][]) =>
       lorDecks[0].map((lorDeck, i) => {
-        const userDeck = {
+        let userDeck: UserDeck = {
           ...{ deck: lorDeck },
           ...{
             title: generateDeckName(lorDeck),
@@ -108,6 +133,12 @@ export function runescolaMetaDecksToUserDecks(
               : [],
           },
         };
+        if (!!addTierBadge === true) {
+          userDeck = {
+            ...userDeck,
+            badges: { tier: getDeckTierByWR(runescolaDecks[i]) },
+          };
+        }
         return addLoRDeckBadges(userDeck);
       }),
     ),
