@@ -61,4 +61,11 @@ export class DecksService {
   ): Observable<UserDeck[]> {
     return this.http.getLowPlayRateHighWinrateOpal(limit, relatedDecks);
   }
+
+  public getHiddenGemsDecksCitrine(
+    limit = 15,
+    relatedDecks = true,
+  ): Observable<UserDeck[]> {
+    return this.http.getLowPlayRateHighWinrateCitrine(limit, relatedDecks);
+  }
 }

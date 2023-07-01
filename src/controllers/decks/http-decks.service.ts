@@ -7,17 +7,19 @@ import {
   map,
   Observable,
   of,
-  pluck, tap,
-  throwError
-} from "rxjs";
+  pluck,
+  tap,
+  throwError,
+} from 'rxjs';
 import {
   DeckStats,
   LorMasterMetaDeck,
   MobalyticsDeck,
-  MobalyticsMetaDeck, RunescolaMetaDeck,
+  MobalyticsMetaDeck,
+  RunescolaMetaDeck,
   UserDeck,
-  UserDeckQueryResponse
-} from "../../shared/models";
+  UserDeckQueryResponse,
+} from '../../shared/models';
 import qs from 'qs';
 import { getLoRDecks } from '../../shared/utils/deck-utils';
 import {
@@ -111,9 +113,7 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getMetaDecksCitrine(
-    getRelatedDecks = true,
-  ): Observable<UserDeck[]> {
+  public getMetaDecksCitrine(getRelatedDecks = true): Observable<UserDeck[]> {
     const url =
       'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
     return this.http.get(url).pipe(
@@ -387,7 +387,7 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getLowPlayRateHighWinrateOpal(deckLimit: number = 15, relatedDecks: boolean = true) {
+  public getLowPlayRateHighWinrateOpal(deckLimit = 15, relatedDecks = true) {
     const url = 'https://lormaster.herokuapp.com/archetypes/all';
 
     return this.http.get(url).pipe(
@@ -401,6 +401,35 @@ export class HttpDecksService {
       }),
       concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
         return lorMasterDecksToUserDecks(lorMasterDecks, relatedDecks);
+      }),
+    ) as unknown as Observable<UserDeck[]>;
+  }
+
+  public getLowPlayRateHighWinrateCitrine(deckLimit = 15, relatedDecks = true) {
+    const url =
+      'https://runescola.com.br/runescolaCrawler/resource/meta/data.json';
+    return this.http.get(url).pipe(
+      map((response) => response.data),
+      map((runescolaMetaData) => {
+        let matches: RunescolaMetaDeck[] = _.orderBy(
+          runescolaMetaData.stats.patch,
+          ['total_matches'],
+          ['asc'],
+        )
+          .filter((matchStats) => matchStats.winrate > 50)
+          .slice(0, deckLimit);
+        matches = _.orderBy(matches, ['winrate'], ['desc']);
+        runescolaMetaData.stats.patch = matches;
+        return runescolaMetaData;
+      }),
+      concatMap((runescolaMetaData) => {
+        const decks = runescolaMetaData.stats.patch;
+        return runescolaMetaDecksToUserDecks(
+          decks,
+          relatedDecks,
+          false,
+          runescolaMetaData?.info?.last_update,
+        );
       }),
     ) as unknown as Observable<UserDeck[]>;
   }
