@@ -226,6 +226,7 @@ export class HttpDecksService {
     const payload: {
       region?: { region: string; regionRef: string }[];
       champ?: { name: string; cardCode: string }[];
+      searches?: any[];
     } = {};
 
     // traduz as abreviações de regiões para o formato que o runeterraAR aceita
@@ -250,17 +251,43 @@ export class HttpDecksService {
 
     // traduz os cardIds o formato de APENAS CHAMPS que o runeterraAR aceita
     if (searchObj?.cardIds && Array.isArray(searchObj.cardIds)) {
+      let champObjects = [];
       let cardObjects = [];
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const cards: RiotLoRCard[] = require(`../../assets/sets/en_us/en_us.json`);
       for (const cardId of searchObj.cardIds) {
         const card = cards.find((cd) => cd?.cardCode === `${cardId}`);
         if (card && card?.rarityRef === 'Champion') {
-          cardObjects.push({ name: card.name, cardcode: card.cardCode });
+          champObjects.push({
+            name: card.name,
+            cardcode: card.cardCode,
+          });
+        } else {
+          cardObjects.push({
+            gameName: null,
+            name: card.name,
+            picture: null,
+            route: `cards/${card.cardCode}`,
+            order: 0,
+            vip: false,
+            creator: false,
+            region: card.regionRefs[0],
+            type: 'card',
+            code: card.cardCode,
+            server: null,
+            country: null,
+            privacy: false,
+          });
         }
       }
+      champObjects = _.uniqBy(champObjects, 'name');
       cardObjects = _.uniqBy(cardObjects, 'name');
-      payload['champ'] = cardObjects;
+      if (champObjects.length > 0) {
+        payload['champ'] = champObjects;
+      }
+      if (cardObjects.length > 0) {
+        payload['searches'] = cardObjects;
+      }
     }
 
     return this.http
