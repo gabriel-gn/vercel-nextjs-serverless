@@ -21,6 +21,7 @@ let setNames = [
   'set6cde',
   'set7',
   'set7b',
+  'set8',
 ];
 let langs = [
   'en_us',
