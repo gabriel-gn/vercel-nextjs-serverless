@@ -24,7 +24,7 @@
     "copy:assets": "cp -rv src/assets dist/"
   },
   "dependencies": {
-    "@gabrielgn-test/runeterra-tools": "^0.0.37",
+    "@gabrielgn-test/runeterra-tools": "^0.0.38",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.3.12",
     "@nestjs/config": "^2.3.1",
