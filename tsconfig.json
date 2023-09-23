@@ -13,13 +13,20 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "rootDir": ".",
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "noEmit": false,       // <- remove this or set to false
-    "incremental": false, // <- remove this or set to false
-  }
+    "noEmit": false,
+    "incremental": false,
+    "paths": {
+      "@controllers/*": ["./src/controllers/*"],
+      "@environments/*": ["./src/environments/*"],
+      "@assets/*": ["./src/assets/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.json"]
 }

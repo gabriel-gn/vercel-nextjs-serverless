@@ -1,11 +1,10 @@
 import { Deck, getDeckFromCode } from 'lor-deckcodes-ts';
 import { DeckFormat } from './deck-format-utils';
 import { concatMap, forkJoin, map, Observable, of } from 'rxjs';
-import { DeckCard } from '../../shared/models';
+import { DeckCard } from '../models';
 import { getCards } from './card-utils';
-import _ from 'lodash';
+import { set } from 'lodash';
 import {
-  isRiotLorStandardFormat,
   LoRDeck,
   RiotLoRCard,
   UserDeck,
@@ -95,7 +94,7 @@ export function addLoRDeckBadges(deck: UserDeck): UserDeck {
   if (deck.hasOwnProperty('badges')) {
     deck.badges = { ...deck.badges, ...defaultDeckBadges };
   } else {
-    _.set(deck, 'badges', defaultDeckBadges);
+    set(deck, 'badges', defaultDeckBadges);
   }
   return deck;
 }
