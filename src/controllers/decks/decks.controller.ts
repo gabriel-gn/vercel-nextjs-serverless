@@ -16,7 +16,7 @@ import {
 } from './decks.dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
-import { CardRegionAbbreviation } from '@gabrielgn-test/runeterra-tools';
+import { RiotLorRegionAbbreviation } from '@gabrielgn-test/runeterra-tools';
 import { catchError } from 'rxjs';
 
 @ApiTags('Decks')
@@ -110,7 +110,7 @@ export class DecksController {
     @Query('playStyle') playStyle: SearchDeckLibraryPlaystyle,
     @Query('searchTerm') searchTerm: string,
     @Query('cardIds') cardIds: string[],
-    @Query('factions') factions: CardRegionAbbreviation[],
+    @Query('factions') factions: RiotLorRegionAbbreviation[],
     @Query('keywords') keywords: string[],
     @Query('count') count: number,
     @Query('from') from: number,
@@ -139,7 +139,7 @@ export class DecksController {
     }
 
     if (!!factions) {
-      factions = `${factions}`.split(',') as CardRegionAbbreviation[];
+      factions = `${factions}`.split(',') as RiotLorRegionAbbreviation[];
       searchObj.factions = factions;
     }
 

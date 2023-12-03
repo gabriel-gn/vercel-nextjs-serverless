@@ -1,16 +1,16 @@
 import { CardCodeAndCount, getCodeFromDeck } from 'lor-deckcodes-ts';
 import {
-  CARD_REGION_ABBREVIATION,
-  CardRegionAbbreviation,
+  RIOT_LOR_REGION_ABBREVIATION,
+  RiotLorRegionAbbreviation,
   DeckCard,
   getCardMainRegion,
-  getCardMainRegionFromDeck,
   getCardType,
-  getDeckMainRegions, getRiotLorDeckFormats,
+  getDeckMainRegions,
+  getRiotLorDeckFormats,
   LoRDeck,
   rarityRefToCardCost,
-  regionRefToRegionAbbreviation
-} from "@gabrielgn-test/runeterra-tools";
+  regionRefToRegionAbbreviation,
+} from '@gabrielgn-test/runeterra-tools';
 import { reverse, sortBy, transform, uniq } from 'lodash';
 
 export class DeckFormat {
@@ -19,14 +19,14 @@ export class DeckFormat {
 
   public static deckMainRegionOrderedByCardQt(
     deck: LoRDeck,
-  ): CardRegionAbbreviation[] {
+  ): RiotLorRegionAbbreviation[] {
     let regionRefsOrderedByCardQt: {
-      faction: CardRegionAbbreviation;
+      faction: RiotLorRegionAbbreviation;
       factionCardsQt: number;
     }[] = Object.keys(deck.factionCardsQt)
       .map((faction) => {
         return {
-          faction: faction as unknown as CardRegionAbbreviation,
+          faction: faction as unknown as RiotLorRegionAbbreviation,
           factionCardsQt: deck.factionCardsQt[faction],
         };
       })
@@ -34,13 +34,13 @@ export class DeckFormat {
     regionRefsOrderedByCardQt = reverse(
       sortBy(regionRefsOrderedByCardQt, 'factionCardsQt'),
     );
-    const factionIdentifiers: CardRegionAbbreviation[] =
+    const factionIdentifiers: RiotLorRegionAbbreviation[] =
       regionRefsOrderedByCardQt.map((refObj) => refObj.faction);
 
     if (
       // caso 'Runeterra' seja uma região e não esteja entre as duas primeiras, faz ela ser a segunda
-      factionIdentifiers.includes(CARD_REGION_ABBREVIATION.RUNETERRA) &&
-      factionIdentifiers.indexOf(CARD_REGION_ABBREVIATION.RUNETERRA) > 1
+      factionIdentifiers.includes(RIOT_LOR_REGION_ABBREVIATION.RUNETERRA) &&
+      factionIdentifiers.indexOf(RIOT_LOR_REGION_ABBREVIATION.RUNETERRA) > 1
     ) {
       const swapArrayLoc = (arr, from, to) => {
         // mova itens de posição de u; array
@@ -50,7 +50,7 @@ export class DeckFormat {
       // move "Runeterra" para a segunda posição do array
       swapArrayLoc(
         factionIdentifiers,
-        factionIdentifiers.indexOf(CARD_REGION_ABBREVIATION.RUNETERRA),
+        factionIdentifiers.indexOf(RIOT_LOR_REGION_ABBREVIATION.RUNETERRA),
         1,
       );
     }
@@ -83,8 +83,10 @@ export class DeckFormat {
       factions: [],
       factionCardsQt: {
         ...transform(
-          Object.entries(CARD_REGION_ABBREVIATION).map((e) => e[1]),
+          Object.entries(RIOT_LOR_REGION_ABBREVIATION).map((e) => e[1]),
           (result, n) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             result[n] = 0;
           },
           {},
