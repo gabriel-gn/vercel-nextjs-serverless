@@ -8,7 +8,7 @@ import {
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { addLoRDeckBadges, getLoRDeckBadges, getLoRDecks } from './deck-utils';
 import { generateDeckName, LoRDeck } from '@gabrielgn-test/runeterra-tools';
-import _ from 'lodash';
+import { max, min, unescape } from "lodash";
 
 export function mobalyticsDecksToUserDecks(
   mobalyticsDecks: MobalyticsDeck[],
@@ -54,7 +54,7 @@ export function runeterraARDecksToUserDecks(
         const userDeck = {
           ...{ deck: lorDeck },
           ...{
-            title: _.unescape(
+            title: unescape(
               runeterraArDecks[i]?.deck_name
                 .split('\n')[0]
                 .replace(/<\/?[^>]+(>|$)/g, ''),
@@ -85,8 +85,8 @@ export function runescolaMetaDecksToUserDecks(
     return of([]);
   }
 
-  const maxWr = _.max(runescolaDecks.map((m) => m.winrate));
-  const minWr = _.min(runescolaDecks.map((m) => m.winrate));
+  const maxWr = max(runescolaDecks.map((m) => m.winrate));
+  const minWr = min(runescolaDecks.map((m) => m.winrate));
   const wrIntervals = (maxWr - minWr) / 5;
   const badgeTier = {
     S: maxWr - 0.5 * wrIntervals,
@@ -156,8 +156,8 @@ export function lorMasterDecksToUserDecks(
     return of([]);
   }
 
-  const maxWr = _.max(lorMasterDecks.map((m) => m.win_rate));
-  const minWr = _.min(lorMasterDecks.map((m) => m.win_rate));
+  const maxWr = max(lorMasterDecks.map((m) => m.win_rate));
+  const minWr = min(lorMasterDecks.map((m) => m.win_rate));
   const wrIntervals = (maxWr - minWr) / 5;
   const badgeTier = {
     S: maxWr - 0.5 * wrIntervals,
