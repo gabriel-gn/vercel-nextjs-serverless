@@ -26,7 +26,7 @@ import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
 } from './decks.dto';
-import _ from 'lodash';
+import {orderBy, uniqBy, omit} from 'lodash';
 import {
   lorMasterDecksToUserDecks,
   mobalyticsDecksToUserDecks,
@@ -100,11 +100,11 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       map((data) => {
-        let matches = _.orderBy(data.data, 'match_num', 'desc').slice(
+        let matches = orderBy(data.data, 'match_num', 'desc').slice(
           0,
           deckLimit,
         );
-        matches = _.orderBy(matches, 'win_rate', 'desc');
+        matches = orderBy(matches, 'win_rate', 'desc');
         return matches;
       }),
       concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
@@ -119,12 +119,12 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       map((runescolaMetaData) => {
-        let matches: RunescolaMetaDeck[] = _.orderBy(
+        let matches: RunescolaMetaDeck[] = orderBy(
           runescolaMetaData.stats.seven,
           'total_matches',
           'desc',
         ).slice(0, 15);
-        matches = _.orderBy(matches, 'winrate', 'desc');
+        matches = orderBy(matches, 'winrate', 'desc');
         runescolaMetaData.stats.seven = matches;
         return runescolaMetaData;
       }),
@@ -245,7 +245,7 @@ export class HttpDecksService {
           });
         }
       }
-      regions = _.uniqBy(regions, 'region');
+      regions = uniqBy(regions, 'region');
       payload['region'] = regions;
     }
 
@@ -280,8 +280,8 @@ export class HttpDecksService {
           });
         }
       }
-      champObjects = _.uniqBy(champObjects, 'name');
-      cardObjects = _.uniqBy(cardObjects, 'name');
+      champObjects = uniqBy(champObjects, 'name');
+      cardObjects = uniqBy(cardObjects, 'name');
       if (champObjects.length > 0) {
         payload['champ'] = champObjects;
       }
@@ -370,7 +370,7 @@ export class HttpDecksService {
         return {
           codes: deckStats.map((d) => d.deckCode),
           stats: deckStats.map((d) => {
-            return _.omit(d, 'deckCode');
+            return omit(d, 'deckCode');
           }),
         };
       }),
@@ -389,7 +389,7 @@ export class HttpDecksService {
             stats: deckStats[1][index],
           };
         });
-        return _.orderBy(resultDecks, 'stats.matchesQt', 'desc') as any[];
+        return orderBy(resultDecks, 'stats.matchesQt', 'desc') as any[];
       }),
       catchError((error) => throwError(error)),
     );
@@ -420,10 +420,10 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       map((data) => {
-        let matches = _.orderBy(data.data, 'win_rate', 'desc')
+        let matches = orderBy(data.data, 'win_rate', 'desc')
           .filter((matchStats) => matchStats.match_num < 300)
           .slice(0, deckLimit);
-        matches = _.orderBy(matches, 'win_rate', 'desc');
+        matches = orderBy(matches, 'win_rate', 'desc');
         return matches;
       }),
       concatMap((lorMasterDecks: LorMasterMetaDeck[]) => {
@@ -438,14 +438,14 @@ export class HttpDecksService {
     return this.http.get(url).pipe(
       map((response) => response.data),
       map((runescolaMetaData) => {
-        let matches: RunescolaMetaDeck[] = _.orderBy(
+        let matches: RunescolaMetaDeck[] = orderBy(
           runescolaMetaData.stats.patch,
           ['total_matches'],
           ['asc'],
         )
           .filter((matchStats) => matchStats.winrate > 50)
           .slice(0, deckLimit);
-        matches = _.orderBy(matches, ['winrate'], ['desc']);
+        matches = orderBy(matches, ['winrate'], ['desc']);
         runescolaMetaData.stats.patch = matches;
         return runescolaMetaData;
       }),
