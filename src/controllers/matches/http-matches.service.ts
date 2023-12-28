@@ -44,10 +44,11 @@ export class HttpMatchesService {
         }),
       );
 
+    let result: Observable<RiotID[]>;
     if (region) {
-        return forkJoin([getHttpCall(region)]) as Observable<RiotID[]>
+        result = forkJoin([getHttpCall(region)]) as Observable<RiotID[]>
     } else {
-        return forkJoin([
+        result = forkJoin([
             getHttpCall('americas'),
             getHttpCall('sea'),
             getHttpCall('europe'),
@@ -63,10 +64,12 @@ export class HttpMatchesService {
             })
         ) as Observable<RiotID[]>
     }
+
+    return result;
   }
 
-  public getPlayerDataByPuuid(puuid: string, region: LoRServerRegion) {
-    return this.http
+  public getPlayerDataByPuuid(puuid: string, region?: LoRServerRegion): Observable<RiotID[]> {
+      const getHttpCall = (region: LoRServerRegion) => this.http
       .get(
         `${
           RiotLoRAPIEndpoints[region.toUpperCase()]
@@ -83,6 +86,29 @@ export class HttpMatchesService {
           );
         }),
       );
+
+      let result: Observable<RiotID[]>;
+      if (region) {
+          result = forkJoin([getHttpCall(region)]);
+      } else {
+          result = forkJoin([
+              getHttpCall('americas'),
+              getHttpCall('sea'),
+              getHttpCall('europe'),
+          ]).pipe(
+              map((resp) => {
+                  const filteredResp: RiotID[] = [];
+                  resp.forEach((playerData) => {
+                      if (filteredResp.some(i => isEqual(i, playerData)) === false) {
+                          filteredResp.push(playerData)
+                      }
+                  })
+                  return filteredResp;
+              })
+          )
+      }
+
+      return result;
   }
 
   public getPlayerActiveShard(
