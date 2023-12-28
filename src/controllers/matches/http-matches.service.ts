@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { concatMap, map, Observable, tap } from "rxjs";
+import {concatMap, forkJoin, map, Observable, tap} from "rxjs";
 import {
   LoRServerRegion,
   RiotID,
@@ -8,6 +8,7 @@ import {
 } from '../../shared/models/riot-related';
 import { LoRMatch } from '../../shared/models/lor-matches';
 import { AxiosRequestConfig } from 'axios';
+import { isEqual } from "lodash";
 
 @Injectable()
 export class HttpMatchesService {
@@ -23,9 +24,9 @@ export class HttpMatchesService {
   public getPlayerData(
     gameName: string,
     tagLine: string,
-    region: LoRServerRegion,
-  ): Observable<RiotID> {
-    return this.http
+    region?: LoRServerRegion,
+  ): Observable<RiotID[]> {
+    const getHttpCall = (region: LoRServerRegion) => this.http
       .get(
         `${
           RiotLoRAPIEndpoints[region.toUpperCase()]
@@ -36,12 +37,32 @@ export class HttpMatchesService {
         map((response) => response.data),
         concatMap((response: RiotID) => {
           return this.getPlayerActiveShard(response.puuid, region).pipe(
-            map((activeShard) => {
+            map((activeShard: LoRServerRegion) => {
               return { ...response, ...{ activeShard: activeShard } } as RiotID;
             }),
           );
         }),
       );
+
+    if (region) {
+        return forkJoin([getHttpCall(region)]) as Observable<RiotID[]>
+    } else {
+        return forkJoin([
+            getHttpCall('americas'),
+            getHttpCall('sea'),
+            getHttpCall('europe'),
+        ]).pipe(
+            map((resp) => {
+                const filteredResp: RiotID[] = [];
+                resp.forEach((playerData) => {
+                    if (filteredResp.some(i => isEqual(i, playerData)) === false) {
+                        filteredResp.push(playerData)
+                    }
+                })
+                return filteredResp;
+            })
+        ) as Observable<RiotID[]>
+    }
   }
 
   public getPlayerDataByPuuid(puuid: string, region: LoRServerRegion) {

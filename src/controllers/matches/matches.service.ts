@@ -8,15 +8,16 @@ import { LoRDeck } from '@gabrielgn-test/runeterra-tools';
 
 @Injectable()
 export class MatchesService {
-  constructor(private readonly httpMatchesService: HttpMatchesService) {}
+  constructor(public readonly httpMatchesService: HttpMatchesService) {}
 
   public getPlayerMatches(from = 0, count = 0): Observable<LoRMatch[]> {
     let playerData: RiotID;
     return this.httpMatchesService
       .getPlayerData('Book', 'Teemo', 'americas')
       .pipe(
-        tap((riotData: RiotID) => {
-          playerData = riotData;
+        map((riotData: RiotID[]) => {
+          playerData = riotData[0];
+          return playerData;
         }),
         concatMap((riotData: RiotID) =>
           this.httpMatchesService.getPlayerMatches(
