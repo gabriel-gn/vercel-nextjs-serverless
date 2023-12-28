@@ -2,18 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { HttpMatchesService } from './http-matches.service';
 import { concatMap, forkJoin, map, Observable, tap, of } from 'rxjs';
 import { LoRServerRegion, RiotID } from '../../shared/models/riot-related';
-import { LoRMatch } from '../../shared/models/lor-matches';
-import { getLoRDecks } from '../../shared/utils/deck-utils';
+import {LoRMatch, LoRMatchPlayer} from '../../shared/models/lor-matches';
+import {getLoRDeck, getLoRDecks} from '../../shared/utils/deck-utils';
 import { LoRDeck } from '@gabrielgn-test/runeterra-tools';
+import {isEqual} from "lodash";
 
 @Injectable()
 export class MatchesService {
   constructor(public readonly httpMatchesService: HttpMatchesService) {}
 
-  public getPlayerMatches(from = 0, count = 0): Observable<LoRMatch[]> {
+  public getPlayerMatches(puuid: string, from = 0, count = 0): Observable<LoRMatch[]> {
     let playerData: RiotID;
     return this.httpMatchesService
-      .getPlayerData('Book', 'Teemo', 'americas')
+      .getPlayerDataByPuuid(puuid)
       .pipe(
         map((riotData: RiotID[]) => {
           playerData = riotData[0];
@@ -38,72 +39,70 @@ export class MatchesService {
             }),
           );
         }),
-        concatMap((lorMatches: LoRMatch[]) => {
-          // ESSE CONCAT MAP MELHORA AS INFORMAÇÕES DE PLAYERS!!
-          return forkJoin(
-            lorMatches.map((lorMatch) => {
-              const playerPuuids = lorMatch.info.players.map(
-                (player) => player.puuid,
-              );
-              const playerInfoRequests = forkJoin(
-                playerPuuids.map((puuid) => {
-                  if (puuid === playerData.puuid) {
-                    return of(playerData);
-                  } else {
-                    return this.httpMatchesService.getPlayerDataByPuuid(
-                      puuid,
-                      playerData.activeShard,
-                    );
-                  }
-                }),
-              );
-              return playerInfoRequests.pipe(
-                map((players: RiotID[]) => {
-                  const completePlayersInfo = lorMatch.info.players.map(
-                    (playerInfo) => {
-                      return {
-                        ...playerInfo,
-                        ...{
-                          riotId: players.find(
-                            (x) => x.puuid === playerInfo.puuid,
-                          ),
-                        },
-                      };
-                    },
-                  );
-                  const result = lorMatch;
-                  lorMatch.info.players = completePlayersInfo;
-                  return result as LoRMatch;
-                }),
-              );
-            }),
-          );
-        }),
       );
   }
 
-  public getPlayerMatchesWithDeck(from = 0, count = 0): Observable<LoRMatch[]> {
-    return this.getPlayerMatches(from, count).pipe(
-      concatMap((playerMatches: LoRMatch[]) =>
-        forkJoin(
-          playerMatches.map((playerMatch) => {
-            const deckCodes = playerMatch.info.players.map(
-              (player) => player.deck_code,
-            );
-            return getLoRDecks(deckCodes).pipe(
-              map((decks: LoRDeck[], index) => {
-                const result = playerMatch;
-                result.info.players = result.info.players.map(
-                  (playerInfo, index) => {
-                    return { ...playerInfo, ...{ deck: decks[index] } };
-                  },
-                );
-                return result as LoRMatch;
+  public proccessMatchesData(playerMatches$: Observable<LoRMatch[]>): Observable<LoRMatch[]> {
+    let puuids: string[] = [];
+    let riotIds: RiotID[] = [];
+    let playerMatches: LoRMatch[] = [];
+    let deckCodes: string[] = [];
+    let decks: LoRDeck[] = [];
+
+    return playerMatches$.pipe(
+        // mapeia todos os puuids dos jogadores
+         tap((matches: LoRMatch[]) => {
+             playerMatches = matches
+             const playersPuuids = matches.map((match: LoRMatch) => match.info.players.map(p => p.puuid)).flat();
+             const uniquePuuids = [...new Set(playersPuuids)];
+             puuids = uniquePuuids;
+         }),
+         // faz chamada pra API da riot buscando todos os dados completos do PUUID dos jogadores
+         concatMap((matches: LoRMatch[]) => {
+             return forkJoin(
+                 puuids.map(puuid => {
+                     return this.httpMatchesService.getPlayerDataByPuuid(puuid)
+                         .pipe(map(riotIds => riotIds[0]))
+                 })
+             )
+         }),
+        // adiciona RiotID para cada "player" de cada "match"
+        tap((riotIdsResponse: RiotID[]) => {
+            riotIds = riotIdsResponse;
+            playerMatches.forEach((match: LoRMatch) => {
+                match.info.players.forEach((player: LoRMatchPlayer) => {
+                    player.riotId = riotIds.find(id => isEqual(id.puuid, player.puuid));
+                })
+            })
+        }),
+      // mapeia todos os decks das partidas
+        tap(() => {
+            const matchesDeckCodes = playerMatches.map((match: LoRMatch) => match.info.players.map(p => p.deck_code)).flat();
+            const uniqueDeckCodes = [...new Set(matchesDeckCodes)];
+            deckCodes = uniqueDeckCodes;
+            console.log(deckCodes);
+        }),
+        // faz converte todos os deckCodes em LoRDeck e mapeia o deck code pra coincidir com o original
+        concatMap(() => {
+          return forkJoin(
+            deckCodes.map(deckCode => {
+              return getLoRDeck(deckCode).pipe(map(lorDeck => {
+                return {...lorDeck, code: deckCode}; // faz isso para manter o mesmo deck code inputado
+              }))
+            })
+          )
+        }),
+        // adiciona deck para cada "player" de cada "match"
+              tap((lorDeckResponse: LoRDeck[]) => {
+                decks = lorDeckResponse;
+                console.log(decks.map(d => d.code));
+                playerMatches.forEach((match: LoRMatch) => {
+                  match.info.players.forEach((player: LoRMatchPlayer) => {
+                    player.deck = decks.find((deck) => deck.code === player.deck_code);
+                  })
+                })
               }),
-            );
-          }),
-        ),
-      ),
+        map(() => playerMatches)
     );
   }
 }
