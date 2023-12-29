@@ -80,7 +80,6 @@ export class MatchesService {
             const matchesDeckCodes = playerMatches.map((match: LoRMatch) => match.info.players.map(p => p.deck_code)).flat();
             const uniqueDeckCodes = [...new Set(matchesDeckCodes)];
             deckCodes = uniqueDeckCodes;
-            console.log(deckCodes);
         }),
         // faz converte todos os deckCodes em LoRDeck e mapeia o deck code pra coincidir com o original
         concatMap(() => {
@@ -95,7 +94,6 @@ export class MatchesService {
         // adiciona deck para cada "player" de cada "match"
               tap((lorDeckResponse: LoRDeck[]) => {
                 decks = lorDeckResponse;
-                console.log(decks.map(d => d.code));
                 playerMatches.forEach((match: LoRMatch) => {
                   match.info.players.forEach((player: LoRMatchPlayer) => {
                     player.deck = decks.find((deck) => deck.code === player.deck_code);
