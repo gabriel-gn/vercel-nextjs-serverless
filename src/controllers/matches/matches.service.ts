@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {HttpMatchesService} from './http-matches.service';
-import {concatMap, forkJoin, map, Observable, tap} from 'rxjs';
+import {catchError, concatMap, forkJoin, map, Observable, of, tap, throwError} from 'rxjs';
 import {getLoRDeck} from '../../shared/utils/deck-utils';
 import {
   isValidDeckCode,
@@ -88,6 +88,7 @@ export class MatchesService {
       }),
       // faz converte todos os deckCodes em LoRDeck e mapeia o deck code pra coincidir com o original
       concatMap(() => {
+        if (deckCodes.length === 0) { return of([]) }
         return forkJoin(
           deckCodes.map(deckCode => {
             return getLoRDeck(deckCode).pipe(map(lorDeck => {
@@ -106,7 +107,8 @@ export class MatchesService {
           })
         })
       }),
-      map(() => playerMatches)
+      map(() => playerMatches),
+      catchError((err) => throwError(err))
     );
   }
 }

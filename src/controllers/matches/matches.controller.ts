@@ -71,18 +71,32 @@ export class MatchesController {
     required: false,
     type: Boolean,
   })
+  @ApiImplicitParam({
+    name: 'from',
+    required: false,
+    type: Number,
+    description: 'from which index of will return. 0 is most recent. 20 latest.'
+  })
+  @ApiImplicitParam({
+    name: 'count',
+    required: false,
+    type: Number,
+    description: 'number of entries returned after "from."'
+  })
   async getMatchesByPlayer(
     @Query('gameName') gameName: string,
     @Query('tagLine') tagLine: string,
     @Query('region') region: LoRServerRegion,
     @Query('puuid') puuid: string,
     @Query('fullData') fullData: boolean,
+    @Query('from') from: number = 0,
+    @Query('count') count: number = 1,
   ): Promise<Observable<LoRMatch[]>> {
     region = LoRServerRegionQuery.includes(region) ? region : undefined;
     fullData = `${fullData}`.toLowerCase() === 'true';
+    from = (from >= 0 && from < 20) ? from : 0;
+    count = (from + count > 0 && from + count <= 20) ? count : 0;
 
-    const from: number = 0;
-    const count: number = 4;
     let result: Observable<LoRMatch[]>;
     if (!puuid) {
       result = this.matchesService.httpMatchesService.getPlayerData(gameName, tagLine, region)
