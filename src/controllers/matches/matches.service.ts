@@ -4,7 +4,7 @@ import { concatMap, forkJoin, map, Observable, tap, of } from 'rxjs';
 import { LoRServerRegion, RiotID } from '../../shared/models/riot-related';
 import {LoRMatch, LoRMatchPlayer} from '../../shared/models/lor-matches';
 import {getLoRDeck, getLoRDecks} from '../../shared/utils/deck-utils';
-import { LoRDeck } from '@gabrielgn-test/runeterra-tools';
+import {isValidDeckCode, LoRDeck} from '@gabrielgn-test/runeterra-tools';
 import {isEqual} from "lodash";
 
 @Injectable()
@@ -79,7 +79,7 @@ export class MatchesService {
         tap(() => {
             const matchesDeckCodes = playerMatches.map((match: LoRMatch) => match.info.players.map(p => p.deck_code)).flat();
             const uniqueDeckCodes = [...new Set(matchesDeckCodes)];
-            deckCodes = uniqueDeckCodes;
+            deckCodes = uniqueDeckCodes.filter(c => isValidDeckCode(c));
         }),
         // faz converte todos os deckCodes em LoRDeck e mapeia o deck code pra coincidir com o original
         concatMap(() => {
@@ -96,7 +96,8 @@ export class MatchesService {
                 decks = lorDeckResponse;
                 playerMatches.forEach((match: LoRMatch) => {
                   match.info.players.forEach((player: LoRMatchPlayer) => {
-                    player.deck = decks.find((deck) => deck.code === player.deck_code);
+                    // @ts-ignore
+                    player.deck = decks.find((deck) => deck.code === player.deck_code) ?? null;
                   })
                 })
               }),
