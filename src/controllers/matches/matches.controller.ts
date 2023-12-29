@@ -1,18 +1,17 @@
-import {Body, Controller, Get, Param, Post, Query} from '@nestjs/common';
-import {ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
-import { MatchesService } from './matches.service';
+import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
+import {MatchesService} from './matches.service';
 import {concatMap, Observable} from "rxjs";
-import {LoRServerRegion, LoRServerRegionQuery, RiotID} from "../../shared/models/riot-related";
 import {ApiImplicitParam} from "@nestjs/swagger/dist/decorators/api-implicit-param.decorator";
-import {SearchCardsQuery} from "@controllers/cards/cards.dto";
-import {LoRMatch} from "../../shared/models/lor-matches";
+import {LoRMatch, LoRServerRegion, LoRServerRegionQuery, RiotID} from "@gabrielgn-test/runeterra-tools";
 
 @ApiTags('Matches')
 @Controller()
 export class MatchesController {
   constructor(
     private readonly matchesService: MatchesService
-  ) {}
+  ) {
+  }
 
   @Get()
   getMatches() {
@@ -20,7 +19,7 @@ export class MatchesController {
   }
 
   @Get('player')
-  @ApiOperation({ description: 'retrieves player data from riot' })
+  @ApiOperation({description: 'retrieves player data from riot'})
   @ApiImplicitParam({
     name: 'gameName',
     required: true,
@@ -37,16 +36,16 @@ export class MatchesController {
     enum: LoRServerRegionQuery,
   })
   async getPlayerData(
-      @Query('gameName') gameName: string,
-      @Query('tagLine') tagLine: string,
-      @Query('region') region: LoRServerRegion,
+    @Query('gameName') gameName: string,
+    @Query('tagLine') tagLine: string,
+    @Query('region') region: LoRServerRegion,
   ): Promise<Observable<RiotID[]>> {
     region = LoRServerRegionQuery.includes(region) ? region : undefined;
     return this.matchesService.httpMatchesService.getPlayerData(gameName, tagLine, region);
   }
 
   @Get('by-player')
-  @ApiOperation({ description: 'needs to provide (gameName && tagLine) or (puuid)' })
+  @ApiOperation({description: 'needs to provide (gameName && tagLine) or (puuid)'})
   @ApiImplicitParam({
     name: 'gameName',
     required: false,
@@ -73,11 +72,11 @@ export class MatchesController {
     type: Boolean,
   })
   async getMatchesByPlayer(
-      @Query('gameName') gameName: string,
-      @Query('tagLine') tagLine: string,
-      @Query('region') region: LoRServerRegion,
-      @Query('puuid') puuid: string,
-      @Query('fullData') fullData: boolean,
+    @Query('gameName') gameName: string,
+    @Query('tagLine') tagLine: string,
+    @Query('region') region: LoRServerRegion,
+    @Query('puuid') puuid: string,
+    @Query('fullData') fullData: boolean,
   ): Promise<Observable<LoRMatch[]>> {
     region = LoRServerRegionQuery.includes(region) ? region : undefined;
     fullData = `${fullData}`.toLowerCase() === 'true';
@@ -87,9 +86,9 @@ export class MatchesController {
     let result: Observable<LoRMatch[]>;
     if (!puuid) {
       result = this.matchesService.httpMatchesService.getPlayerData(gameName, tagLine, region)
-          .pipe(
-              concatMap(resp => this.matchesService.getPlayerMatches(resp[0].puuid, from, count))
-          )
+        .pipe(
+          concatMap(resp => this.matchesService.getPlayerMatches(resp[0].puuid, from, count))
+        )
     } else {
       result = this.matchesService.getPlayerMatches(puuid, from, count);
     }

@@ -1,10 +1,14 @@
 import {Injectable} from '@nestjs/common';
 import {HttpMatchesService} from './http-matches.service';
 import {concatMap, forkJoin, map, Observable, tap} from 'rxjs';
-import {RiotID} from '../../shared/models/riot-related';
-import {LoRMatch, LoRMatchPlayer} from '../../shared/models/lor-matches';
 import {getLoRDeck} from '../../shared/utils/deck-utils';
-import {isValidDeckCode, LoRDeck} from '@gabrielgn-test/runeterra-tools';
+import {
+  isValidDeckCode,
+  LoRDeck,
+  LoRMatch,
+  LoRMatchExtendedPlayer,
+  LoRMatchPlayer, RiotID
+} from '@gabrielgn-test/runeterra-tools';
 import {isEqual} from "lodash";
 
 @Injectable()
@@ -71,7 +75,7 @@ export class MatchesService {
       tap((riotIdsResponse: RiotID[]) => {
         riotIds = riotIdsResponse;
         playerMatches.forEach((match: LoRMatch) => {
-          match.info.players.forEach((player: LoRMatchPlayer) => {
+          match.info.players.forEach((player: LoRMatchExtendedPlayer) => {
             player.riotId = riotIds.find(id => isEqual(id.puuid, player.puuid));
           })
         })
