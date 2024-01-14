@@ -5,8 +5,8 @@ import { MatchesModule } from './controllers/matches/matches.module';
 import { CardsModule } from './controllers/cards/cards.module';
 import { RiotAssetsModule } from './controllers/riot-assets/riot-assets.module';
 import { ServerInfoModule } from './controllers/server-info/server-info.module';
-import { MatchupsModule } from '@controllers/matchups/matchups.module';
-import { NewsModule } from '@controllers/news/news.module';
+import { MatchupsModule } from './controllers/matchups/matchups.module';
+import { NewsModule } from './controllers/news/news.module';
 
 @Module({})
 export class AppRoutingModule {

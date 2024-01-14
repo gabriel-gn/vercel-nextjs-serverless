@@ -22,11 +22,7 @@
     "noFallthroughCasesInSwitch": false,
     "noEmit": false,
     "incremental": false,
-    "paths": {
-      "@controllers/*": ["./src/controllers/*"],
-      "@environments/*": ["./src/environments/*"],
-      "@assets/*": ["./src/assets/*"]
-    }
+    "paths": {}
   },
   "include": ["src/**/*.ts", "src/**/*.json"]
 }

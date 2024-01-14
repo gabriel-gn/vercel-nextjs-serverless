@@ -9,7 +9,7 @@ import { RedocModule, RedocOptions } from '@nicholas.braun/nestjs-redoc';
 import { LanguageInterceptor } from './shared/interceptors/language.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: false });
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalInterceptors(new LanguageInterceptor());
 
   if (process.env.VERCEL_ENV !== 'production') {
