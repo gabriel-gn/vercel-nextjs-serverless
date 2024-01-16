@@ -501,7 +501,7 @@ export class HttpDecksService {
                   playlistId: c.contentDetails.relatedPlaylists.uploads,
                   maxResults: 10,
                   part: 'snippet,contentDetails',
-                  key: 'AIzaSyCwSNlFMfh5Rf12VGCdT44bXbHgNVr99kQ',
+                  key: YOUTUBE_API_KEY,
                 }
               }
             ).pipe(map(r => r.data))
