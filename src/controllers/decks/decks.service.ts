@@ -68,4 +68,8 @@ export class DecksService {
   ): Observable<UserDeck[]> {
     return this.http.getLowPlayRateHighWinrateCitrine(limit, relatedDecks);
   }
+
+  public getSocialMediaDecks(): Observable<any> {
+    return this.http.getYoutubeInfluencersDecks();
+  }
 }

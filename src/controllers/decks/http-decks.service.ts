@@ -4,7 +4,7 @@ import {
   catchError,
   concatMap,
   forkJoin,
-  map,
+  map, mergeMap,
   Observable,
   of,
   pluck,
@@ -34,10 +34,12 @@ import {
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
 import {
-  generateDeckName,
+  generateDeckName, isValidDeckCode,
   LoRDeck,
   RiotLoRCard,
 } from '@gabrielgn-test/runeterra-tools';
+import {YoutubeChannelInfo} from "./models";
+import {YoutubePlaylist} from "./ytPlaylist.model";
 
 @Injectable()
 export class HttpDecksService {
@@ -459,5 +461,63 @@ export class HttpDecksService {
         );
       }),
     ) as unknown as Observable<UserDeck[]>;
+  }
+
+  public getYoutubeInfluencersDecks(): Observable<any> {
+    const YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
+    const influencersYoutubeIds: {[influencerUsername: string]: string} = {
+      Snnuy: 'UCrMr5Wc0Cn5AGINmUEquzdA',
+      GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg'
+    };
+    let influencerChannels: YoutubeChannelInfo[] = [];
+
+    const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
+      let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
+      return descItems.find(i => isValidDeckCode(i));
+    }
+
+    return this.http.get(
+      `https://www.googleapis.com/youtube/v3/channels`,
+      {
+        params: {
+          id: Object.values(influencersYoutubeIds).join(','),
+          part: 'snippet,contentDetails',
+          key: YOUTUBE_API_KEY
+        }
+      }
+    )
+      .pipe(
+        map((response) => response.data),
+        map((response) => {
+          influencerChannels = response.items as YoutubeChannelInfo[];
+          return influencerChannels;
+        }),
+        mergeMap((ytChannels) => {
+          const channelUploads: Observable<YoutubePlaylist>[] = ytChannels.map(c => {
+            return this.http.get(
+              `https://www.googleapis.com/youtube/v3/playlistItems`,
+              {
+                params: {
+                  playlistId: c.contentDetails.relatedPlaylists.uploads,
+                  maxResults: 10,
+                  part: 'snippet,contentDetails',
+                  key: 'AIzaSyCwSNlFMfh5Rf12VGCdT44bXbHgNVr99kQ',
+                }
+              }
+            ).pipe(map(r => r.data))
+          });
+
+          return forkJoin(channelUploads);
+        }),
+        map((playlistInfos: YoutubePlaylist[]) => {
+          return influencerChannels.map((c, index) => {
+            return {
+              channelUser: c.snippet,
+              uploads: playlistInfos[index].items.map(i => i.snippet),
+              codes: playlistInfos[index].items.map(i => getDeckcodeFromDescription(i.snippet.description))
+            }
+          })
+        })
+      );
   }
 }
