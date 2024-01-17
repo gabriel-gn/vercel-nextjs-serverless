@@ -537,14 +537,17 @@ export class HttpDecksService {
       }),
       // formata para retornar o objeto final
       concatMap((auxEntry) => {
+        // return of(auxEntry)
         const result$ = auxEntry.map((entry) => {
           const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))
           const userDecks: Observable<UserDeck[]> = lorDecks.pipe(
             map((lorDecks) => {
               return lorDecks.map((d, dIndex) => {
                 return {
+                  title: entry.uploads[dIndex].title,
                   username: entry.source.title,
                   deck: {...d, thumbnail: entry.uploads[dIndex].thumbnails.maxres.url},
+                  createdAt: new Date(entry.uploads[dIndex].publishedAt).getTime() / 1000,
                 } as UserDeck;
               }) as UserDeck[];
             }),
@@ -560,7 +563,6 @@ export class HttpDecksService {
           return socialMediaDecks;
         })
         return forkJoin(result$);
-        // return forkJoin([]);
       })
     )
   }
