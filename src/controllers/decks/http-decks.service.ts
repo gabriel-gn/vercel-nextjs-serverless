@@ -19,7 +19,7 @@ import {
   UserDeckQueryResponse,
 } from '../../shared/models';
 import qs from 'qs';
-import { getLoRDecks } from '../../shared/utils/deck-utils';
+import {getLoRDeck, getLoRDecks} from '../../shared/utils/deck-utils';
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
@@ -37,7 +37,7 @@ import {
   LoRDeck,
   RiotLoRCard, UserDeck,
 } from '@gabrielgn-test/runeterra-tools';
-import {YoutubeChannelInfo} from "./ytChannel.model";
+import {SocialMediaDecks, YoutubeChannelInfo} from "./ytChannel.model";
 import {YoutubePlaylist} from "./ytPlaylist.model";
 
 @Injectable()
@@ -462,8 +462,8 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getYoutubeInfluencersDecks(): Observable<any> {
     const YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
+  public getYoutubeInfluencersDecks(): Observable<any[]> {
     const influencersYoutubeIds: {[influencerUsername: string]: string} = {
       Snnuy: 'UCrMr5Wc0Cn5AGINmUEquzdA',
       GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg'
@@ -475,48 +475,86 @@ export class HttpDecksService {
       return descItems.find(i => isValidDeckCode(i));
     }
 
-    return this.http.get(
-      `https://www.googleapis.com/youtube/v3/channels`,
-      {
-        params: {
-          id: Object.values(influencersYoutubeIds).join(','),
-          part: 'snippet,contentDetails',
-          key: YOUTUBE_API_KEY
-        }
-      }
-    )
-      .pipe(
-        map((response) => response.data),
-        map((response) => {
-          influencerChannels = response.items as YoutubeChannelInfo[];
-          return influencerChannels;
-        }),
-        mergeMap((ytChannels) => {
-          const channelUploads: Observable<YoutubePlaylist>[] = ytChannels.map(c => {
-            return this.http.get(
-              `https://www.googleapis.com/youtube/v3/playlistItems`,
-              {
-                params: {
-                  playlistId: c.contentDetails.relatedPlaylists.uploads,
-                  maxResults: 10,
-                  part: 'snippet,contentDetails',
-                  key: YOUTUBE_API_KEY,
-                }
+    return of('').pipe(
+      // busca os dados de canais do youtube
+      concatMap(() => {
+        return this.http.get(
+          `https://www.googleapis.com/youtube/v3/channels`,
+          {
+            params: {
+              id: Object.values(influencersYoutubeIds).join(','),
+              part: 'snippet,contentDetails',
+              key: YOUTUBE_API_KEY
+            }
+          }
+        ).pipe(map(r => r.data))
+      }),
+      // guarda em variável a resposta dos itens pertinentes
+      map((response) => {
+        influencerChannels = response.items as YoutubeChannelInfo[];
+        return influencerChannels;
+      }),
+      // retorna dados das playlists de upload de cada canal
+      concatMap((ytChannels) => {
+        const channelUploads: Observable<YoutubePlaylist>[] = ytChannels.map(c => {
+          return this.http.get(
+            `https://www.googleapis.com/youtube/v3/playlistItems`,
+            {
+              params: {
+                playlistId: c.contentDetails.relatedPlaylists.uploads,
+                maxResults: 10,
+                part: 'snippet,contentDetails',
+                key: YOUTUBE_API_KEY,
               }
-            ).pipe(map(r => r.data))
-          });
+            }
+          ).pipe(map(r => r.data))
+        });
 
-          return forkJoin(channelUploads);
-        }),
-        map((playlistInfos: YoutubePlaylist[]) => {
-          return influencerChannels.map((c, index) => {
-            return {
-              channelUser: c.snippet,
-              uploads: playlistInfos[index].items.map(i => i.snippet),
-              codes: playlistInfos[index].items.map(i => getDeckcodeFromDescription(i.snippet.description))
+        return forkJoin(channelUploads);
+      }),
+      // formata o objeto de resposta final
+      map((playlistInfos: YoutubePlaylist[]) => {
+        return influencerChannels.map((c, index) => {
+          const sourceEntry = {
+            title: `${c.snippet.title}`,
+            thumbnail: `${c.snippet.thumbnails.high.url}`,
+            origin: 'youtube',
+          }
+          const deckCodes = playlistInfos[index].items.map(i => getDeckcodeFromDescription(i.snippet.description));
+          const uploads = playlistInfos[index].items.map(i => i.snippet);
+          deckCodes.forEach((code, index) => {
+            if (!code) {
+              uploads[index] = null; // faz o upload ser invalido se não tiver um código de deck
+            } else {
+              uploads[index].description = code;
             }
           })
+          return {
+            source: sourceEntry,
+            uploads: uploads.filter(i => !!i),
+          }
         })
-      );
+      }),
+      // formata para retornar o objeto final
+      // concatMap((auxEntry) => {
+      //   const result$ = auxEntry.map((entry) => {
+      //     const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))
+      //     const userDecks: Observable<UserDeck[]> = lorDecks.pipe(
+      //       map((lorDecks) => {
+      //         return lorDecks.map(d => {
+      //           return {
+      //             username: entry.source.title,
+      //             deck: d
+      //           } as UserDeck;
+      //         }) as UserDeck[];
+      //       }),
+      //     );
+      //     return userDecks;
+      //   })
+      //   return of(result$);
+      //   // return forkJoin(result$);
+      //   // return forkJoin([]);
+      // })
+    )
   }
 }
