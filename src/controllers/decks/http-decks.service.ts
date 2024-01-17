@@ -536,25 +536,32 @@ export class HttpDecksService {
         })
       }),
       // formata para retornar o objeto final
-      // concatMap((auxEntry) => {
-      //   const result$ = auxEntry.map((entry) => {
-      //     const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))
-      //     const userDecks: Observable<UserDeck[]> = lorDecks.pipe(
-      //       map((lorDecks) => {
-      //         return lorDecks.map(d => {
-      //           return {
-      //             username: entry.source.title,
-      //             deck: d
-      //           } as UserDeck;
-      //         }) as UserDeck[];
-      //       }),
-      //     );
-      //     return userDecks;
-      //   })
-      //   return of(result$);
-      //   // return forkJoin(result$);
-      //   // return forkJoin([]);
-      // })
+      concatMap((auxEntry) => {
+        const result$ = auxEntry.map((entry) => {
+          const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))
+          const userDecks: Observable<UserDeck[]> = lorDecks.pipe(
+            map((lorDecks) => {
+              return lorDecks.map((d, dIndex) => {
+                return {
+                  username: entry.source.title,
+                  deck: {...d, thumbnail: entry.uploads[dIndex].thumbnails.maxres.url},
+                } as UserDeck;
+              }) as UserDeck[];
+            }),
+          );
+          const socialMediaDecks: Observable<SocialMediaDecks> = userDecks.pipe(
+            map((userDecks: UserDeck[]) => {
+              return {
+                source: entry.source,
+                decks: userDecks
+              } as SocialMediaDecks
+            })
+          )
+          return socialMediaDecks;
+        })
+        return forkJoin(result$);
+        // return forkJoin([]);
+      })
     )
   }
 }
