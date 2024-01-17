@@ -462,8 +462,8 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-    const YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
   public getYoutubeInfluencersDecks(): Observable<any[]> {
+    const YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
     const influencersYoutubeIds: {[influencerUsername: string]: string} = {
       Snnuy: 'UCrMr5Wc0Cn5AGINmUEquzdA',
       GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg'
