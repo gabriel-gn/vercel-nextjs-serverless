@@ -1,3 +1,5 @@
+import {UserDeck} from "@gabrielgn-test/runeterra-tools";
+
 export interface YoutubeChannelInfo {
   kind: string
   etag: string
@@ -39,4 +41,13 @@ export interface ContentDetails {
 export interface RelatedPlaylists {
   likes: string
   uploads: string
+}
+
+export interface SocialMediaDecks {
+  source: {
+    title: string;
+    thumbnail: string;
+    origin?: string;
+  };
+  decks: UserDeck[]
 }

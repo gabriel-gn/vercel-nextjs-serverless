@@ -12,12 +12,10 @@ import {
   throwError,
 } from 'rxjs';
 import {
-  DeckStats,
   LorMasterMetaDeck,
   MobalyticsDeck,
   MobalyticsMetaDeck,
   RunescolaMetaDeck,
-  UserDeck,
   UserDeckQueryResponse,
 } from '../../shared/models';
 import qs from 'qs';
@@ -34,11 +32,12 @@ import {
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
 import {
+  DeckStats,
   generateDeckName, isValidDeckCode,
   LoRDeck,
-  RiotLoRCard,
+  RiotLoRCard, UserDeck,
 } from '@gabrielgn-test/runeterra-tools';
-import {YoutubeChannelInfo} from "./models";
+import {YoutubeChannelInfo} from "./ytChannel.model";
 import {YoutubePlaylist} from "./ytPlaylist.model";
 
 @Injectable()
