@@ -546,8 +546,9 @@ export class HttpDecksService {
                 return {
                   title: entry.uploads[dIndex].title,
                   username: entry.source.title,
-                  deck: {...d, thumbnail: entry.uploads[dIndex].thumbnails.maxres.url},
+                  deck: d,
                   createdAt: new Date(entry.uploads[dIndex].publishedAt).getTime() / 1000,
+                  thumbnail: entry.uploads[dIndex].thumbnails.maxres.url
                 } as UserDeck;
               }) as UserDeck[];
             }),
