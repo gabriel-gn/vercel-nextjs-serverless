@@ -502,7 +502,7 @@ export class HttpDecksService {
             {
               params: {
                 playlistId: c.contentDetails.relatedPlaylists.uploads,
-                maxResults: 10,
+                maxResults: 20,
                 part: 'snippet,contentDetails',
                 key: YOUTUBE_API_KEY,
               }
