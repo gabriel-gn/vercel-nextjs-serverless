@@ -16,7 +16,7 @@ export class HttpMatchesService {
   private getRiotHeadersConfig(): {
     headers: { [stringName: string]: string };
   } {
-    const headers = { 'X-Riot-Token': `RGAPI-bd65e23d-fdf6-4531-b4ce-a0e465651362` };
+    const headers = { 'X-Riot-Token': `${process.env.RIOT_TOKEN}` };
     return { headers: headers };
   }
 
