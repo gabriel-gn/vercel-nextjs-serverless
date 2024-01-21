@@ -3,11 +3,10 @@ import {
   MobalyticsDeck,
   RunescolaMetaDeck,
   RuneterraArLibraryDeck,
-  UserDeck,
 } from '../models';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { addLoRDeckBadges, getLoRDeckBadges, getLoRDecks } from './deck-utils';
-import { generateDeckName, LoRDeck } from '@gabrielgn-test/runeterra-tools';
+import {generateDeckName, LoRDeck, UserDeck} from '@gabrielgn-test/runeterra-tools';
 import { max, min, unescape } from "lodash";
 
 export function mobalyticsDecksToUserDecks(

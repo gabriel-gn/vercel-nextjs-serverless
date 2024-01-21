@@ -237,4 +237,9 @@ export class DecksController {
         ),
       );
   }
+
+  @Get('social-media')
+  async getSocialMediaDecks() {
+    return this.decksService.getSocialMediaDecks();
+  }
 }

@@ -1,26 +1,8 @@
-import { LoRDeck, RiotLoRCard } from '@gabrielgn-test/runeterra-tools';
+import {RiotLoRCard, UserDeck} from '@gabrielgn-test/runeterra-tools';
 
 export interface DeckCard {
   card: RiotLoRCard;
   count: number;
-}
-
-export interface DeckStats {
-  playRatePercent?: number;
-  winRatePercent?: number;
-  matchesQt?: number;
-}
-
-export interface UserDeck {
-  title?: string;
-  description?: string;
-  badges?: { tier?: string };
-  changedAt?: number;
-  createdAt?: number;
-  stats?: DeckStats;
-  username: string;
-  deck: LoRDeck;
-  relatedDecks?: LoRDeck[];
 }
 
 export interface MobalyticsDeck {

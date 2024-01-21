@@ -4,7 +4,7 @@ import {
   catchError,
   concatMap,
   forkJoin,
-  map,
+  map, mergeMap,
   Observable,
   of,
   pluck,
@@ -12,16 +12,14 @@ import {
   throwError,
 } from 'rxjs';
 import {
-  DeckStats,
   LorMasterMetaDeck,
   MobalyticsDeck,
   MobalyticsMetaDeck,
   RunescolaMetaDeck,
-  UserDeck,
   UserDeckQueryResponse,
 } from '../../shared/models';
 import qs from 'qs';
-import { getLoRDecks } from '../../shared/utils/deck-utils';
+import {getLoRDeck, getLoRDecks} from '../../shared/utils/deck-utils';
 import {
   SearchDeckLibraryDto,
   SearchDeckLibraryRuneterraArDto,
@@ -34,10 +32,13 @@ import {
   runeterraARDecksToUserDecks,
 } from '../../shared/utils/external-deck-converters';
 import {
-  generateDeckName,
+  DeckStats,
+  generateDeckName, isValidDeckCode,
   LoRDeck,
-  RiotLoRCard,
+  RiotLoRCard, UserDeck,
 } from '@gabrielgn-test/runeterra-tools';
+import {SocialMediaDecks, YoutubeChannelInfo} from "./ytChannel.model";
+import {YoutubePlaylist} from "./ytPlaylist.model";
 
 @Injectable()
 export class HttpDecksService {
@@ -459,5 +460,111 @@ export class HttpDecksService {
         );
       }),
     ) as unknown as Observable<UserDeck[]>;
+  }
+
+  public getYoutubeInfluencersDecks(): Observable<any[]> {
+    const YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
+    const influencersYoutubeIds: {[influencerUsername: string]: string} = {
+      Snnuy: 'UCrMr5Wc0Cn5AGINmUEquzdA',
+      GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg'
+    };
+    let influencerChannels: YoutubeChannelInfo[] = [];
+
+    const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
+      let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
+      return descItems.find(i => isValidDeckCode(i));
+    }
+
+    return of('').pipe(
+      // busca os dados de canais do youtube
+      concatMap(() => {
+        return this.http.get(
+          `https://www.googleapis.com/youtube/v3/channels`,
+          {
+            params: {
+              id: Object.values(influencersYoutubeIds).join(','),
+              part: 'snippet,contentDetails',
+              key: YOUTUBE_API_KEY
+            }
+          }
+        ).pipe(map(r => r.data))
+      }),
+      // guarda em variável a resposta dos itens pertinentes
+      map((response) => {
+        influencerChannels = response.items as YoutubeChannelInfo[];
+        return influencerChannels;
+      }),
+      // retorna dados das playlists de upload de cada canal
+      concatMap((ytChannels) => {
+        const channelUploads: Observable<YoutubePlaylist>[] = ytChannels.map(c => {
+          return this.http.get(
+            `https://www.googleapis.com/youtube/v3/playlistItems`,
+            {
+              params: {
+                playlistId: c.contentDetails.relatedPlaylists.uploads,
+                maxResults: 20,
+                part: 'snippet,contentDetails',
+                key: YOUTUBE_API_KEY,
+              }
+            }
+          ).pipe(map(r => r.data))
+        });
+
+        return forkJoin(channelUploads);
+      }),
+      // formata o objeto de resposta final
+      map((playlistInfos: YoutubePlaylist[]) => {
+        return influencerChannels.map((c, index) => {
+          const sourceEntry = {
+            title: `${c.snippet.title}`,
+            thumbnail: `${c.snippet.thumbnails.high.url}`,
+            origin: 'youtube',
+          }
+          const deckCodes = playlistInfos[index].items.map(i => getDeckcodeFromDescription(i.snippet.description));
+          const uploads = playlistInfos[index].items.map(i => i.snippet);
+          deckCodes.forEach((code, index) => {
+            if (!code) {
+              uploads[index] = null; // faz o upload ser invalido se não tiver um código de deck
+            } else {
+              uploads[index].description = code;
+            }
+          })
+          return {
+            source: sourceEntry,
+            uploads: uploads.filter(i => !!i),
+          }
+        })
+      }),
+      // formata para retornar o objeto final
+      concatMap((auxEntry) => {
+        // return of(auxEntry)
+        const result$ = auxEntry.map((entry) => {
+          const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))
+          const userDecks: Observable<UserDeck[]> = lorDecks.pipe(
+            map((lorDecks) => {
+              return lorDecks.map((d, dIndex) => {
+                return {
+                  title: entry.uploads[dIndex].title,
+                  username: entry.source.title,
+                  deck: d,
+                  createdAt: new Date(entry.uploads[dIndex].publishedAt).getTime() / 1000,
+                  thumbnail: entry.uploads[dIndex].thumbnails.maxres.url
+                } as UserDeck;
+              }) as UserDeck[];
+            }),
+          );
+          const socialMediaDecks: Observable<SocialMediaDecks> = userDecks.pipe(
+            map((userDecks: UserDeck[]) => {
+              return {
+                source: entry.source,
+                decks: userDecks
+              } as SocialMediaDecks
+            })
+          )
+          return socialMediaDecks;
+        })
+        return forkJoin(result$);
+      })
+    )
   }
 }
