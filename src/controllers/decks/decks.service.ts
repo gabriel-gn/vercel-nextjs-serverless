@@ -69,6 +69,10 @@ export class DecksService {
     return this.http.getLowPlayRateHighWinrateCitrine(limit, relatedDecks);
   }
 
+  public getSocialMediaCreators(): Observable<any> {
+    return this.http.getYoutubeCreators();
+  }
+
   public getSocialMediaDecks(): Observable<any> {
     return this.http.getYoutubeInfluencersDecks();
   }

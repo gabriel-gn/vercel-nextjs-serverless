@@ -43,11 +43,13 @@ export interface RelatedPlaylists {
   uploads: string
 }
 
+export interface SocialMediaSource {
+  title: string;
+  thumbnail: string;
+  origin?: string;
+}
+
 export interface SocialMediaDecks {
-  source: {
-    title: string;
-    thumbnail: string;
-    origin?: string;
-  };
+  source: SocialMediaSource;
   decks: UserDeck[]
 }

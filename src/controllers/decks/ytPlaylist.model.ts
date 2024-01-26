@@ -10,11 +10,11 @@ export interface Item {
   kind: string
   etag: string
   id: string
-  snippet: Snippet
+  snippet: YoutubePlaylistSnippet
   contentDetails: ContentDetails
 }
 
-export interface Snippet {
+export interface YoutubePlaylistSnippet {
   publishedAt: string
   channelId: string
   title: string

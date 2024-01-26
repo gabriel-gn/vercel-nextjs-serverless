@@ -37,11 +37,13 @@ import {
   LoRDeck,
   RiotLoRCard, UserDeck,
 } from '@gabrielgn-test/runeterra-tools';
-import {SocialMediaDecks, YoutubeChannelInfo} from "./ytChannel.model";
-import {YoutubePlaylist} from "./ytPlaylist.model";
+import {SocialMediaDecks, SocialMediaSource, YoutubeChannelInfo} from "./ytChannel.model";
+import {YoutubePlaylist, YoutubePlaylistSnippet} from "./ytPlaylist.model";
 
 @Injectable()
 export class HttpDecksService {
+  private readonly YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
+
   constructor(private http: HttpService) {}
 
   public getMetaDecksIndigo(): Observable<UserDeck[]> {
@@ -462,18 +464,13 @@ export class HttpDecksService {
     ) as unknown as Observable<UserDeck[]>;
   }
 
-  public getYoutubeInfluencersDecks(): Observable<any[]> {
-    const YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
+  public getYoutubeCreators(): Observable<YoutubeChannelInfo[]> {
     const influencersYoutubeIds: {[influencerUsername: string]: string} = {
       Snnuy: 'UCrMr5Wc0Cn5AGINmUEquzdA',
-      GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg'
+      GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg',
+      MegaMogwai: 'UCvUZXLShMx-FZvoadtb8xBQ',
+      MajiinBae: 'UCPWvMRZq__Q-LaCNui9budg',
     };
-    let influencerChannels: YoutubeChannelInfo[] = [];
-
-    const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
-      let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
-      return descItems.find(i => isValidDeckCode(i));
-    }
 
     return of('').pipe(
       // busca os dados de canais do youtube
@@ -484,15 +481,28 @@ export class HttpDecksService {
             params: {
               id: Object.values(influencersYoutubeIds).join(','),
               part: 'snippet,contentDetails',
-              key: YOUTUBE_API_KEY
+              key: this.YOUTUBE_API_KEY
             }
           }
         ).pipe(map(r => r.data))
       }),
+      map(response => response.items)
+    );
+  }
+
+  public getYoutubeInfluencersDecks(): Observable<SocialMediaDecks[]> {
+    let influencerChannels: YoutubeChannelInfo[] = [];
+
+    const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
+      let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
+      return descItems.find(i => isValidDeckCode(i));
+    }
+
+    return of('').pipe(
+      concatMap(() => this.getYoutubeCreators()),
       // guarda em variável a resposta dos itens pertinentes
-      map((response) => {
-        influencerChannels = response.items as YoutubeChannelInfo[];
-        return influencerChannels;
+      tap((response) => {
+        influencerChannels = response;
       }),
       // retorna dados das playlists de upload de cada canal
       concatMap((ytChannels) => {
@@ -504,7 +514,7 @@ export class HttpDecksService {
                 playlistId: c.contentDetails.relatedPlaylists.uploads,
                 maxResults: 20,
                 part: 'snippet,contentDetails',
-                key: YOUTUBE_API_KEY,
+                key: this.YOUTUBE_API_KEY,
               }
             }
           ).pipe(map(r => r.data))
@@ -521,7 +531,7 @@ export class HttpDecksService {
             origin: 'youtube',
           }
           const deckCodes = playlistInfos[index].items.map(i => getDeckcodeFromDescription(i.snippet.description));
-          const uploads = playlistInfos[index].items.map(i => i.snippet);
+          const uploads: YoutubePlaylistSnippet[] = playlistInfos[index].items.map(i => i.snippet);
           deckCodes.forEach((code, index) => {
             if (!code) {
               uploads[index] = null; // faz o upload ser invalido se não tiver um código de deck
@@ -536,7 +546,7 @@ export class HttpDecksService {
         })
       }),
       // formata para retornar o objeto final
-      concatMap((auxEntry) => {
+      concatMap((auxEntry: {source: SocialMediaSource, uploads: YoutubePlaylistSnippet[]}[]) => {
         // return of(auxEntry)
         const result$ = auxEntry.map((entry) => {
           const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))

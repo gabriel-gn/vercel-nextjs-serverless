@@ -238,6 +238,11 @@ export class DecksController {
       );
   }
 
+  @Get('social-media-creators')
+  async getSocialMediaCreators() {
+    return this.decksService.getSocialMediaCreators();
+  }
+
   @Get('social-media')
   async getSocialMediaDecks() {
     return this.decksService.getSocialMediaDecks();
