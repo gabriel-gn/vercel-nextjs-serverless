@@ -557,8 +557,8 @@ export class HttpDecksService {
                   title: entry.uploads[dIndex].title,
                   username: entry.source.title,
                   deck: d,
-                  createdAt: new Date(entry.uploads[dIndex].publishedAt).getTime() / 1000,
-                  changedAt: new Date(entry.uploads[dIndex].publishedAt).getTime() / 1000,
+                  createdAt: new Date(entry.uploads[dIndex].publishedAt).getTime(),
+                  changedAt: new Date(entry.uploads[dIndex].publishedAt).getTime(),
                   thumbnail: entry.uploads[dIndex].thumbnails.maxres.url
                 } as UserDeck;
               }) as UserDeck[];
