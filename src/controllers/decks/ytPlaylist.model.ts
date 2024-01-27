@@ -1,12 +1,19 @@
+import {LoRDeck, UserDeck} from "@gabrielgn-test/runeterra-tools";
+
 export interface YoutubePlaylist {
   kind: string
   etag: string
   nextPageToken: string
-  items: Item[]
+  items: PlaylistItem[]
   pageInfo: PageInfo
 }
 
-export interface Item {
+export interface PlaylistDeckItem extends YoutubePlaylistSnippet {
+  deckCode: string
+  deck: LoRDeck
+}
+
+export interface PlaylistItem {
   kind: string
   etag: string
   id: string

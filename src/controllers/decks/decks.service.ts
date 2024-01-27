@@ -73,6 +73,10 @@ export class DecksService {
     return this.http.getYoutubeCreators();
   }
 
+  public getYoutubePlaylistDecks(playlistId: string): Observable<any> {
+    return this.http.getYoutubePlaylistDecks(playlistId);
+  }
+
   public getSocialMediaDecks(): Observable<any> {
     return this.http.getYoutubeInfluencersDecks();
   }

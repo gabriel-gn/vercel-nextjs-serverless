@@ -38,7 +38,7 @@ import {
   RiotLoRCard, UserDeck,
 } from '@gabrielgn-test/runeterra-tools';
 import {SocialMediaDecks, SocialMediaSource, YoutubeChannelInfo} from "./ytChannel.model";
-import {YoutubePlaylist, YoutubePlaylistSnippet} from "./ytPlaylist.model";
+import {PlaylistDeckItem, YoutubePlaylist, YoutubePlaylistSnippet} from "./ytPlaylist.model";
 
 @Injectable()
 export class HttpDecksService {
@@ -490,7 +490,53 @@ export class HttpDecksService {
     );
   }
 
-  public getYoutubeInfluencersDecks(): Observable<SocialMediaDecks[]> {
+  public getYoutubePlaylistDecks(playlistId: string): Observable<PlaylistDeckItem[]> {
+    const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
+      let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
+      return descItems.find(i => isValidDeckCode(i));
+    }
+
+    return of('').pipe(
+      concatMap(() => {
+        return this.http.get(
+          `https://www.googleapis.com/youtube/v3/playlistItems`,
+          {
+            params: {
+              playlistId: playlistId,
+              maxResults: 20,
+              part: 'snippet,contentDetails',
+              key: this.YOUTUBE_API_KEY,
+            }
+          }
+        ).pipe(map(r => r.data))
+      }),
+      map((playlist: YoutubePlaylist) => {
+        const deckCodes: string[] = playlist.items.map(i => getDeckcodeFromDescription(i.snippet.description));
+        let uploads: YoutubePlaylistSnippet[] = playlist.items.map(i => i.snippet);
+        deckCodes.forEach((code, index) => {
+          if (!code) {
+            uploads[index] = null; // faz o upload ser invalido se não tiver um código de deck
+          } else {
+            uploads[index]['deckCode'] = code;
+          }
+        })
+        uploads = uploads.filter(u => !!u);
+        return uploads
+      }),
+      concatMap((uploads: any[]) => {
+        const lorDecks: Observable<LoRDeck[]> = getLoRDecks(uploads.map(u => u['deckCode']));
+        return lorDecks.pipe(
+          map((decks: LoRDeck[]) => {
+            return decks.map((d, i) => {
+              return {...uploads[i], deck: d} as PlaylistDeckItem;
+            })
+          })
+        ) as Observable<PlaylistDeckItem[]>
+      }),
+    );
+  }
+
+  public getYoutubeInfluencersDecks(): Observable<any[]> {
     let influencerChannels: YoutubeChannelInfo[] = [];
 
     const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
@@ -506,76 +552,44 @@ export class HttpDecksService {
       }),
       // retorna dados das playlists de upload de cada canal
       concatMap((ytChannels) => {
-        const channelUploads: Observable<YoutubePlaylist>[] = ytChannels.map(c => {
-          return this.http.get(
-            `https://www.googleapis.com/youtube/v3/playlistItems`,
-            {
-              params: {
-                playlistId: c.contentDetails.relatedPlaylists.uploads,
-                maxResults: 20,
-                part: 'snippet,contentDetails',
-                key: this.YOUTUBE_API_KEY,
-              }
-            }
-          ).pipe(map(r => r.data))
+        const channelUploads: Observable<PlaylistDeckItem[]>[] = ytChannels.map(c => {
+          return this.getYoutubePlaylistDecks(c.contentDetails.relatedPlaylists.uploads);
         });
-
         return forkJoin(channelUploads);
       }),
       // formata o objeto de resposta final
-      map((playlistInfos: YoutubePlaylist[]) => {
+      map((playlistsInfos: PlaylistDeckItem[][]) => {
         return influencerChannels.map((c, index) => {
           const sourceEntry = {
             title: `${c.snippet.title}`,
             thumbnail: `${c.snippet.thumbnails.high.url}`,
             origin: 'youtube',
           }
-          const deckCodes = playlistInfos[index].items.map(i => getDeckcodeFromDescription(i.snippet.description));
-          const uploads: YoutubePlaylistSnippet[] = playlistInfos[index].items.map(i => i.snippet);
-          deckCodes.forEach((code, index) => {
-            if (!code) {
-              uploads[index] = null; // faz o upload ser invalido se não tiver um código de deck
-            } else {
-              uploads[index].description = code;
-            }
-          })
           return {
             source: sourceEntry,
-            uploads: uploads.filter(i => !!i),
+            uploads: playlistsInfos[index],
           }
         })
       }),
       // formata para retornar o objeto final
-      concatMap((auxEntry: {source: SocialMediaSource, uploads: YoutubePlaylistSnippet[]}[]) => {
-        // return of(auxEntry)
-        const result$ = auxEntry.map((entry) => {
-          const lorDecks: Observable<LoRDeck[]> = getLoRDecks(entry.uploads.map(u => u.description))
-          const userDecks: Observable<UserDeck[]> = lorDecks.pipe(
-            map((lorDecks) => {
-              return lorDecks.map((d, dIndex) => {
-                return {
-                  title: entry.uploads[dIndex].title,
-                  username: entry.source.title,
-                  deck: d,
-                  createdAt: new Date(entry.uploads[dIndex].publishedAt).getTime(),
-                  changedAt: new Date(entry.uploads[dIndex].publishedAt).getTime(),
-                  thumbnail: entry.uploads[dIndex].thumbnails.maxres.url
-                } as UserDeck;
-              }) as UserDeck[];
-            }),
-          );
-          const socialMediaDecks: Observable<SocialMediaDecks> = userDecks.pipe(
-            map((userDecks: UserDeck[]) => {
+      map((auxEntry: {source: SocialMediaSource, uploads: PlaylistDeckItem[]}[]) => {
+        return auxEntry.map((entry, entryIndex) => {
+          const userDecks: UserDeck[] = entry.uploads.map((entryUpload: PlaylistDeckItem) => {
               return {
-                source: entry.source,
-                decks: userDecks
-              } as SocialMediaDecks
-            })
-          )
-          return socialMediaDecks;
+                title: entryUpload.title,
+                username: entry.source.title,
+                deck: entryUpload.deck,
+                createdAt: new Date(entryUpload.publishedAt).getTime(),
+                changedAt: new Date(entryUpload.publishedAt).getTime(),
+                thumbnail: entryUpload.thumbnails.maxres.url
+              } as UserDeck;
+          });
+          return {
+            source: entry.source,
+            decks: userDecks
+          } as SocialMediaDecks
         })
-        return forkJoin(result$);
-      })
+      }),
     )
   }
 }

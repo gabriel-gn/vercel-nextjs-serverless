@@ -240,6 +240,7 @@ export class DecksController {
 
   @Get('social-media-creators')
   async getSocialMediaCreators() {
+    // return this.decksService.getYoutubePlaylistDecks('UUrMr5Wc0Cn5AGINmUEquzdA');
     return this.decksService.getSocialMediaCreators();
   }
 
