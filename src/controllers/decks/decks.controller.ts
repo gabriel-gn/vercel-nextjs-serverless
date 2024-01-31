@@ -245,15 +245,15 @@ export class DecksController {
   }
 
   @ApiImplicitQuery({
-    name: 'playlistid',
+    name: 'playlistId',
     required: false,
     type: String,
   })
   @Get('social-media')
-  async getSocialMediaDecks(@Query('playlistid') playlistid: string) {
-    playlistid = playlistid ? `${playlistid}` : undefined;
-    if (playlistid) {
-      return this.decksService.getYoutubePlaylistDecks(playlistid);
+  async getSocialMediaDecks(@Query('playlistId') playlistId: string) {
+    playlistId = playlistId ? `${playlistId}` : undefined;
+    if (playlistId) {
+      return this.decksService.getYoutubePlaylistDecks(playlistId);
     } else {
       return this.decksService.getSocialMediaDecks();
     }
