@@ -244,8 +244,18 @@ export class DecksController {
     return this.decksService.getSocialMediaCreators();
   }
 
+  @ApiImplicitQuery({
+    name: 'playlistid',
+    required: false,
+    type: String,
+  })
   @Get('social-media')
-  async getSocialMediaDecks() {
-    return this.decksService.getSocialMediaDecks();
+  async getSocialMediaDecks(@Query('playlistid') playlistid: string) {
+    playlistid = playlistid ? `${playlistid}` : undefined;
+    if (playlistid) {
+      return this.decksService.getYoutubePlaylistDecks(playlistid);
+    } else {
+      return this.decksService.getSocialMediaDecks();
+    }
   }
 }

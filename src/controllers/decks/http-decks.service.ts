@@ -490,7 +490,7 @@ export class HttpDecksService {
     );
   }
 
-  public getYoutubePlaylistDecks(playlistId: string): Observable<PlaylistDeckItem[]> {
+  public getYoutubePlaylistDecks(playlistId: string): Observable<UserDeck[]> {
     const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
       let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
       return descItems.find(i => isValidDeckCode(i));
@@ -533,16 +533,22 @@ export class HttpDecksService {
           })
         ) as Observable<PlaylistDeckItem[]>
       }),
+      map((playlistItems: PlaylistDeckItem[]) => {
+        return playlistItems.map((item: PlaylistDeckItem) => {
+          return {
+            title: item.title,
+            deck: item.deck,
+            createdAt: new Date(item.publishedAt).getTime(),
+            changedAt: new Date(item.publishedAt).getTime(),
+            thumbnail: item.thumbnails.maxres.url
+          } as UserDeck;
+        })
+      })
     );
   }
 
   public getYoutubeInfluencersDecks(): Observable<any[]> {
     let influencerChannels: YoutubeChannelInfo[] = [];
-
-    const getDeckcodeFromDescription: (desc: string) => string = (desc: string) => {
-      let descItems: string[] = desc.split(/[^a-zA-Z0-9']/);
-      return descItems.find(i => isValidDeckCode(i));
-    }
 
     return of('').pipe(
       concatMap(() => this.getYoutubeCreators()),
@@ -552,13 +558,13 @@ export class HttpDecksService {
       }),
       // retorna dados das playlists de upload de cada canal
       concatMap((ytChannels) => {
-        const channelUploads: Observable<PlaylistDeckItem[]>[] = ytChannels.map(c => {
+        const channelUploads: Observable<UserDeck[]>[] = ytChannels.map(c => {
           return this.getYoutubePlaylistDecks(c.contentDetails.relatedPlaylists.uploads);
         });
         return forkJoin(channelUploads);
       }),
       // formata o objeto de resposta final
-      map((playlistsInfos: PlaylistDeckItem[][]) => {
+      map((playlistsInfos: UserDeck[][]) => {
         return influencerChannels.map((c, index) => {
           const sourceEntry = {
             title: `${c.snippet.title}`,
@@ -572,16 +578,12 @@ export class HttpDecksService {
         })
       }),
       // formata para retornar o objeto final
-      map((auxEntry: {source: SocialMediaSource, uploads: PlaylistDeckItem[]}[]) => {
+      map((auxEntry: {source: SocialMediaSource, uploads: UserDeck[]}[]) => {
         return auxEntry.map((entry, entryIndex) => {
-          const userDecks: UserDeck[] = entry.uploads.map((entryUpload: PlaylistDeckItem) => {
+          const userDecks: UserDeck[] = entry.uploads.map((entryUpload: UserDeck) => {
               return {
-                title: entryUpload.title,
+                ...entryUpload,
                 username: entry.source.title,
-                deck: entryUpload.deck,
-                createdAt: new Date(entryUpload.publishedAt).getTime(),
-                changedAt: new Date(entryUpload.publishedAt).getTime(),
-                thumbnail: entryUpload.thumbnails.maxres.url
               } as UserDeck;
           });
           return {
