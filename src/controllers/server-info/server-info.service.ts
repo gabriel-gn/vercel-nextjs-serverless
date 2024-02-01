@@ -22,6 +22,16 @@ export class ServerInfoService {
       cardTilesSource: 'diamond',
       cardImageSource: 'indigo',
       cardFullArtSource: 'sapphire',
+      featureFlags: {
+        'decksLibrary': true,
+        'decksMeta': true,
+        'decksTrending': true,
+        'decksFavorites': true,
+        'decksLowPlayrateHighWinrate': true,
+        'decksSocialMedia': true,
+        'cardLibrary': true,
+        'newsRiotOfficial': true
+      }
     });
   }
 }
