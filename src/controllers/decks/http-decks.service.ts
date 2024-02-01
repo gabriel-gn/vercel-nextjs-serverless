@@ -42,6 +42,7 @@ import {PlaylistDeckItem, YoutubePlaylist, YoutubePlaylistSnippet} from "./ytPla
 
 @Injectable()
 export class HttpDecksService {
+  // https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas?hl=pt-br&project=lordecks
   private readonly YOUTUBE_API_KEY: string = `${process.env.YOUTUBE_API_KEY}`;
 
   constructor(private http: HttpService) {}
@@ -470,6 +471,10 @@ export class HttpDecksService {
       GrappLr: 'UCq5ZYJax8VC580PAIU5xuvg',
       MegaMogwai: 'UCvUZXLShMx-FZvoadtb8xBQ',
       MajiinBae: 'UCPWvMRZq__Q-LaCNui9budg',
+      TheLegendXXVII: 'UC9Zv4qekqeWZVYJl7mnRUzg',
+      LGamesBr: 'UCQ7Ib0ngICjF2nGWlS6XIPA',
+      otaofruneterra: 'UCCM8l6dytm8uqASH0gijbZQ',
+      LuckyCAD: 'UCa4tK4ry575cuJzayeaxmSQ',
     };
 
     return of('').pipe(
