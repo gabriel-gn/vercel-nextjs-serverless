@@ -33,6 +33,7 @@
     "@nestjs/swagger": "^6.2.1",
     "@nicholas.braun/nestjs-redoc": "^2.2.3",
     "@types/lodash": "^4.14.192",
+    "@vercel/analytics": "^1.1.2",
     "axios": "^1.3.4",
     "csv-parse": "^5.3.6",
     "extract-zip": "^2.0.1",

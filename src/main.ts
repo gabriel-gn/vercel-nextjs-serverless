@@ -7,6 +7,7 @@ import {
 import { AppModule } from './app.module';
 import { RedocModule, RedocOptions } from '@nicholas.braun/nestjs-redoc';
 import { LanguageInterceptor } from './shared/interceptors/language.interceptor';
+import { inject as injectVercelAnalytics } from '@vercel/analytics';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -75,6 +76,7 @@ async function bootstrap() {
     await RedocModule.setup('/docs', app, document, redocOptions);
     // SwaggerModule.setup('docs', app, document);
   }
+  injectVercelAnalytics();
 
   await app.listen(3000);
 }
