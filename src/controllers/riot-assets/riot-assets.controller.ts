@@ -22,7 +22,7 @@ export class RiotAssetsController {
     return this.riotAssetsService.getLoRCards();
   }
 
-  @Get('tpoc')
+  @Get('tpoc-items')
   async getLoRTPoCAssets() {
     return this.riotAssetsService.getLoRTPoCAssets();
   }
