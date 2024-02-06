@@ -21,4 +21,9 @@ export class RiotAssetsController {
   async getCards() {
     return this.riotAssetsService.getLoRCards();
   }
+
+  @Get('tpoc-items')
+  async getLoRTPoCAssets() {
+    return this.riotAssetsService.getLoRTPoCAssets();
+  }
 }

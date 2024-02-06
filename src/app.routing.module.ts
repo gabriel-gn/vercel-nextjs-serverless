@@ -7,6 +7,7 @@ import { RiotAssetsModule } from './controllers/riot-assets/riot-assets.module';
 import { ServerInfoModule } from './controllers/server-info/server-info.module';
 import { MatchupsModule } from './controllers/matchups/matchups.module';
 import { NewsModule } from './controllers/news/news.module';
+import { TpocModule } from "./controllers/tpoc/tpoc.module";
 
 @Module({})
 export class AppRoutingModule {
@@ -22,6 +23,7 @@ export class AppRoutingModule {
         MatchupsModule,
         NewsModule,
         RiotAssetsModule,
+        TpocModule,
         RouterModule.register([
           {
             path: '/about',
@@ -50,6 +52,10 @@ export class AppRoutingModule {
           {
             path: '/news',
             module: NewsModule,
+          },
+          {
+            path: '/tpoc',
+            module: TpocModule,
           },
         ]),
       ],

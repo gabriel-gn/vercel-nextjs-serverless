@@ -24,7 +24,7 @@
     "copy:assets": "cp -rv src/assets dist/"
   },
   "dependencies": {
-    "@gabrielgn-test/runeterra-tools": "^0.2.9",
+    "@gabrielgn-test/runeterra-tools": "^0.2.10",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.3.12",
     "@nestjs/config": "^2.3.1",
@@ -33,6 +33,7 @@
     "@nestjs/swagger": "^6.2.1",
     "@nicholas.braun/nestjs-redoc": "^2.2.3",
     "@types/lodash": "^4.14.192",
+    "@types/string-similarity": "^4.0.2",
     "axios": "^1.3.4",
     "csv-parse": "^5.3.6",
     "extract-zip": "^2.0.1",
@@ -46,6 +47,7 @@
     "rimraf": "^4.4.1",
     "rxjs": "^7.8.0",
     "simple-git": "^3.17.0",
+    "string-similarity": "^4.0.4",
     "swagger-ui-express": "^4.6.2",
     "zip-local": "^0.3.5"
   },
