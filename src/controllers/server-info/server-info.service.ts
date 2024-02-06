@@ -32,7 +32,7 @@ export class ServerInfoService {
         'cardLibrary': true,
         'newsRiotOfficial': true,
         'tpocModifiers': true,
-        'tpocChampionBuilds': false,
+        'tpocChampionBuilds': true,
       }
     });
   }
