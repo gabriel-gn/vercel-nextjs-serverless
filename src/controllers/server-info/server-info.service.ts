@@ -30,9 +30,11 @@ export class ServerInfoService {
         'decksLowPlayrateHighWinrate': true,
         'decksSocialMedia': true,
         'cardLibrary': true,
+        'playerProfile': false,
         'newsRiotOfficial': true,
         'tpocModifiers': true,
         'tpocChampionBuilds': true,
+        'cardCreator': false,
       }
     });
   }
