@@ -53,7 +53,7 @@ export class TpocService {
           const lorChampionNames = Object.keys(CHAMPION_CARD_CODE).map(k => k)
           const supportingChampionNames = row.c[7].v.split('\n');
           return {
-            championId: findChampionCodeByString(row.c[0].v, lorChampionNames),
+            champion: findChampionCodeByString(row.c[0].v, lorChampionNames),
             bestSupportingChampions: supportingChampionNames.map(c => findChampionCodeByString(c, lorChampionNames)),
             bestPowers: powerIds,
             bestRelics: relicIds,
