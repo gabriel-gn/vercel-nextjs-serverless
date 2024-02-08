@@ -20,8 +20,13 @@ export class TpocService {
   public getOptimalTpocChampionBuilds(): Observable<any> {
     let tpocSheet: any;
     const findRelicCodeByString = (str: string, relics: RiotLoRTPoCRelic[]) => {
-      const bestMatchName: string = findBestMatch(str.toLowerCase(), relics.map(r => r.name.toLowerCase())).bestMatch.target;
-      return relics.find((r: RiotLoRTPoCRelic) => r.name.toLowerCase() === bestMatchName.toLowerCase()).relicCode;
+      const relicByExactName = relics.find(r => r?.name?.toLowerCase() === str.toLowerCase());
+      if (relicByExactName) {
+        return relicByExactName.relicCode;
+      } else {
+        const bestMatchName: string = findBestMatch(str.toLowerCase(), relics.map(r => r.name.toLowerCase())).bestMatch.target;
+        return relics.find((r: RiotLoRTPoCRelic) => r.name.toLowerCase() === bestMatchName.toLowerCase()).relicCode;
+      }
     }
 
     const findPowerCodeByString = (str: string, powers: RiotLoRTPoCPower[]) => {
@@ -46,18 +51,38 @@ export class TpocService {
         // return sheet;
         let result = sheet.table.rows.map(row => {
           const riotTpocUpgrades = JSON.parse(fs.readFileSync('src/assets/tpoc/en_us/en_us.json', 'utf-8'))
-          const relicNames = row.c[9].v.split('Combo:')[0].split('\n');
+          let relicNames = row.c[9].v
+            .split('Combo:')[0].split('\n')
+            .map(r => r.split(' (')[0])
+            .filter(r => !!r)
+          ;
           const relicIds = relicNames.map(n => findRelicCodeByString(n, riotTpocUpgrades.relics));
+          let comboPowers = row.c[9].v.split('Combo:');
+          if (comboPowers.length > 1) {
+            comboPowers = comboPowers[1].toLowerCase()
+              .split(' or')
+              .filter(i => !!i)
+              .map(i => i.split('\n').filter(j => !!j)) //acha nome dos combos
+            console.log(comboPowers)
+            comboPowers = comboPowers[0] // pode ter mais de um combo, então só vou pegar o primeiro
+              .map(p => p.split(' (')[0]) // acha o Id dos combos
+              .map(p => findPowerCodeByString(p, riotTpocUpgrades.powers))
+          } else {
+            comboPowers = [];
+          }
           const powerNames = row.c[8].v.split('\n');
           const powerIds = powerNames.map(n => findPowerCodeByString(n, riotTpocUpgrades.powers));
           const lorChampionNames = Object.keys(CHAMPION_CARD_CODE).map(k => k)
           const supportingChampionNames = row.c[7].v.split('\n');
+          const supportingChampionIds = supportingChampionNames.map(c => findChampionCodeByString(c, lorChampionNames));
+          const championId = findChampionCodeByString(row.c[0].v, lorChampionNames)
           return {
-            champion: findChampionCodeByString(row.c[0].v, lorChampionNames),
-            bestSupportingChampions: supportingChampionNames.map(c => findChampionCodeByString(c, lorChampionNames)),
+            champion: championId,
+            bestSupportingChampions: supportingChampionIds,
             bestPowers: powerIds,
             bestRelics: relicIds,
             summary: row.c[3].v,
+            comboPowers: comboPowers,
           }
         })
         return result;
