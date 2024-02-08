@@ -66,7 +66,7 @@ export class TpocService {
             console.log(comboRelics)
             comboRelics = comboRelics[0] // pode ter mais de um combo, então só vou pegar o primeiro
               .map(p => p.split(' (')[0]) // acha o Id dos combos
-              .map(p => findRelicCodeByString(p, riotTpocUpgrades.powers))
+              .map(p => findRelicCodeByString(p, riotTpocUpgrades.relics))
           } else {
             comboRelics = [];
           }
