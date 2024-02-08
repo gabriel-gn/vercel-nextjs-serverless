@@ -57,18 +57,18 @@ export class TpocService {
             .filter(r => !!r)
           ;
           const relicIds = relicNames.map(n => findRelicCodeByString(n, riotTpocUpgrades.relics));
-          let comboPowers = row.c[9].v.split('Combo:');
-          if (comboPowers.length > 1) {
-            comboPowers = comboPowers[1].toLowerCase()
+          let comboRelics = row.c[9].v.split('Combo:');
+          if (comboRelics.length > 1) {
+            comboRelics = comboRelics[1].toLowerCase()
               .split(' or')
               .filter(i => !!i)
               .map(i => i.split('\n').filter(j => !!j)) //acha nome dos combos
-            console.log(comboPowers)
-            comboPowers = comboPowers[0] // pode ter mais de um combo, então só vou pegar o primeiro
+            console.log(comboRelics)
+            comboRelics = comboRelics[0] // pode ter mais de um combo, então só vou pegar o primeiro
               .map(p => p.split(' (')[0]) // acha o Id dos combos
-              .map(p => findPowerCodeByString(p, riotTpocUpgrades.powers))
+              .map(p => findRelicCodeByString(p, riotTpocUpgrades.powers))
           } else {
-            comboPowers = [];
+            comboRelics = [];
           }
           const powerNames = row.c[8].v.split('\n');
           const powerIds = powerNames.map(n => findPowerCodeByString(n, riotTpocUpgrades.powers));
@@ -82,7 +82,7 @@ export class TpocService {
             bestPowers: powerIds,
             bestRelics: relicIds,
             summary: row.c[3].v,
-            comboPowers: comboPowers,
+            comboRelics: comboRelics,
           }
         })
         return result;
