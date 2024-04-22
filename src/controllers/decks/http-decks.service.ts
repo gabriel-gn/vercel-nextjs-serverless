@@ -217,6 +217,7 @@ export class HttpDecksService {
     const url = 'https://runeterra.ar/api/deck/getdecks';
     const defaultParams = {
       take: numberOfDecksToGet,
+      game: "lor"
       // server: 'everyone',
     };
 
@@ -317,7 +318,7 @@ export class HttpDecksService {
   }
 
   public getTrendingDecksCarbon(): Observable<UserDeck[]> {
-    const url = 'https://runeterra.ar/Meta/get/filter/everyone/en_us';
+    const url = 'https://runeterra.ar/api/meta/get/everyone/en_us';
     const defaultPayload = {
       region: [],
       champ: [],
