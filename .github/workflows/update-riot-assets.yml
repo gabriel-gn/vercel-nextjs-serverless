@@ -2,8 +2,8 @@ name: Update Riot assets
 
 # Use '0 19 * * *' on cron when spoiler season
 on:
-  schedule:
-    - cron: '0 19 * * 3' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
+  # schedule:
+  #   - cron: '0 19 * * 3' # "mm hh dd MM dayWeek(0-6 sunday-monday) (ref: https://crontab.guru/)"
   workflow_dispatch:
     inputs:
       patch:
